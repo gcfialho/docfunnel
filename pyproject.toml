@@ -1,13 +1,13 @@
 [project]
 name = "docfunnel"
 version = "0.1.0"
-description = "Schema-constrained LLM extraction for receipts and invoices, with retries, human-in-the-loop flags and a reproducible evaluation harness."
+description = "CPU-first document pipeline: per-page PDF parsing and OCR routing, then schema-validated LLM extraction, with stage-level evals."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Guilherme Fialho", email = "guilhermec.fialho@gmail.com" }]
 requires-python = ">=3.12"
-keywords = ["llm", "document-extraction", "evals", "pydantic", "structured-output", "invoices", "receipts"]
+keywords = ["llm", "document-ai", "ocr", "pdf", "evals", "pydantic", "structured-output", "invoices"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
