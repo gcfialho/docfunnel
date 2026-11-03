@@ -5,8 +5,8 @@ from collections.abc import Callable
 
 import pytest
 
-from docextract.extractor import Extractor, ModelTarget, RetryPolicy
-from docextract.pricing import PriceTable
+from docfunnel.extractor import Extractor, ModelTarget, RetryPolicy
+from docfunnel.pricing import PriceTable
 
 from helpers import VALID_PAYLOAD, ScriptedProvider
 

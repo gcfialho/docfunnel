@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from docextract.cli import app
+from docfunnel.cli import app
 
 from helpers import DATASET, US_RECEIPT
 
@@ -13,7 +13,7 @@ runner = CliRunner()
 
 @pytest.fixture(autouse=True)
 def offline_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    for name in ("DOCEXTRACT_PROVIDER", "DOCEXTRACT_MODEL", "DOCEXTRACT_FALLBACK"):
+    for name in ("DOCFUNNEL_PROVIDER", "DOCFUNNEL_MODEL", "DOCFUNNEL_FALLBACK"):
         monkeypatch.delenv(name, raising=False)
 
 

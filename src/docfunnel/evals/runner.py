@@ -9,9 +9,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 from pydantic import BaseModel, Field
 
-from docextract import __version__
-from docextract.evals.dataset import LabeledDocument
-from docextract.evals.metrics import (
+from docfunnel import __version__
+from docfunnel.evals.dataset import LabeledDocument
+from docfunnel.evals.metrics import (
     Outcome,
     f1,
     match_line_items,
@@ -19,9 +19,9 @@ from docextract.evals.metrics import (
     safe_div,
     score_header_fields,
 )
-from docextract.extractor import Extractor
-from docextract.prompts import PROMPT_VERSION
-from docextract.schema import HEADER_FIELDS, ExtractionResult
+from docfunnel.extractor import Extractor
+from docfunnel.prompts import PROMPT_VERSION
+from docfunnel.schema import HEADER_FIELDS, ExtractionResult
 
 
 class DocumentScore(BaseModel):

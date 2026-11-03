@@ -15,7 +15,7 @@ import threading
 from dataclasses import asdict
 from pathlib import Path
 
-from docextract.providers.base import (
+from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,
     LLMProvider,

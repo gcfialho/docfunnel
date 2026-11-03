@@ -492,6 +492,78 @@ wheels = [
 ]
 
 [[package]]
+name = "docfunnel"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "fastapi" },
+    { name = "pydantic" },
+    { name = "typer" },
+    { name = "uvicorn" },
+]
+
+[package.optional-dependencies]
+anthropic = [
+    { name = "anthropic" },
+]
+gemini = [
+    { name = "google-genai" },
+]
+mcp = [
+    { name = "mcp" },
+]
+ocr = [
+    { name = "pillow" },
+    { name = "pytesseract" },
+]
+openai = [
+    { name = "openai" },
+]
+pdf = [
+    { name = "pypdf" },
+]
+providers = [
+    { name = "anthropic" },
+    { name = "google-genai" },
+    { name = "openai" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "httpx" },
+    { name = "pytest" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "anthropic", marker = "extra == 'anthropic'", specifier = ">=0.40" },
+    { name = "anthropic", marker = "extra == 'providers'", specifier = ">=0.40" },
+    { name = "fastapi", specifier = ">=0.110" },
+    { name = "google-genai", marker = "extra == 'gemini'", specifier = ">=1.0" },
+    { name = "google-genai", marker = "extra == 'providers'", specifier = ">=1.0" },
+    { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.2" },
+    { name = "openai", marker = "extra == 'openai'", specifier = ">=1.40" },
+    { name = "openai", marker = "extra == 'providers'", specifier = ">=1.40" },
+    { name = "pillow", marker = "extra == 'ocr'", specifier = ">=10.0" },
+    { name = "pydantic", specifier = ">=2.7" },
+    { name = "pypdf", marker = "extra == 'pdf'", specifier = ">=4.0" },
+    { name = "pytesseract", marker = "extra == 'ocr'", specifier = ">=0.3.10" },
+    { name = "typer", specifier = ">=0.12" },
+    { name = "uvicorn", specifier = ">=0.29" },
+]
+provides-extras = ["openai", "anthropic", "gemini", "providers", "mcp", "pdf", "ocr"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "httpx", specifier = ">=0.27" },
+    { name = "pytest", specifier = ">=8.0" },
+    { name = "pytest-cov", specifier = ">=5.0" },
+    { name = "ruff", specifier = ">=0.6" },
+]
+
+[[package]]
 name = "docstring-parser"
 version = "0.18.0"
 source = { registry = "https://pypi.org/simple" }
@@ -770,78 +842,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/19/74/a633ee74eb36c44aa6d1095e7cc5569bebf04342ee146178e2d36600708b/jsonschema_specifications-2025.9.1.tar.gz", hash = "sha256:b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d", size = 32855, upload-time = "2025-09-08T01:34:59.186Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/41/45/1a4ed80516f02155c51f51e8cedb3c1902296743db0bbc66608a0db2814f/jsonschema_specifications-2025.9.1-py3-none-any.whl", hash = "sha256:98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe", size = 18437, upload-time = "2025-09-08T01:34:57.871Z" },
-]
-
-[[package]]
-name = "llm-document-extraction-evals"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "fastapi" },
-    { name = "pydantic" },
-    { name = "typer" },
-    { name = "uvicorn" },
-]
-
-[package.optional-dependencies]
-anthropic = [
-    { name = "anthropic" },
-]
-gemini = [
-    { name = "google-genai" },
-]
-mcp = [
-    { name = "mcp" },
-]
-ocr = [
-    { name = "pillow" },
-    { name = "pytesseract" },
-]
-openai = [
-    { name = "openai" },
-]
-pdf = [
-    { name = "pypdf" },
-]
-providers = [
-    { name = "anthropic" },
-    { name = "google-genai" },
-    { name = "openai" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "httpx" },
-    { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "anthropic", marker = "extra == 'anthropic'", specifier = ">=0.40" },
-    { name = "anthropic", marker = "extra == 'providers'", specifier = ">=0.40" },
-    { name = "fastapi", specifier = ">=0.110" },
-    { name = "google-genai", marker = "extra == 'gemini'", specifier = ">=1.0" },
-    { name = "google-genai", marker = "extra == 'providers'", specifier = ">=1.0" },
-    { name = "mcp", marker = "extra == 'mcp'", specifier = ">=1.2" },
-    { name = "openai", marker = "extra == 'openai'", specifier = ">=1.40" },
-    { name = "openai", marker = "extra == 'providers'", specifier = ">=1.40" },
-    { name = "pillow", marker = "extra == 'ocr'", specifier = ">=10.0" },
-    { name = "pydantic", specifier = ">=2.7" },
-    { name = "pypdf", marker = "extra == 'pdf'", specifier = ">=4.0" },
-    { name = "pytesseract", marker = "extra == 'ocr'", specifier = ">=0.3.10" },
-    { name = "typer", specifier = ">=0.12" },
-    { name = "uvicorn", specifier = ">=0.29" },
-]
-provides-extras = ["openai", "anthropic", "gemini", "providers", "mcp", "pdf", "ocr"]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "httpx", specifier = ">=0.27" },
-    { name = "pytest", specifier = ">=8.0" },
-    { name = "pytest-cov", specifier = ">=5.0" },
-    { name = "ruff", specifier = ">=0.6" },
 ]
 
 [[package]]

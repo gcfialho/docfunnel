@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pytest
 
-from docextract.evals.metrics import (
+from docfunnel.evals.metrics import (
     Outcome,
     compare_field,
     f1,
@@ -10,7 +10,7 @@ from docextract.evals.metrics import (
     percentile,
     score_header_fields,
 )
-from docextract.schema import LineItem, ReceiptData
+from docfunnel.schema import LineItem, ReceiptData
 
 
 @pytest.mark.parametrize(

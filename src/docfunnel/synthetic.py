@@ -29,8 +29,8 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from docextract.normalize import CENT
-from docextract.schema import LineItem, PaymentMethod, ReceiptData
+from docfunnel.normalize import CENT
+from docfunnel.schema import LineItem, PaymentMethod, ReceiptData
 
 D = Decimal
 

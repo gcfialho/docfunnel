@@ -2,7 +2,7 @@
 
 Every backend (OpenAI, Anthropic, Gemini, the offline fake, the replay cassette)
 implements the same tiny contract: messages in, text + token counts out. Retries,
-repair, fallback and accounting live in :mod:`docextract.extractor`, not here.
+repair, fallback and accounting live in :mod:`docfunnel.extractor`, not here.
 """
 
 from __future__ import annotations

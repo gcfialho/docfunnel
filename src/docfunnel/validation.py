@@ -12,8 +12,8 @@ import datetime as dt
 from dataclasses import dataclass
 from decimal import Decimal
 
-from docextract.normalize import ISO_CURRENCIES
-from docextract.schema import (
+from docfunnel.normalize import ISO_CURRENCIES
+from docfunnel.schema import (
     CONFIDENCE_FIELDS,
     ReceiptExtraction,
     Severity,

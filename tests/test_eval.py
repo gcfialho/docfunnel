@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pytest
 
-from docextract.config import Settings, build_extractor
-from docextract.evals.compare import Status, Thresholds, compare_reports, render_comparison
-from docextract.evals.dataset import file_sha256, load_dataset
-from docextract.evals.report import load_report, render_markdown, write_report
-from docextract.evals.runner import EvalReport, run_eval
+from docfunnel.config import Settings, build_extractor
+from docfunnel.evals.compare import Status, Thresholds, compare_reports, render_comparison
+from docfunnel.evals.dataset import file_sha256, load_dataset
+from docfunnel.evals.report import load_report, render_markdown, write_report
+from docfunnel.evals.runner import EvalReport, run_eval
 
 from helpers import DATASET
 

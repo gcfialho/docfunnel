@@ -1,6 +1,6 @@
 """Regression check between two evaluation runs (baseline vs candidate).
 
-Designed for CI: ``docextract compare baseline.json candidate.json`` exits non-zero
+Designed for CI: ``docfunnel compare baseline.json candidate.json`` exits non-zero
 when a quality metric drops (or a cost/latency metric grows) beyond its threshold.
 """
 
@@ -9,8 +9,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
-from docextract.evals.report import fmt_ms, fmt_pct, fmt_usd
-from docextract.evals.runner import EvalReport
+from docfunnel.evals.report import fmt_ms, fmt_pct, fmt_usd
+from docfunnel.evals.runner import EvalReport
 
 
 class Direction(StrEnum):

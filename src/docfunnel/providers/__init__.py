@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from docextract.providers.base import (
+from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,
     LLMProvider,
@@ -12,7 +12,7 @@ from docextract.providers.base import (
     ProviderError,
     ProviderNotConfiguredError,
 )
-from docextract.providers.fake import FakeProvider
+from docfunnel.providers.fake import FakeProvider
 
 PROVIDER_NAMES = ("fake", "openai", "anthropic", "gemini", "replay")
 
@@ -30,19 +30,19 @@ def get_provider(name: str, *, cassette: Path | None = None) -> LLMProvider:
         case "fake":
             return FakeProvider()
         case "openai":
-            from docextract.providers.openai_provider import OpenAIProvider
+            from docfunnel.providers.openai_provider import OpenAIProvider
 
             return OpenAIProvider()
         case "anthropic":
-            from docextract.providers.anthropic_provider import AnthropicProvider
+            from docfunnel.providers.anthropic_provider import AnthropicProvider
 
             return AnthropicProvider()
         case "gemini":
-            from docextract.providers.gemini_provider import GeminiProvider
+            from docfunnel.providers.gemini_provider import GeminiProvider
 
             return GeminiProvider()
         case "replay":
-            from docextract.providers.replay import ReplayProvider
+            from docfunnel.providers.replay import ReplayProvider
 
             if cassette is None:
                 raise ProviderNotConfiguredError("the replay provider needs a cassette path")

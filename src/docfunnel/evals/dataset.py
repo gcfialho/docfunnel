@@ -7,7 +7,7 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from docextract.schema import ReceiptData
+from docfunnel.schema import ReceiptData
 
 DEFAULT_DATASET = Path("data/synthetic/receipts.jsonl")
 

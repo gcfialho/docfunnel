@@ -22,7 +22,7 @@ from difflib import SequenceMatcher
 from enum import StrEnum
 from typing import Any
 
-from docextract.normalize import (
+from docfunnel.normalize import (
     amounts_close,
     normalize_currency,
     normalize_identifier,
@@ -30,7 +30,7 @@ from docextract.normalize import (
     parse_amount,
     parse_date,
 )
-from docextract.schema import HEADER_FIELDS, LineItem, ReceiptData
+from docfunnel.schema import HEADER_FIELDS, LineItem, ReceiptData
 
 
 class Outcome(StrEnum):

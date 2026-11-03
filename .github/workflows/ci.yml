@@ -28,7 +28,7 @@ jobs:
       - name: Ruff format
         run: uv run ruff format --check .
       - name: Tests (offline - fake provider, no API keys)
-        run: uv run pytest --cov=docextract --cov-report=term-missing
+        run: uv run pytest --cov=docfunnel --cov-report=term-missing
 
   eval-regression:
     name: Eval regression gate
@@ -42,12 +42,12 @@ jobs:
       - run: uv sync --locked
       - name: Run eval on the synthetic dataset (fake provider)
         run: >
-          uv run docextract eval
+          uv run docfunnel eval
           --provider fake --model fake-mini --fallback fake:fake-pro
           --out reports/ci --run-name "ci-${{ github.sha }}"
       - name: Compare against committed baseline
         run: >
-          uv run docextract compare
+          uv run docfunnel compare
           reports/baseline/fake-mini+fallback/report.json reports/ci/report.json
           --out reports/ci/comparison.md
       - name: Publish summary
@@ -67,6 +67,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build image
-        run: docker build -t docextract:ci .
+        run: docker build -t docfunnel:ci .
       - name: Smoke test CLI inside the image
-        run: docker run --rm docextract:ci docextract extract examples/receipt_us.txt --no-include-calls
+        run: docker run --rm docfunnel:ci docfunnel extract examples/receipt_us.txt --no-include-calls

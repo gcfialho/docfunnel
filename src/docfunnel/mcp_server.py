@@ -2,7 +2,7 @@
 
 Run it over stdio for MCP clients (Claude Desktop, IDEs, agents)::
 
-    uv run --extra mcp docextract mcp
+    uv run --extra mcp docfunnel mcp
 
 The tool logic is a plain function (:func:`extract_document`) so it can be tested
 without the SDK installed.
@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from docextract.service import get_extractor
+from docfunnel.service import get_extractor
 
 TOOL_DESCRIPTION = (
     "Extract structured data (vendor, date, currency, subtotal, tax, total, payment method, "
@@ -37,7 +37,7 @@ def build_server() -> Any:
             raise RuntimeError(
                 "the MCP server requires the 'mcp' extra: uv sync --extra mcp"
             ) from exc
-    server = Server("docextract")
+    server = Server("docfunnel")
     server.tool(name="extract_document", description=TOOL_DESCRIPTION)(extract_document)
     return server
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from docextract.providers.base import (
+from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,
     ProviderError,

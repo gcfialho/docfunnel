@@ -3,14 +3,14 @@ from pathlib import Path
 
 import pytest
 
-from docextract.config import Settings, build_extractor, parse_target
-from docextract.pricing import PriceTable
-from docextract.prompts import OutputParseError, parse_json_object, system_prompt, user_prompt
-from docextract.providers import ProviderNotConfiguredError, get_provider
-from docextract.providers.base import CompletionRequest, Message, ProviderError
-from docextract.providers.fake import FakeProvider, FaultProfile, heuristic_extract
-from docextract.providers.replay import RecordingProvider, ReplayProvider, request_key
-from docextract.schema import ReceiptExtraction
+from docfunnel.config import Settings, build_extractor, parse_target
+from docfunnel.pricing import PriceTable
+from docfunnel.prompts import OutputParseError, parse_json_object, system_prompt, user_prompt
+from docfunnel.providers import ProviderNotConfiguredError, get_provider
+from docfunnel.providers.base import CompletionRequest, Message, ProviderError
+from docfunnel.providers.fake import FakeProvider, FaultProfile, heuristic_extract
+from docfunnel.providers.replay import RecordingProvider, ReplayProvider, request_key
+from docfunnel.schema import ReceiptExtraction
 
 from helpers import US_RECEIPT
 
@@ -143,10 +143,10 @@ def test_real_providers_need_credentials(monkeypatch, name: str, env: str) -> No
 def test_settings_from_env_and_build_extractor() -> None:
     settings = Settings.from_env(
         {
-            "DOCEXTRACT_PROVIDER": "fake",
-            "DOCEXTRACT_FALLBACK": "fake:fake-pro",
-            "DOCEXTRACT_MAX_ATTEMPTS": "2",
-            "DOCEXTRACT_REVIEW_MIN_CONFIDENCE": "0.8",
+            "DOCFUNNEL_PROVIDER": "fake",
+            "DOCFUNNEL_FALLBACK": "fake:fake-pro",
+            "DOCFUNNEL_MAX_ATTEMPTS": "2",
+            "DOCFUNNEL_REVIEW_MIN_CONFIDENCE": "0.8",
         }
     )
     assert settings.primary == ("fake", "fake-mini")

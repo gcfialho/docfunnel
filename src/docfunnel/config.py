@@ -1,15 +1,15 @@
 """Runtime configuration from environment variables.
 
 =====================================  ================================================
-``DOCEXTRACT_PROVIDER``                 fake | openai | anthropic | gemini | replay
-``DOCEXTRACT_MODEL``                    model name (defaults per provider)
-``DOCEXTRACT_FALLBACK``                 comma-separated ``provider:model`` chain
-``DOCEXTRACT_MAX_ATTEMPTS``             attempts per model (default 3)
-``DOCEXTRACT_BACKOFF_BASE_S``           base backoff in seconds (default 0.5)
-``DOCEXTRACT_REVIEW_MIN_CONFIDENCE``    review threshold for field confidence (0.7)
-``DOCEXTRACT_PRICING_FILE``             JSON price table overriding the bundled one
-``DOCEXTRACT_CASSETTE``                 cassette path for the replay provider
-``DOCEXTRACT_INPUT_DIR``                directory the API may read files from (off if unset)
+``DOCFUNNEL_PROVIDER``                 fake | openai | anthropic | gemini | replay
+``DOCFUNNEL_MODEL``                    model name (defaults per provider)
+``DOCFUNNEL_FALLBACK``                 comma-separated ``provider:model`` chain
+``DOCFUNNEL_MAX_ATTEMPTS``             attempts per model (default 3)
+``DOCFUNNEL_BACKOFF_BASE_S``           base backoff in seconds (default 0.5)
+``DOCFUNNEL_REVIEW_MIN_CONFIDENCE``    review threshold for field confidence (0.7)
+``DOCFUNNEL_PRICING_FILE``             JSON price table overriding the bundled one
+``DOCFUNNEL_CASSETTE``                 cassette path for the replay provider
+``DOCFUNNEL_INPUT_DIR``                directory the API may read files from (off if unset)
 =====================================  ================================================
 """
 
@@ -20,10 +20,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
-from docextract.extractor import Extractor, ModelTarget, RetryPolicy
-from docextract.pricing import PriceTable
-from docextract.providers import DEFAULT_MODELS, get_provider
-from docextract.validation import ReviewPolicy
+from docfunnel.extractor import Extractor, ModelTarget, RetryPolicy
+from docfunnel.pricing import PriceTable
+from docfunnel.providers import DEFAULT_MODELS, get_provider
+from docfunnel.validation import ReviewPolicy
 
 
 def parse_target(spec: str) -> tuple[str, str]:
@@ -54,17 +54,17 @@ class Settings:
             value = env.get(name)
             return Path(value) if value else None
 
-        fallback_spec = env.get("DOCEXTRACT_FALLBACK", "")
+        fallback_spec = env.get("DOCFUNNEL_FALLBACK", "")
         return cls(
-            provider=env.get("DOCEXTRACT_PROVIDER", "fake"),
-            model=env.get("DOCEXTRACT_MODEL") or None,
+            provider=env.get("DOCFUNNEL_PROVIDER", "fake"),
+            model=env.get("DOCFUNNEL_MODEL") or None,
             fallbacks=tuple(parse_target(s) for s in fallback_spec.split(",") if s.strip()),
-            max_attempts=int(env.get("DOCEXTRACT_MAX_ATTEMPTS", "3")),
-            backoff_base_s=float(env.get("DOCEXTRACT_BACKOFF_BASE_S", "0.5")),
-            review_min_confidence=float(env.get("DOCEXTRACT_REVIEW_MIN_CONFIDENCE", "0.7")),
-            pricing_file=path("DOCEXTRACT_PRICING_FILE"),
-            cassette=path("DOCEXTRACT_CASSETTE"),
-            input_dir=path("DOCEXTRACT_INPUT_DIR"),
+            max_attempts=int(env.get("DOCFUNNEL_MAX_ATTEMPTS", "3")),
+            backoff_base_s=float(env.get("DOCFUNNEL_BACKOFF_BASE_S", "0.5")),
+            review_min_confidence=float(env.get("DOCFUNNEL_REVIEW_MIN_CONFIDENCE", "0.7")),
+            pricing_file=path("DOCFUNNEL_PRICING_FILE"),
+            cassette=path("DOCFUNNEL_CASSETTE"),
+            input_dir=path("DOCFUNNEL_INPUT_DIR"),
         )
 
     def with_overrides(self, **overrides: object) -> Settings:

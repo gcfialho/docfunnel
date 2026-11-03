@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from docextract.prompts import (
+from docfunnel.prompts import (
     DOCUMENT_OPEN,
     REPAIR_MARKER,
     OutputParseError,

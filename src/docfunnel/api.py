@@ -1,7 +1,7 @@
 """HTTP API (FastAPI).
 
 ``POST /extract`` accepts either inline ``text`` or a ``path`` to a file inside the
-directory configured by ``DOCEXTRACT_INPUT_DIR`` (disabled when unset, so the API
+directory configured by ``DOCFUNNEL_INPUT_DIR`` (disabled when unset, so the API
 cannot be used to read arbitrary files from the host).
 """
 
@@ -13,12 +13,12 @@ from typing import Annotated, Self
 from fastapi import Depends, FastAPI, HTTPException, status
 from pydantic import BaseModel, Field, model_validator
 
-from docextract import __version__
-from docextract.config import Settings
-from docextract.extractor import MAX_DOCUMENT_CHARS, Extractor
-from docextract.loaders import UnsupportedDocumentError, load_document
-from docextract.schema import ExtractionResult
-from docextract.service import get_extractor, get_settings
+from docfunnel import __version__
+from docfunnel.config import Settings
+from docfunnel.extractor import MAX_DOCUMENT_CHARS, Extractor
+from docfunnel.loaders import UnsupportedDocumentError, load_document
+from docfunnel.schema import ExtractionResult
+from docfunnel.service import get_extractor, get_settings
 
 app = FastAPI(
     title="LLM document extraction",
@@ -34,7 +34,7 @@ class ExtractRequest(BaseModel):
         description="Raw document text (e.g. OCR output).",
     )
     path: str | None = Field(
-        default=None, description="File (txt/pdf/image) relative to DOCEXTRACT_INPUT_DIR."
+        default=None, description="File (txt/pdf/image) relative to DOCFUNNEL_INPUT_DIR."
     )
 
     @model_validator(mode="after")
@@ -55,7 +55,7 @@ def _resolve_input(path: str, settings: Settings) -> Path:
     if settings.input_dir is None:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
-            "file input is disabled; set DOCEXTRACT_INPUT_DIR to enable it",
+            "file input is disabled; set DOCFUNNEL_INPUT_DIR to enable it",
         )
     root = settings.input_dir.resolve()
     candidate = (root / path).resolve()

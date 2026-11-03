@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 from pathlib import Path
 
-from docextract.providers.base import CompletionRequest, CompletionResponse, ProviderError
+from docfunnel.providers.base import CompletionRequest, CompletionResponse, ProviderError
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DATASET = REPO_ROOT / "data" / "synthetic" / "receipts.jsonl"

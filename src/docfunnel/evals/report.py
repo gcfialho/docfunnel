@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from docextract.evals.runner import EvalReport
+from docfunnel.evals.runner import EvalReport
 
 
 def fmt_pct(value: float | None) -> str:

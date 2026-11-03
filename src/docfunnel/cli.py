@@ -10,15 +10,15 @@ from typing import Annotated
 
 import typer
 
-from docextract.config import Settings, build_extractor, parse_target
-from docextract.evals.compare import Thresholds, compare_reports, render_comparison
-from docextract.evals.dataset import DEFAULT_DATASET, file_sha256, load_dataset
-from docextract.evals.report import load_report, summary_rows, write_report
-from docextract.evals.runner import run_eval
-from docextract.extractor import ModelTarget
-from docextract.loaders import UnsupportedDocumentError, load_document
-from docextract.providers.base import ProviderNotConfiguredError
-from docextract.providers.replay import RecordingProvider
+from docfunnel.config import Settings, build_extractor, parse_target
+from docfunnel.evals.compare import Thresholds, compare_reports, render_comparison
+from docfunnel.evals.dataset import DEFAULT_DATASET, file_sha256, load_dataset
+from docfunnel.evals.report import load_report, summary_rows, write_report
+from docfunnel.evals.runner import run_eval
+from docfunnel.extractor import ModelTarget
+from docfunnel.loaders import UnsupportedDocumentError, load_document
+from docfunnel.providers.base import ProviderNotConfiguredError
+from docfunnel.providers.replay import RecordingProvider
 
 app = typer.Typer(
     help="LLM structured extraction for receipts/invoices, with an evaluation harness.",
@@ -31,24 +31,24 @@ ProviderOpt = Annotated[
     typer.Option(
         "--provider",
         "-p",
-        help="fake | openai | anthropic | gemini | replay [env: DOCEXTRACT_PROVIDER]",
+        help="fake | openai | anthropic | gemini | replay [env: DOCFUNNEL_PROVIDER]",
     ),
 ]
 ModelOpt = Annotated[
-    str | None, typer.Option("--model", "-m", help="Model name [env: DOCEXTRACT_MODEL]")
+    str | None, typer.Option("--model", "-m", help="Model name [env: DOCFUNNEL_MODEL]")
 ]
 FallbackOpt = Annotated[
     list[str] | None,
     typer.Option(
         "--fallback",
         "-f",
-        help="Fallback target 'provider:model' (repeatable) [env: DOCEXTRACT_FALLBACK]",
+        help="Fallback target 'provider:model' (repeatable) [env: DOCFUNNEL_FALLBACK]",
     ),
 ]
 CassetteOpt = Annotated[
     Path | None,
     typer.Option(
-        "--cassette", help="Cassette file for the replay provider [env: DOCEXTRACT_CASSETTE]"
+        "--cassette", help="Cassette file for the replay provider [env: DOCFUNNEL_CASSETTE]"
     ),
 ]
 
@@ -211,7 +211,7 @@ def generate_dataset(
     seed: Annotated[int, typer.Option(help="Random seed")] = 7,
 ) -> None:
     """(Re)generate the synthetic labelled dataset deterministically."""
-    from docextract.synthetic import write_dataset
+    from docfunnel.synthetic import write_dataset
 
     count = write_dataset(out, n=n, seed=seed)
     typer.echo(f"Wrote {count} documents to {out}")
@@ -225,13 +225,13 @@ def serve(
     """Run the FastAPI server."""
     import uvicorn
 
-    uvicorn.run("docextract.api:app", host=host, port=port)
+    uvicorn.run("docfunnel.api:app", host=host, port=port)
 
 
 @app.command("mcp")
 def mcp_command() -> None:
     """Run the MCP server over stdio (requires the 'mcp' extra)."""
-    from docextract.mcp_server import build_server
+    from docfunnel.mcp_server import build_server
 
     try:
         server = build_server()

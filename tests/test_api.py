@@ -4,9 +4,9 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from docextract.api import app
-from docextract.config import Settings, build_extractor
-from docextract.service import get_extractor, get_settings
+from docfunnel.api import app
+from docfunnel.config import Settings, build_extractor
+from docfunnel.service import get_extractor, get_settings
 
 from helpers import US_RECEIPT
 

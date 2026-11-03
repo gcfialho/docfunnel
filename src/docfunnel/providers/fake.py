@@ -25,9 +25,9 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
-from docextract.normalize import parse_amount, parse_date
-from docextract.prompts import DOCUMENT_CLOSE, DOCUMENT_OPEN, REPAIR_MARKER
-from docextract.providers.base import (
+from docfunnel.normalize import parse_amount, parse_date
+from docfunnel.prompts import DOCUMENT_CLOSE, DOCUMENT_OPEN, REPAIR_MARKER
+from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,
     ProviderError,

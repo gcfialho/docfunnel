@@ -3,9 +3,9 @@ from decimal import Decimal
 
 import pytest
 
-from docextract.extractor import RetryPolicy
-from docextract.prompts import REPAIR_MARKER
-from docextract.providers.base import ProviderError
+from docfunnel.extractor import RetryPolicy
+from docfunnel.prompts import REPAIR_MARKER
+from docfunnel.providers.base import ProviderError
 
 from helpers import US_RECEIPT, VALID_PAYLOAD, ScriptedProvider
 

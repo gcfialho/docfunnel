@@ -1,5 +1,5 @@
 {
-  "_comment": "USD per 1M tokens. Illustrative list prices for cost tracking; verify against the providers' current pricing pages and override with DOCEXTRACT_PRICING_FILE.",
+  "_comment": "USD per 1M tokens. Illustrative list prices for cost tracking; verify against the providers' current pricing pages and override with DOCFUNNEL_PRICING_FILE.",
   "fake-mini": {"input": 0.0, "output": 0.0},
   "fake-pro": {"input": 0.0, "output": 0.0},
   "gpt-4o-mini": {"input": 0.15, "output": 0.60},

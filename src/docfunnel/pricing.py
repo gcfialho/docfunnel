@@ -38,7 +38,7 @@ class PriceTable:
     @classmethod
     def load(cls, path: Path | None = None) -> PriceTable:
         if path is None:
-            text = resources.files("docextract").joinpath("pricing.json").read_text("utf-8")
+            text = resources.files("docfunnel").joinpath("pricing.json").read_text("utf-8")
         else:
             text = path.read_text(encoding="utf-8")
         return cls.from_mapping(json.loads(text))

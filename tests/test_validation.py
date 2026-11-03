@@ -1,7 +1,7 @@
 from datetime import date
 
-from docextract.schema import ReceiptExtraction
-from docextract.validation import ReviewPolicy, check_business_rules, review_decision
+from docfunnel.schema import ReceiptExtraction
+from docfunnel.validation import ReviewPolicy, check_business_rules, review_decision
 
 TODAY = date(2025, 6, 1)
 

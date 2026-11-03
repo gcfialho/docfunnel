@@ -3,7 +3,7 @@
 Failure handling, from cheapest to most expensive:
 
 1. Harmless formatting deviations (markdown fences, prose around the JSON) are fixed
-   in code by :func:`docextract.prompts.parse_json_object`.
+   in code by :func:`docfunnel.prompts.parse_json_object`.
 2. Invalid JSON or schema violations trigger a *repair* turn: the model sees its own
    answer plus the concrete validation errors and is asked to fix them.
 3. Transient provider errors (429/5xx/timeouts) are retried with exponential backoff
@@ -26,8 +26,8 @@ from dataclasses import dataclass, field
 
 from pydantic import ValidationError
 
-from docextract.pricing import PriceTable
-from docextract.prompts import (
+from docfunnel.pricing import PriceTable
+from docfunnel.prompts import (
     OutputParseError,
     format_validation_errors,
     parse_json_object,
@@ -35,19 +35,19 @@ from docextract.prompts import (
     system_prompt,
     user_prompt,
 )
-from docextract.providers.base import (
+from docfunnel.providers.base import (
     CompletionRequest,
     LLMProvider,
     Message,
     ProviderError,
 )
-from docextract.schema import (
+from docfunnel.schema import (
     CallRecord,
     ExtractionResult,
     ReceiptExtraction,
     UsageSummary,
 )
-from docextract.validation import ReviewPolicy, check_business_rules, review_decision
+from docfunnel.validation import ReviewPolicy, check_business_rules, review_decision
 
 logger = logging.getLogger(__name__)
 

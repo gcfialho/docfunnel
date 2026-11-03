@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from docextract import mcp_server
-from docextract.loaders import UnsupportedDocumentError, load_document, register_loader
+from docfunnel import mcp_server
+from docfunnel.loaders import UnsupportedDocumentError, load_document, register_loader
 
 from helpers import US_RECEIPT
 

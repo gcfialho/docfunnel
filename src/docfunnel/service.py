@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from functools import cache
 
-from docextract.config import Settings, build_extractor
-from docextract.extractor import Extractor
+from docfunnel.config import Settings, build_extractor
+from docfunnel.extractor import Extractor
 
 
 @cache

@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from docextract.providers.base import CompletionRequest, Message, ProviderError
+from docfunnel.providers.base import CompletionRequest, Message, ProviderError
 
 REQUEST = CompletionRequest(
     model="some-model",
@@ -45,7 +45,7 @@ class TestOpenAI:
     @pytest.fixture
     def provider(self):
         pytest.importorskip("openai")
-        from docextract.providers.openai_provider import OpenAIProvider
+        from docfunnel.providers.openai_provider import OpenAIProvider
 
         return OpenAIProvider(api_key="test-key")
 
@@ -99,7 +99,7 @@ class TestAnthropic:
     @pytest.fixture
     def provider(self):
         pytest.importorskip("anthropic")
-        from docextract.providers.anthropic_provider import AnthropicProvider
+        from docfunnel.providers.anthropic_provider import AnthropicProvider
 
         return AnthropicProvider(api_key="test-key")
 
@@ -137,7 +137,7 @@ class TestGemini:
     @pytest.fixture
     def provider(self):
         pytest.importorskip("google.genai")
-        from docextract.providers.gemini_provider import GeminiProvider
+        from docfunnel.providers.gemini_provider import GeminiProvider
 
         return GeminiProvider(api_key="test-key")
 
