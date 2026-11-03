@@ -77,6 +77,7 @@ class ParseEvalMeta(BaseModel):
     pages: int
     scanned_pages: dict[str, int]
     workers: int
+    ocr_threads: int
     dpi: int
     versions: dict[str, str]
     hardware: Hardware
@@ -403,6 +404,7 @@ class ParseEvalConfig:
     dataset: Path
     engines: list[str] = field(default_factory=lambda: ["auto"])
     workers: int | None = None
+    ocr_threads: int = 1  # ONNX Runtime threads per worker
     dpi: int = 200
     run_name: str | None = None
     bench_repeats: int = 3
@@ -427,7 +429,7 @@ def run_parse_eval(config: ParseEvalConfig) -> ParseEvalReport:
     routing: RoutingMetrics | None = None
     misrouted: list[PageRecord] = []
     for name in engine_names:
-        options = ParseOptions(ocr_engine=name, dpi=config.dpi)
+        options = ParseOptions(ocr_engine=name, dpi=config.dpi, ocr_threads=config.ocr_threads)
         with PagePool(options, workers) as pool:
             started = time.perf_counter()
             docs = pool.parse(paths, [t.id for t in truths])
@@ -477,6 +479,7 @@ def run_parse_eval(config: ParseEvalConfig) -> ParseEvalReport:
         pages=sum(len(t.pages) for t in truths),
         scanned_pages=dict(sorted(scanned_counts.items())),
         workers=workers,
+        ocr_threads=config.ocr_threads,
         dpi=config.dpi,
         versions=package_versions(),
         hardware=hardware_info(),
@@ -552,7 +555,8 @@ def render_parse_markdown(report: ParseEvalReport) -> str:
         f"- Hardware: {hw.cpu}, {hw.logical_cores} logical cores, "
         f"{hw.memory_gb or '?'} GB RAM, {hw.os}, Python {hw.python}",
         f"- Versions: {', '.join(f'{k} {v}' for k, v in meta.versions.items())}",
-        f"- Page pool: {meta.workers} worker processes; OCR render at {meta.dpi} dpi",
+        f"- Page pool: {meta.workers} worker processes x {meta.ocr_threads} OCR thread(s); "
+        f"OCR render at {meta.dpi} dpi",
         f"- Package `{meta.package_version}`, created {meta.created_at}",
         "",
         "## Summary",
@@ -621,7 +625,8 @@ def render_parse_markdown(report: ParseEvalReport) -> str:
         f"| pypdfium2: raw text only | {tl.pypdfium2_text_only_pages_per_s:,.1f} |",
         f"| pypdf `extract_text()` (previous loader) | {_rate(tl.pypdf_pages_per_s, '')} |",
         "",
-        f"Full pipeline in the page pool ({meta.workers} processes, one thread each):",
+        f"Full pipeline in the page pool ({meta.workers} processes x "
+        f"{meta.ocr_threads} thread(s)):",
         "",
         "| Engine | Pages/s (all) | OCR pages | OCR pages/s | OCR ms/page p50 / p95 (in a worker) "
         "| Cold start | Peak worker RSS | Page errors |",
@@ -723,8 +728,8 @@ def compare_parse_reports(
     before, after = baseline.gate_metrics(), candidate.gate_metrics()
     results = []
     for check in thresholds.checks(list(before)):
-        if check.metric not in after:  # engine missing in the candidate run
-            results.append(CheckResult(check, before[check.metric], None, Status.REGRESSION))
+        if check.metric not in after:  # engine not run in the candidate (e.g. no Tesseract in CI)
+            results.append(CheckResult(check, before[check.metric], None, Status.SKIPPED))
             continue
         old, new = before[check.metric], after[check.metric]
         results.append(CheckResult(check, old, new, evaluate_check(check, old, new)))

@@ -143,3 +143,12 @@ def test_cli_eval_parse_requires_a_dataset(tmp_path: Path) -> None:
     result = runner.invoke(app, ["eval-parse", "--data", str(tmp_path)])
     assert result.exit_code == 2
     assert "generate-pdfs" in result.output
+
+
+def test_engines_missing_from_the_candidate_are_skipped(report: ParseEvalReport) -> None:
+    baseline = report.model_copy(deep=True)
+    baseline.engines["tesseract"] = baseline.engines["none"].model_copy(deep=True)
+    comparison = compare_parse_reports(baseline, report, ParseThresholds(min_speedup_vs_pypdf=None))
+    assert comparison.passed
+    skipped = {r.check.metric for r in comparison.results if r.status.value == "skipped"}
+    assert skipped == {"tesseract.digital_cer", "tesseract.scanned_cer", "tesseract.field_recall"}

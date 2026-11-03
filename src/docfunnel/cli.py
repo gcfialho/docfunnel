@@ -291,6 +291,7 @@ def eval_parse(
         typer.Option("--ocr-engine", help="auto | none | rapidocr | tesseract (repeatable)"),
     ] = None,
     workers: Annotated[int | None, typer.Option(help="Worker processes (default: CPUs)")] = None,
+    ocr_threads: Annotated[int, typer.Option(help="ONNX Runtime threads per worker")] = 1,
     dpi: Annotated[int, typer.Option(help="Render resolution for OCR")] = 200,
     run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
 ) -> None:
@@ -308,6 +309,7 @@ def eval_parse(
         dataset=data,
         engines=ocr_engine or ["auto"],
         workers=workers,
+        ocr_threads=ocr_threads,
         dpi=dpi,
         run_name=run_name,
     )
