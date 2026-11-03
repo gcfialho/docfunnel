@@ -25,10 +25,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-openai = ["openai>=1.40"]
-anthropic = ["anthropic>=0.40"]
-gemini = ["google-genai>=1.0"]
-providers = ["openai>=1.40", "anthropic>=0.40", "google-genai>=1.0"]
+# Floors are the releases the adapters are tested against: they pass reasoning_effort,
+# output_config/thinking (API version 2026-10-21) and thinking_level / response_json_schema.
+openai = ["openai>=3.42"]
+anthropic = ["anthropic>=2.4"]
+gemini = ["google-genai>=2.34"]
+providers = ["openai>=3.42", "anthropic>=2.4", "google-genai>=2.34"]
 mcp = ["mcp>=1.2"]
 pdf = ["pypdfium2>=5.0"]
 ocr = ["pypdfium2>=5.0", "rapidocr>=3.0", "onnxruntime>=1.20", "pillow>=10.0"]
