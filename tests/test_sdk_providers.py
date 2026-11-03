@@ -223,28 +223,111 @@ class TestAnthropic:
 
         return AnthropicProvider(api_key="test-key")
 
-    def test_system_prompt_is_passed_separately(
-        self, provider: AnthropicProvider, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    @staticmethod
+    def stub(
+        provider: AnthropicProvider,
+        monkeypatch: pytest.MonkeyPatch,
+        *,
+        content: list[Any],
+        stop_reason: str = "end_turn",
+    ) -> dict[str, Any]:
         captured: dict[str, Any] = {}
 
         def create(**kwargs: Any) -> Any:
             captured.update(kwargs)
             return SimpleNamespace(
                 model="some-model",
-                content=[SimpleNamespace(type="text", text='{"total": 1}')],
+                content=content,
+                stop_reason=stop_reason,
                 usage=SimpleNamespace(input_tokens=20, output_tokens=5),
             )
 
         monkeypatch.setattr(
             provider, "_client", SimpleNamespace(messages=SimpleNamespace(create=create))
         )
+        return captured
+
+    def test_system_prompt_is_passed_separately(
+        self, provider: AnthropicProvider, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        captured = self.stub(
+            provider, monkeypatch, content=[SimpleNamespace(type="text", text='{"total": 1}')]
+        )
         response = provider.complete(REQUEST)
 
         assert captured["system"] == "SYSTEM"
         assert [m["role"] for m in captured["messages"]] == ["user", "assistant", "user"]
         assert captured["max_tokens"] == 512
+        assert "temperature" not in captured  # API version 2026-10-21 rejects it
         assert (response.input_tokens, response.output_tokens) == (20, 5)
+
+    def test_haiku_5_5_thinking_off_low_effort_structured_output(self) -> None:
+        from docfunnel.providers.anthropic_provider import AnthropicProvider
+
+        params = AnthropicProvider.build_params(request_for("claude-haiku-5-5"))
+
+        assert params["thinking"] == {"type": "disabled"}
+        assert params["output_config"] == {
+            "effort": "low",
+            "format": {"type": "json_schema", "schema": SCHEMA},
+        }
+        assert params["max_tokens"] == 4096
+        assert "temperature" not in params
+
+    def test_haiku_4_5_gets_structured_output_but_no_effort_or_thinking(self) -> None:
+        from docfunnel.providers.anthropic_provider import AnthropicProvider
+
+        params = AnthropicProvider.build_params(request_for("claude-haiku-4-5"))
+
+        assert params["output_config"] == {"format": {"type": "json_schema", "schema": SCHEMA}}
+        assert "thinking" not in params  # effort errors on Haiku 4.5; thinking is off
+        assert params["max_tokens"] == 2048
+
+    @pytest.mark.parametrize("model", ["claude-sonnet-5-5", "claude-opus-5-5", "claude-fable-5-1"])
+    def test_models_that_cannot_disable_thinking_lower_effort_instead(self, model: str) -> None:
+        from docfunnel.providers.anthropic_provider import AnthropicProvider
+
+        params = AnthropicProvider.build_params(request_for(model))
+
+        assert "thinking" not in params  # {"type": "disabled"} returns 400 on these
+        assert params["output_config"]["effort"] == "low"
+        assert params["max_tokens"] == 8192
+
+    def test_unknown_model_gets_structured_output_only(self) -> None:
+        from docfunnel.providers.anthropic_provider import AnthropicProvider
+
+        params = AnthropicProvider.build_params(request_for("claude-future-1"))
+
+        assert params["output_config"] == {"format": {"type": "json_schema", "schema": SCHEMA}}
+        assert "thinking" not in params
+
+    def test_no_schema_means_no_output_config(self) -> None:
+        from docfunnel.providers.anthropic_provider import AnthropicProvider
+
+        params = AnthropicProvider.build_params(REQUEST)
+
+        assert "output_config" not in params
+
+    def test_thinking_blocks_are_skipped_when_reading_the_answer(
+        self, provider: AnthropicProvider, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        self.stub(
+            provider,
+            monkeypatch,
+            content=[
+                SimpleNamespace(type="thinking", thinking="", signature="sig"),
+                SimpleNamespace(type="text", text='{"total": 1}'),
+            ],
+        )
+        assert provider.complete(request_for("claude-sonnet-5-5")).text == '{"total": 1}'
+
+    def test_refusal_is_not_retryable(
+        self, provider: AnthropicProvider, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        self.stub(provider, monkeypatch, content=[], stop_reason="refusal")
+        with pytest.raises(ProviderError, match="refusal") as info:
+            provider.complete(request_for("claude-haiku-5-5"))
+        assert info.value.retryable is False
 
     @pytest.mark.parametrize(("status", "retryable"), [(429, True), (529, True), (400, False)])
     def test_error_classification(
