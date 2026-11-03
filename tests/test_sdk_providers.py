@@ -356,7 +356,7 @@ class TestGemini:
 
         return GeminiProvider(api_key="test-key")
 
-    def test_roles_and_json_mime_type(
+    def test_roles_mime_type_and_usage_with_thoughts(
         self, provider: GeminiProvider, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         captured: dict[str, Any] = {}
@@ -365,7 +365,9 @@ class TestGemini:
             captured.update(kwargs)
             return SimpleNamespace(
                 text='{"total": 1}',
-                usage_metadata=SimpleNamespace(prompt_token_count=30, candidates_token_count=4),
+                usage_metadata=SimpleNamespace(
+                    prompt_token_count=30, candidates_token_count=4, thoughts_token_count=6
+                ),
             )
 
         monkeypatch.setattr(
@@ -378,7 +380,54 @@ class TestGemini:
         assert [c.role for c in captured["contents"]] == ["user", "model", "user"]
         assert captured["config"].system_instruction == "SYSTEM"
         assert captured["config"].response_mime_type == "application/json"
-        assert (response.input_tokens, response.output_tokens) == (30, 4)
+        # Thought tokens are billed as output, so they are counted with the answer.
+        assert (response.input_tokens, response.output_tokens) == (30, 10)
+
+    def test_flash_lite_3_5_minimal_thinking_and_json_schema(self) -> None:
+        from google.genai import types
+
+        from docfunnel.providers.gemini_provider import GeminiProvider
+
+        config = GeminiProvider.build_config(request_for("gemini-3.5-flash-lite"))
+
+        assert config.response_mime_type == "application/json"
+        assert config.response_json_schema == SCHEMA
+        assert config.response_schema is None
+        assert config.thinking_config is not None
+        assert config.thinking_config.thinking_level == types.ThinkingLevel.MINIMAL
+        assert config.thinking_config.thinking_budget is None  # deprecated on Gemini 3
+        assert config.temperature is None
+        assert config.max_output_tokens == 8192
+
+    def test_flash_lite_2_5_keeps_the_original_request_shape(self) -> None:
+        from docfunnel.providers.gemini_provider import GeminiProvider
+
+        config = GeminiProvider.build_config(request_for("gemini-2.5-flash-lite"))
+
+        assert config.temperature == 0.0
+        assert config.response_mime_type == "application/json"
+        assert config.response_json_schema is None
+        assert config.thinking_config is None
+        assert config.max_output_tokens == 2048
+
+    def test_unknown_model_gets_json_mode_only(self) -> None:
+        from docfunnel.providers.gemini_provider import GeminiProvider
+
+        config = GeminiProvider.build_config(request_for("gemini-future"))
+
+        assert config.response_mime_type == "application/json"
+        assert config.response_json_schema is None
+        assert config.temperature is None
+        assert config.thinking_config is None
+
+    def test_built_config_serializes_for_the_api(self) -> None:
+        from docfunnel.providers.gemini_provider import GeminiProvider
+
+        config = GeminiProvider.build_config(request_for("gemini-3.5-flash-lite"))
+        dumped = config.model_dump(mode="json", exclude_none=True)
+
+        assert dumped["thinking_config"] == {"thinking_level": "MINIMAL"}
+        assert dumped["response_json_schema"]["type"] == "object"
 
     @pytest.mark.parametrize(("code", "retryable"), [(429, True), (503, True), (400, False)])
     def test_error_classification(
