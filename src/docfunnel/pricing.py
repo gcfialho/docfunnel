@@ -7,12 +7,51 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import resources
 from pathlib import Path
+from typing import Any
+
+
+@dataclass(frozen=True)
+class LongContextPrice:
+    """Higher rates that apply to the whole call once its input exceeds a threshold."""
+
+    above_input_tokens: int
+    input_per_mtok: float
+    output_per_mtok: float
 
 
 @dataclass(frozen=True)
 class ModelPrice:
     input_per_mtok: float
     output_per_mtok: float
+    long_context: LongContextPrice | None = None
+    source: str | None = None
+    checked: str | None = None
+
+    def rates(self, input_tokens: int) -> tuple[float, float]:
+        """``(input, output)`` USD per 1M tokens for a call with this many input tokens."""
+        tier = self.long_context
+        if tier is not None and input_tokens > tier.above_input_tokens:
+            return tier.input_per_mtok, tier.output_per_mtok
+        return self.input_per_mtok, self.output_per_mtok
+
+
+def _model_price(entry: Mapping[str, Any]) -> ModelPrice:
+    long_context = entry.get("long_context")
+    return ModelPrice(
+        float(entry["input"]),
+        float(entry["output"]),
+        long_context=(
+            None
+            if long_context is None
+            else LongContextPrice(
+                int(long_context["above_input_tokens"]),
+                float(long_context["input"]),
+                float(long_context["output"]),
+            )
+        ),
+        source=entry.get("source"),
+        checked=entry.get("checked"),
+    )
 
 
 class PriceTable:
@@ -27,11 +66,15 @@ class PriceTable:
         self._prices = prices
 
     @classmethod
-    def from_mapping(cls, raw: Mapping[str, Mapping[str, float]]) -> PriceTable:
-        """Build from ``{model: {"input": usd, "output": usd}}``; skips ``_``-prefixed keys."""
+    def from_mapping(cls, raw: Mapping[str, Mapping[str, Any]]) -> PriceTable:
+        """Build from ``{model: {"input": usd, "output": usd, ...}}``; skips ``_``-prefixed keys.
+
+        Optional per-model keys: ``long_context`` (``{"above_input_tokens": n, "input": usd,
+        "output": usd}``), ``source`` (URL of the pricing page) and ``checked`` (ISO date).
+        """
         return cls(
             {
-                model: ModelPrice(float(entry["input"]), float(entry["output"]))
+                model: _model_price(entry)
                 for model, entry in raw.items()
                 if not model.startswith("_")
             }
@@ -45,6 +88,10 @@ class PriceTable:
             text = path.read_text(encoding="utf-8")
         return cls.from_mapping(json.loads(text))
 
+    @property
+    def models(self) -> list[str]:
+        return sorted(self._prices)
+
     def price_for(self, model: str) -> ModelPrice | None:
         if model in self._prices:
             return self._prices[model]
@@ -55,4 +102,5 @@ class PriceTable:
         price = self.price_for(model)
         if price is None:
             return None
-        return (input_tokens * price.input_per_mtok + output_tokens * price.output_per_mtok) / 1e6
+        input_rate, output_rate = price.rates(input_tokens)
+        return (input_tokens * input_rate + output_tokens * output_rate) / 1e6

@@ -132,6 +132,20 @@ def test_price_table_prefix_lookup_and_bundled_defaults() -> None:
     assert table.cost("unknown-model", 1, 1) is None
 
 
+def test_long_context_rates_apply_to_the_whole_call_above_the_threshold() -> None:
+    table = PriceTable.from_mapping(
+        {
+            "tiered": {
+                "input": 0.10,
+                "output": 0.50,
+                "long_context": {"above_input_tokens": 100_000, "input": 0.50, "output": 2.50},
+            }
+        }
+    )
+    assert table.cost("tiered", 100_000, 1_000) == pytest.approx(0.0105)  # at the threshold
+    assert table.cost("tiered", 100_001, 1_000) == pytest.approx(0.0525005)
+
+
 def test_get_provider_rejects_unknown_names() -> None:
     with pytest.raises(ValueError, match="unknown provider"):
         get_provider("cohere")
