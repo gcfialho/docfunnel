@@ -278,6 +278,93 @@ def generate_pdfs(
     typer.echo(f"Wrote {len(truths)} documents ({pages} pages, {scanned} scanned) to {out}")
 
 
+@app.command("eval-parse")
+def eval_parse(
+    data: Annotated[Path, typer.Option(help="Directory from generate-pdfs")] = Path(
+        "data/synthetic/pdf"
+    ),
+    out: Annotated[Path, typer.Option(help="Output directory for report.json/report.md")] = Path(
+        "reports/parse-latest"
+    ),
+    ocr_engine: Annotated[
+        list[str] | None,
+        typer.Option("--ocr-engine", help="auto | none | rapidocr | tesseract (repeatable)"),
+    ] = None,
+    workers: Annotated[int | None, typer.Option(help="Worker processes (default: CPUs)")] = None,
+    dpi: Annotated[int, typer.Option(help="Render resolution for OCR")] = 200,
+    run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
+) -> None:
+    """Evaluate the parse stage: OCR routing, CER/WER, field recall and throughput."""
+    from docfunnel.evals.parse_eval import (
+        ParseEvalConfig,
+        run_parse_eval,
+        summary_rows,
+        write_parse_report,
+    )
+
+    if not (data / "manifest.jsonl").is_file():
+        raise _fail(f"{data}/manifest.jsonl not found; run 'docfunnel generate-pdfs' first")
+    config = ParseEvalConfig(
+        dataset=data,
+        engines=ocr_engine or ["auto"],
+        workers=workers,
+        dpi=dpi,
+        run_name=run_name,
+    )
+    try:
+        report = run_parse_eval(config)
+    except (ImportError, ValueError, RuntimeError) as exc:
+        raise _fail(str(exc)) from exc
+    json_path, md_path = write_parse_report(report, out)
+    rows = summary_rows(report)
+    width = max(len(name) for name, _ in rows)
+    for name, value in rows:
+        typer.echo(f"{name:<{width}}  {value}")
+    typer.echo(f"\nWrote {json_path} and {md_path}")
+
+
+@app.command("compare-parse")
+def compare_parse(
+    baseline: Annotated[Path, typer.Argument(help="Baseline parse report.json")],
+    candidate: Annotated[Path, typer.Argument(help="Candidate parse report.json")],
+    max_routing_drop: float = 0.0,
+    max_digital_cer_increase: float = 0.001,
+    max_scanned_cer_increase: float = 0.01,
+    max_field_recall_drop: float = 0.02,
+    min_speedup_vs_pypdf: Annotated[
+        float | None, typer.Option(help="pypdfium2 vs pypdf in the candidate run; 0 disables")
+    ] = 3.0,
+    out: Annotated[Path | None, typer.Option(help="Also write the comparison as Markdown")] = None,
+) -> None:
+    """Compare two parse eval runs; exit 1 on a quality regression."""
+    from docfunnel.evals.parse_eval import (
+        ParseThresholds,
+        compare_parse_reports,
+        load_parse_report,
+        render_parse_comparison,
+    )
+
+    try:
+        base, cand = load_parse_report(baseline), load_parse_report(candidate)
+    except (OSError, ValueError) as exc:
+        raise _fail(str(exc)) from exc
+    thresholds = ParseThresholds(
+        max_routing_drop=max_routing_drop,
+        max_digital_cer_increase=max_digital_cer_increase,
+        max_scanned_cer_increase=max_scanned_cer_increase,
+        max_field_recall_drop=max_field_recall_drop,
+        min_speedup_vs_pypdf=min_speedup_vs_pypdf or None,
+    )
+    comparison = compare_parse_reports(base, cand, thresholds)
+    markdown = render_parse_comparison(comparison, base, cand)
+    typer.echo(markdown)
+    if out is not None:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(markdown, encoding="utf-8")
+    if not comparison.passed:
+        raise typer.Exit(1)
+
+
 @app.command()
 def serve(
     host: str = "127.0.0.1",

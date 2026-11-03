@@ -89,7 +89,7 @@ class Comparison:
         return self.dataset_matches and all(r.status is not Status.REGRESSION for r in self.results)
 
 
-def _evaluate(check: Check, baseline: float | None, candidate: float | None) -> Status:
+def evaluate_check(check: Check, baseline: float | None, candidate: float | None) -> Status:
     if check.tolerance is None or baseline is None or candidate is None:
         return Status.SKIPPED
     allowed = check.tolerance * abs(baseline) if check.relative else check.tolerance
@@ -109,7 +109,7 @@ def compare_reports(
     for check in thresholds.checks():
         before = getattr(baseline.metrics, check.metric)
         after = getattr(candidate.metrics, check.metric)
-        results.append(CheckResult(check, before, after, _evaluate(check, before, after)))
+        results.append(CheckResult(check, before, after, evaluate_check(check, before, after)))
     return Comparison(
         results=results,
         dataset_matches=baseline.meta.dataset_sha256 == candidate.meta.dataset_sha256,
