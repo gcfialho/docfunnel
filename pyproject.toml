@@ -14,6 +14,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
 ]
 dependencies = [
     "pydantic>=2.7",
@@ -48,6 +49,8 @@ dev = [
     "httpx>=0.27",
     "ruff>=0.6",
     "pypdf>=6.0", # baseline for the parse throughput benchmark only
+    "mypy>=2.4.1",
+    "types-reportlab>=5.0.0.20261008",
 ]
 
 [build-system]
@@ -69,6 +72,16 @@ ignore = ["B008"] # typer/fastapi use call expressions in defaults
 [tool.ruff.lint.isort]
 known-first-party = ["docfunnel"]
 known-local-folder = ["helpers"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+# Optional extras that ship neither inline types nor a py.typed marker, and have no stubs.
+module = ["pypdfium2", "pypdfium2.*", "pytesseract"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
