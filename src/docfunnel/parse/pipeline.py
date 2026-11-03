@@ -246,7 +246,8 @@ def parse_image(path: Path, doc_id: str, options: ParseOptions) -> ParsedDocumen
 def parse_text_file(path: Path, doc_id: str) -> ParsedDocument:
     started = time.perf_counter()
     text = path.read_text(encoding="utf-8")
-    blocks, offset = [], 0
+    blocks: list[Block] = []
+    offset = 0
     for line in text.split("\n"):
         stripped = line.strip()
         if stripped:

@@ -30,11 +30,15 @@ from collections.abc import Iterator
 from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from docfunnel.normalize import CENT
 from docfunnel.schema import LineItem, ReceiptData
 from docfunnel.synthetic import LOCALES, Locale, format_amount
+
+if TYPE_CHECKING:
+    from PIL.Image import Image
+    from reportlab.pdfgen.canvas import Canvas
 
 D = Decimal
 Align = Literal["left", "right"]
@@ -295,10 +299,15 @@ class _DocSpec:
     seed: int
 
 
+# What a document builder returns: laid-out pages, the label, and the footer text.
+_Built = tuple[_Composer, dict[str, Any], str]
+
+
 def _wrap(text: str, font: str, size: float, width: float) -> list[str]:
     from reportlab.lib.utils import simpleSplit
 
-    return simpleSplit(text, font, size, width)
+    lines: list[str] = simpleSplit(text, font, size, width)  # the stub leaves it unannotated
+    return lines
 
 
 def _paragraph(
@@ -336,7 +345,9 @@ _TERMS = (
 )
 
 
-def _invoice(rng: random.Random, locale: Locale, fonts: tuple[str, str], size: tuple[float, float]):
+def _invoice(
+    rng: random.Random, locale: Locale, fonts: tuple[str, str], size: tuple[float, float]
+) -> _Built:
     width, _ = size
     body = rng.choice((9.0, 9.5, 10.0))
     labels = locale.labels
@@ -608,7 +619,7 @@ _FIELD_CLAUSES = ("Term", "Fees and Payment", "Termination", "Limitation of Liab
 
 def _contract(
     rng: random.Random, locale: Locale, fonts: tuple[str, str], size: tuple[float, float]
-):
+) -> _Built:
     width, _ = size
     text_width = width - 2 * MARGIN
     body = rng.choice((9.5, 10.0, 10.5))
@@ -856,7 +867,7 @@ def generate_truths(n: int = 50, seed: int = 11) -> list[DocTruth]:
 # ---- rendering ---------------------------------------------------------------------------
 
 
-def _background_image(width: float, height: float) -> Any:
+def _background_image(width: float, height: float) -> Image:
     """A light letterhead band and watermark box, drawn as one full-page image."""
     from PIL import Image, ImageDraw
 
@@ -868,7 +879,7 @@ def _background_image(width: float, height: float) -> Any:
     return image
 
 
-def _draw_page(canvas: Any, spec: _DocSpec, index: int) -> None:
+def _draw_page(canvas: Canvas, spec: _DocSpec, index: int) -> None:
     from reportlab.lib.utils import ImageReader
 
     width, height = spec.truth.page_size
@@ -890,7 +901,7 @@ def _draw_page(canvas: Any, spec: _DocSpec, index: int) -> None:
     canvas.drawRightString(width - MARGIN, MARGIN - 8, page_label)
 
 
-def _canvas(buffer: io.BytesIO, spec: _DocSpec) -> Any:
+def _canvas(buffer: io.BytesIO, spec: _DocSpec) -> Canvas:
     from reportlab.pdfgen.canvas import Canvas
 
     canvas = Canvas(buffer, pagesize=spec.truth.page_size, invariant=1, pageCompression=1)

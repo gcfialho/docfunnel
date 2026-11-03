@@ -10,9 +10,12 @@ without the SDK installed.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from docfunnel.service import get_extractor
+
+if TYPE_CHECKING:
+    from mcp.server.mcpserver import MCPServer
 
 TOOL_DESCRIPTION = (
     "Extract structured data (vendor, date, currency, subtotal, tax, total, payment method, "
@@ -27,17 +30,20 @@ def extract_document(text: str) -> dict[str, Any]:
     return result.model_dump(mode="json", exclude={"calls"})
 
 
-def build_server() -> Any:
+def build_server() -> MCPServer:
     try:
-        from mcp.server.mcpserver import MCPServer as Server  # mcp >= 2
+        from mcp.server.mcpserver import MCPServer  # mcp >= 2
+
+        server = MCPServer("docfunnel")
     except ImportError:  # pragma: no cover - mcp 1.x
         try:
-            from mcp.server.fastmcp import FastMCP as Server
+            # Checked against the locked mcp 2.x, where this module is an import-time stub.
+            from mcp.server.fastmcp import FastMCP  # type: ignore[attr-defined]
         except ImportError as exc:
             raise RuntimeError(
                 "the MCP server requires the 'mcp' extra: uv sync --extra mcp"
             ) from exc
-    server = Server("docfunnel")
+        server = FastMCP("docfunnel")  # same constructor and .tool()/.run() API in 1.x
     server.tool(name="extract_document", description=TOOL_DESCRIPTION)(extract_document)
     return server
 
