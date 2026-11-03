@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
@@ -7,7 +8,7 @@ import pytest
 from docfunnel.config import Settings, build_extractor, parse_target
 from docfunnel.pricing import PriceTable
 from docfunnel.prompts import OutputParseError, parse_json_object, system_prompt, user_prompt
-from docfunnel.providers import ProviderNotConfiguredError, get_provider
+from docfunnel.providers import DEFAULT_MODELS, ProviderNotConfiguredError, get_provider
 from docfunnel.providers.base import CompletionRequest, Message, ProviderError
 from docfunnel.providers.fake import FakeProvider, FaultProfile, heuristic_extract
 from docfunnel.providers.replay import (
@@ -111,11 +112,11 @@ def test_record_then_replay_offline(tmp_path: Path) -> None:
 
 def test_replay_of_a_hand_written_cassette(tmp_path: Path) -> None:
     """Cassettes are plain JSON, so real-model quirks can be pinned as fixtures."""
-    request = request_for(US_RECEIPT, "gpt-4o-mini")
+    request = request_for(US_RECEIPT, "gpt-6-luna")
     cassette: dict[str, CassetteEntry] = {
         request_key(request): {
             "text": '```json\n{"vendor_name": "Maple Street Hardware", "total": "29.42"}\n```',
-            "model": "gpt-4o-mini-2024-07-18",
+            "model": "gpt-6-luna",
             "input_tokens": 812,
             "output_tokens": 61,
         }
@@ -130,6 +131,21 @@ def test_price_table_prefix_lookup_and_bundled_defaults() -> None:
     assert table.cost("fake-mini", 10_000, 10_000) == 0.0
     assert table.price_for("gpt-4o-mini-2024-07-18") == table.price_for("gpt-4o-mini")
     assert table.cost("unknown-model", 1, 1) is None
+
+
+def test_bundled_prices_cover_every_default_model_and_cite_a_source() -> None:
+    table = PriceTable.load()
+    for model in DEFAULT_MODELS.values():
+        assert table.price_for(model) is not None, model
+    for model in table.models:
+        price = table.price_for(model)
+        assert price is not None
+        if model.startswith("fake-"):
+            continue
+        assert price.source is not None, model
+        assert price.source.startswith("https://"), model
+        assert price.checked is not None, model
+        assert date.fromisoformat(price.checked) <= date.today(), model
 
 
 def test_long_context_rates_apply_to_the_whole_call_above_the_threshold() -> None:
@@ -183,5 +199,7 @@ def test_settings_from_env_and_build_extractor() -> None:
 
 
 def test_parse_target_defaults_model() -> None:
-    assert parse_target("anthropic") == ("anthropic", "claude-haiku-4-5")
-    assert parse_target("openai:gpt-4.1-mini") == ("openai", "gpt-4.1-mini")
+    assert parse_target("anthropic") == ("anthropic", "claude-haiku-5-5")
+    assert parse_target("openai") == ("openai", "gpt-6-luna")
+    assert parse_target("gemini") == ("gemini", "gemini-3.5-flash-lite")
+    assert parse_target("openai:gpt-6.1-terra") == ("openai", "gpt-6.1-terra")

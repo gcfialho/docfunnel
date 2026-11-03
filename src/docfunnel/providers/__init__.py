@@ -18,10 +18,11 @@ PROVIDER_NAMES = ("fake", "openai", "anthropic", "gemini", "replay")
 
 DEFAULT_MODELS: dict[str, str] = {
     "fake": "fake-mini",
-    "openai": "gpt-4o-mini",
-    "anthropic": "claude-haiku-4-5",
-    "gemini": "gemini-2.5-flash",
+    "openai": "gpt-6-luna",
+    "anthropic": "claude-haiku-5-5",
+    "gemini": "gemini-3.5-flash-lite",
 }
+"""The cheapest current general model of each provider; prices are in ``pricing.json``."""
 
 
 def get_provider(name: str, *, cassette: Path | None = None) -> LLMProvider:

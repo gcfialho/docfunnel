@@ -27,7 +27,7 @@ from docfunnel.validation import ReviewPolicy
 
 
 def parse_target(spec: str) -> tuple[str, str]:
-    """``"openai:gpt-4o-mini"`` -> ``("openai", "gpt-4o-mini")``; ``"openai"`` -> default model."""
+    """``"openai:gpt-6.1-terra"`` -> ``("openai", "gpt-6.1-terra")``; ``"openai"`` -> default."""
     provider, _, model = spec.strip().partition(":")
     if not provider:
         raise ValueError(f"invalid target spec {spec!r}")

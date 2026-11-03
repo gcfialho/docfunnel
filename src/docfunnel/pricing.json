@@ -1,11 +1,59 @@
 {
-  "_comment": "USD per 1M tokens. Illustrative list prices for cost tracking; verify against the providers' current pricing pages and override with DOCFUNNEL_PRICING_FILE.",
-  "fake-mini": {"input": 0.0, "output": 0.0},
-  "fake-pro": {"input": 0.0, "output": 0.0},
-  "gpt-4o-mini": {"input": 0.15, "output": 0.60},
-  "gpt-4.1-mini": {"input": 0.40, "output": 1.60},
-  "claude-haiku-4-5": {"input": 1.00, "output": 5.00},
-  "claude-sonnet-4-5": {"input": 3.00, "output": 15.00},
-  "gemini-2.5-flash": {"input": 0.30, "output": 2.50},
-  "gemini-2.5-pro": {"input": 1.25, "output": 10.00}
+  "_comment": "USD per 1M tokens: standard (non-batch, non-priority) list prices for text input, as published on each provider's official pricing page on the date in 'checked'. 'long_context' rates apply to the whole call when its input tokens exceed 'above_input_tokens'. Cache, batch and regional surcharges are not modelled. Prices change: re-check the 'source' pages, or point DOCFUNNEL_PRICING_FILE at your own table.",
+  "fake-mini": {"input": 0.0, "output": 0.0, "source": "offline fake provider, no API cost"},
+  "fake-pro": {"input": 0.0, "output": 0.0, "source": "offline fake provider, no API cost"},
+
+  "gpt-6-luna": {
+    "input": 0.10, "output": 0.50,
+    "long_context": {"above_input_tokens": 272000, "input": 0.20, "output": 0.75},
+    "source": "https://developers.openai.com/api/docs/pricing", "checked": "2026-11-03"
+  },
+  "gpt-6.1-terra": {
+    "input": 1.00, "output": 5.00,
+    "long_context": {"above_input_tokens": 272000, "input": 2.00, "output": 7.50},
+    "source": "https://developers.openai.com/api/docs/pricing", "checked": "2026-11-03"
+  },
+  "gpt-4o-mini": {
+    "input": 0.15, "output": 0.60,
+    "source": "https://developers.openai.com/api/docs/pricing", "checked": "2026-11-03"
+  },
+  "gpt-4.1-mini": {
+    "input": 0.40, "output": 1.60,
+    "source": "https://developers.openai.com/api/docs/pricing", "checked": "2026-11-03"
+  },
+
+  "claude-haiku-5-5": {
+    "input": 0.10, "output": 0.50,
+    "long_context": {"above_input_tokens": 100000, "input": 0.50, "output": 2.50},
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing", "checked": "2026-11-03"
+  },
+  "claude-sonnet-5-5": {
+    "input": 2.00, "output": 10.00,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing", "checked": "2026-11-03"
+  },
+  "claude-opus-5-5": {
+    "input": 4.00, "output": 20.00,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing", "checked": "2026-11-03"
+  },
+  "claude-fable-5-1": {
+    "input": 10.00, "output": 50.00,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing", "checked": "2026-11-03"
+  },
+  "claude-haiku-4-5": {
+    "input": 1.00, "output": 5.00,
+    "source": "https://platform.claude.com/docs/en/about-claude/pricing", "checked": "2026-11-03"
+  },
+
+  "gemini-3.5-flash-lite": {
+    "input": 0.30, "output": 2.50,
+    "source": "https://aistudio.google.com/docs/pricing#gemini-3.5-flash-lite", "checked": "2026-11-03"
+  },
+  "gemini-3.1-flash-lite": {
+    "input": 0.25, "output": 1.50,
+    "source": "https://aistudio.google.com/docs/pricing#gemini-3.1-flash-lite", "checked": "2026-11-03"
+  },
+  "gemini-2.5-flash-lite": {
+    "input": 0.10, "output": 0.40,
+    "source": "https://aistudio.google.com/docs/pricing#gemini-2.5-flash-lite", "checked": "2026-11-03"
+  }
 }
