@@ -72,6 +72,23 @@ uv run docfunnel extract examples/invoice_br.txt \
 
 Each provider defaults to the low-cost tier of its current model family: `gpt-6-luna` (OpenAI, $0.10 / $0.50 per 1M input / output tokens), `claude-haiku-5-5` (Anthropic, $0.10 / $0.50 up to 100K input tokens) and `gemini-3.5-flash-lite` (Gemini, $0.30 / $2.50). For a fallback that steps up in capability rather than switching vendor, use `openai:gpt-6.1-terra` or `anthropic:claude-sonnet-5-5`.
 
+**What each adapter sends.** Request parameters come from a per-model table in [`providers/capabilities.py`](src/docfunnel/providers/capabilities.py), not from the model name. Where the model supports it, the extraction schema is sent as a native structured-output constraint (a strict, provider-neutral subset of the JSON Schema: every field required, optional values as `null`). The system prompt keeps the schema too, and pydantic still validates every answer.
+
+| Model | Output format | Reasoning / thinking | Sampling | Output-token floor |
+|---|---|---|---|---|
+| `gpt-6-luna` | `response_format` `json_schema` (strict) | `reasoning_effort: "none"` | not sent | 4,096 |
+| `gpt-6.1-terra` | `json_schema` (strict) | `reasoning_effort: "low"` | not sent | 16,000 |
+| `gpt-4o-mini`, `gpt-4.1-mini` | `json_schema` (strict) | none | `temperature: 0` | none |
+| `claude-haiku-5-5`, `claude-sonnet-5-5`, `claude-opus-5-5`, `claude-fable-5-1` | `output_config.format` | adaptive thinking (the default), `effort: "low"` | not sent | 8,192 |
+| `claude-haiku-4-5` | `output_config.format` | none (thinking is off by default) | not sent | none |
+| `gemini-3.5-flash-lite` | `response_json_schema` | `thinking_level: "minimal"` | not sent | 8,192 |
+| `gemini-2.5-flash-lite` | JSON MIME type | none | `temperature: 0` | none |
+| any other model | JSON mode / MIME type (OpenAI, Gemini); `output_config.format` (Anthropic) | none | not sent | none |
+
+The floor raises the output-token limit (2,048 by default) because reasoning and thinking tokens count against it. Thinking and reasoning tokens are billed as output, and they are counted in `output_tokens` and the cost (Gemini reports them separately; they are added in). The Anthropic adapter never sends `temperature`: the `anthropic` 2.x SDK sends API version `2026-10-21`, which rejects sampling parameters on every model. Claude models that think are not asked to disable it: the Haiku 5.5 migration guide says to lower `effort` instead (at `low` the model skips thinking on simple tasks), and Sonnet 5.5, Opus 5.5 and Fable 5.1 reject `thinking: disabled`. A refusal (OpenAI `refusal`, Anthropic `stop_reason: "refusal"`) is a non-retryable error, so the fallback chain takes over.
+
+Sources, checked on 2026-11-03: OpenAI [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna), [GPT-6.1 Terra](https://developers.openai.com/api/docs/models/gpt-6.1-terra), [Using GPT-6](https://developers.openai.com/api/docs/guides/latest-model), [Reasoning](https://developers.openai.com/api/docs/guides/reasoning) and [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs); Anthropic [Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs), [Steering thinking](https://platform.claude.com/docs/en/build-with-claude/thinking-steering-and-cost) and the [Claude Haiku 5.5 migration guide](https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide); Google [Gemini 3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite), [What's new in Gemini 3.6 Flash and 3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/generate-content/whats-new-gemini-3.6), [Thinking](https://ai.google.dev/gemini-api/docs/thinking) and [Structured output](https://ai.google.dev/gemini-api/docs/structured-output); plus the installed SDKs (`openai` 3.42, `anthropic` 2.4, `google-genai` 2.34). **None of these settings has been exercised against the live APIs yet**: the tests check the request each SDK would send, offline. Run one real extraction per provider before relying on them.
+
 **HTTP API**
 
 ```bash
@@ -321,7 +338,7 @@ tests/                   # unit, integration, API, CLI, MCP, SDK-adapter, parse 
 ## Testing
 
 ```bash
-uv run pytest                      # 237 tests, about 20 s on the machine above, no network or API keys
+uv run pytest                      # 267 tests, about 20 s on the machine above, no network or API keys
 uv run pytest --cov=docfunnel      # 96% line coverage
 uv run ruff check . && uv run ruff format --check .
 uv run mypy                        # typed (mypy --strict) over src/ and tests/; needs all extras
@@ -331,7 +348,7 @@ uv run mypy                        # typed (mypy --strict) over src/ and tests/;
 - **Parse stage:** text-layer pages, blocks, spans and boxes; image-only and stray-text pages with and without OCR; RapidOCR and Tesseract on a rendered scan (skipped when the engine is missing); page-level error isolation; the process pool against sequential parsing; Markdown export (row and paragraph grouping, OCR notes, escaping).
 - **Synthetic PDFs:** deterministic ground truth, field spans that point at the printed quote, invoice labels that obey the business rules, and rendered PDFs that match the reference text.
 - **Extractor:** a scripted provider drives the repair, backoff, transient-error retry, fallback, total-failure and cost-accounting paths.
-- **Provider adapters:** OpenAI, Anthropic and Gemini adapters are tested against stubbed SDK clients (request mapping, token usage, retryable or non-retryable classification) with no network.
+- **Provider adapters:** OpenAI, Anthropic and Gemini adapters are tested against stubbed SDK clients: the request built for each model in the capability table (structured output, reasoning effort or thinking level, sampling, token floors), token usage including thinking tokens, refusals, and retryable or non-retryable classification. A second set runs the real SDK clients on a mock HTTP transport and checks the JSON body sent for each default model. None of this touches the network or a live API.
 - **Integration:** the full LLM eval through the fake provider, the parse eval on a small generated set, both regression gates, the FastAPI app via `TestClient`, the CLI via `CliRunner`, and the MCP tool via `list_tools` and `call_tool`.
 
 CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint, type checking (mypy --strict) and tests (with Tesseract installed), the **LLM eval regression gate** with the fake provider, the **parse eval gate** (regenerates the PDF set, runs RapidOCR on the CPU, compares routing, CER and field recall against the committed baseline), and a Docker build with smoke tests. No job needs an API key or a GPU.
@@ -345,12 +362,12 @@ Phase 1 (this version) is the parse stage and its evaluation. Known limitations:
 - **No `garbled` test pages.** The rule for broken text layers (fonts without a Unicode map) exists and is unit-tested, but the generator does not produce such PDFs yet.
 - **Lines, not layout.** Blocks are text lines. Paragraphs, tables and multi-column reading order need a layout model (Docling as an optional extra, planned).
 - **Tesseract runs with the `eng` model only**, which costs it accuracy on German and Portuguese text; `ParseOptions(tesseract_lang="eng+deu+por")` is available when those models are installed.
-- **The LLM step is still evaluated only with the fake provider.** No real-model numbers are published.
+- **The LLM step is still evaluated only with the fake provider.** No real-model numbers are published, and no request has been sent to the OpenAI, Anthropic or Gemini APIs yet. The adapters follow the providers' current documentation and the installed SDKs (see "What each adapter sends"), but the first real call per provider is still the real test.
 
 Next phases, from the design notes:
 
 - **Phase 2: classify and retrieve.** More document types in the generator (bank statements, NDAs, purchase orders, letters and hard negatives); a cascade classifier (rules, then TF-IDF with logistic regression, then static embeddings, then the LLM only when confidence is low) with macro-F1 and risk-coverage curves; layout-aware chunking; BM25, dense and hybrid retrieval (RRF) with recall@k; a local benchmark on CORD v2 and olmOCR-bench subsets.
-- **Phase 3: LLM modes and the experiment matrix.** Free-form QA, fixed question sets per document type and structured extraction behind one `Task` interface; a schema per document type; native structured output for OpenAI, Anthropic and Gemini; evidence inside the schema (`chunk_id` + quote) checked in code, with grounded-answer rate and page-citation accuracy; an end-to-end matrix recorded in cassettes, a quality-vs-cost Pareto chart and per-stage cost and latency.
+- **Phase 3: LLM modes and the experiment matrix.** Free-form QA, fixed question sets per document type and structured extraction behind one `Task` interface; a schema per document type (native structured output for OpenAI, Anthropic and Gemini is already in place for the receipt schema); evidence inside the schema (`chunk_id` + quote) checked in code, with grounded-answer rate and page-citation accuracy; an end-to-end matrix recorded in cassettes, a quality-vs-cost Pareto chart and per-stage cost and latency.
 - **Phase 4 (optional): GPU benchmark.** A single, reproducible run of GPU OCR and layout models (Docling, PaddleOCR-VL, olmOCR-2) on the same pages, with price and date recorded, to find which pages (likely the heavy scans) justify a GPU route.
 
 ## Author
