@@ -167,13 +167,13 @@ def eval_command(
 def compare(
     baseline: Annotated[Path, typer.Argument(help="Baseline report.json")],
     candidate: Annotated[Path, typer.Argument(help="Candidate report.json")],
-    max_accuracy_drop: float = Thresholds.max_accuracy_drop,
-    max_exact_match_drop: float = Thresholds.max_exact_match_drop,
-    max_schema_compliance_drop: float = Thresholds.max_schema_compliance_drop,
-    max_hallucination_increase: float = Thresholds.max_hallucination_increase,
-    max_review_recall_drop: float = Thresholds.max_review_recall_drop,
+    max_accuracy_drop: float | None = Thresholds.max_accuracy_drop,
+    max_exact_match_drop: float | None = Thresholds.max_exact_match_drop,
+    max_schema_compliance_drop: float | None = Thresholds.max_schema_compliance_drop,
+    max_hallucination_increase: float | None = Thresholds.max_hallucination_increase,
+    max_review_recall_drop: float | None = Thresholds.max_review_recall_drop,
     max_cost_increase: Annotated[
-        float, typer.Option(help="Relative, e.g. 0.2 = +20%")
+        float | None, typer.Option(help="Relative, e.g. 0.2 = +20%")
     ] = Thresholds.max_cost_increase,
     max_p95_latency_increase: Annotated[
         float | None, typer.Option(help="Relative; disabled unless set (wall-clock is noisy in CI)")
