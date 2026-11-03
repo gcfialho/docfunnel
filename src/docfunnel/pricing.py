@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import resources
 from pathlib import Path
@@ -26,7 +27,8 @@ class PriceTable:
         self._prices = prices
 
     @classmethod
-    def from_mapping(cls, raw: dict[str, dict]) -> PriceTable:
+    def from_mapping(cls, raw: Mapping[str, Mapping[str, float]]) -> PriceTable:
+        """Build from ``{model: {"input": usd, "output": usd}}``; skips ``_``-prefixed keys."""
         return cls(
             {
                 model: ModelPrice(float(entry["input"]), float(entry["output"]))

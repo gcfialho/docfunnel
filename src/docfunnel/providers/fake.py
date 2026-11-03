@@ -190,8 +190,8 @@ def heuristic_extract(text: str) -> dict[str, Any]:
     for line in nonempty:
         lowered = line.lower()
         if any(lowered.startswith(label) for label in _PAYMENT_LABELS):
-            for pattern, method in _PAYMENT_KEYWORDS:
-                if re.search(pattern, lowered):
+            for keyword, method in _PAYMENT_KEYWORDS:
+                if re.search(keyword, lowered):
                     out["payment_method"] = method
                     conf["payment_method"] = 0.85
                     break
@@ -299,7 +299,9 @@ class FakeProvider:
         ].strip()
         is_repair = REPAIR_MARKER in users[-1]
         profile = self._profiles.get(request.model, FaultProfile(fenced_output=0.0))
-        roll = lambda kind: self._roll(request.model, kind, document)  # noqa: E731
+
+        def roll(kind: str) -> float:
+            return self._roll(request.model, kind, document)
 
         if roll("hard_failure") < profile.hard_failure:
             text = "I'm sorry, but I can't reliably read this document."

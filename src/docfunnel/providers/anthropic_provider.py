@@ -3,13 +3,27 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
 from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,
+    Message,
     ProviderError,
     ProviderNotConfiguredError,
 )
+
+if TYPE_CHECKING:
+    from anthropic.types import MessageParam
+
+
+def _message_param(message: Message) -> MessageParam:
+    # One branch per role so each dict matches exactly one of the SDK's message TypedDicts.
+    if message.role == "user":
+        return {"role": "user", "content": message.content}
+    if message.role == "assistant":
+        return {"role": "assistant", "content": message.content}
+    return {"role": "system", "content": message.content}
 
 
 class AnthropicProvider:
@@ -35,7 +49,7 @@ class AnthropicProvider:
                 model=request.model,
                 max_tokens=request.max_output_tokens,
                 system=request.system,
-                messages=[{"role": m.role, "content": m.content} for m in request.conversation],
+                messages=[_message_param(m) for m in request.conversation],
             )
         except anthropic.APIConnectionError as exc:  # includes timeouts
             raise ProviderError(f"anthropic connection error: {exc}", retryable=True) from exc

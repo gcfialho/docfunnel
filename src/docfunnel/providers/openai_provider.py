@@ -3,13 +3,28 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
 from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,
+    Message,
     ProviderError,
     ProviderNotConfiguredError,
 )
+
+if TYPE_CHECKING:
+    from openai.types.chat import ChatCompletionMessageParam
+    from openai.types.chat.completion_create_params import CompletionCreateParamsNonStreaming
+
+
+def _message_param(message: Message) -> ChatCompletionMessageParam:
+    # One branch per role so each dict matches exactly one of the SDK's message TypedDicts.
+    if message.role == "system":
+        return {"role": "system", "content": message.content}
+    if message.role == "user":
+        return {"role": "user", "content": message.content}
+    return {"role": "assistant", "content": message.content}
 
 
 class OpenAIProvider:
@@ -31,9 +46,9 @@ class OpenAIProvider:
 
     def complete(self, request: CompletionRequest) -> CompletionResponse:
         openai = self._openai
-        kwargs: dict = {
+        kwargs: CompletionCreateParamsNonStreaming = {
             "model": request.model,
-            "messages": [{"role": m.role, "content": m.content} for m in request.messages],
+            "messages": [_message_param(m) for m in request.messages],
             "max_completion_tokens": request.max_output_tokens,
         }
         if request.temperature is not None:

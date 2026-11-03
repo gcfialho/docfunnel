@@ -12,8 +12,8 @@ from __future__ import annotations
 import hashlib
 import json
 import threading
-from dataclasses import asdict
 from pathlib import Path
+from typing import TypedDict
 
 from docfunnel.providers.base import (
     CompletionRequest,
@@ -32,16 +32,29 @@ def request_key(request: CompletionRequest) -> str:
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
 
-def load_cassette(path: Path) -> dict[str, dict]:
+class CassetteEntry(TypedDict):
+    """One recorded response: the fields of :class:`CompletionResponse`."""
+
+    text: str
+    model: str
+    input_tokens: int
+    output_tokens: int
+
+
+Cassette = dict[str, CassetteEntry]
+
+
+def load_cassette(path: Path) -> Cassette:
     if not path.exists():
         return {}
-    return json.loads(path.read_text(encoding="utf-8"))
+    entries: Cassette = json.loads(path.read_text(encoding="utf-8"))
+    return entries
 
 
 class ReplayProvider:
     name = "replay"
 
-    def __init__(self, cassette: Path | dict[str, dict]) -> None:
+    def __init__(self, cassette: Path | Cassette) -> None:
         self._entries = load_cassette(cassette) if isinstance(cassette, Path) else cassette
 
     def complete(self, request: CompletionRequest) -> CompletionResponse:
@@ -64,7 +77,12 @@ class RecordingProvider:
     def complete(self, request: CompletionRequest) -> CompletionResponse:
         response = self._inner.complete(request)
         with self._lock:
-            self._entries[request_key(request)] = asdict(response)
+            self._entries[request_key(request)] = {
+                "text": response.text,
+                "model": response.model,
+                "input_tokens": response.input_tokens,
+                "output_tokens": response.output_tokens,
+            }
             self._path.parent.mkdir(parents=True, exist_ok=True)
             self._path.write_text(
                 json.dumps(self._entries, indent=1, ensure_ascii=False), encoding="utf-8"
