@@ -2,7 +2,7 @@
 
 *Previously named `llm-document-extraction-evals`.*
 
-**Production-style LLM extraction of receipts and invoices into validated JSON, with retries, model fallback, human-review routing, cost/latency tracking, and an evaluation harness that gates regressions in CI.**
+**A CPU-first document pipeline: parse PDFs and scans page by page, run OCR only where it is needed, then extract validated JSON with an LLM. Every stage has its own evaluation, and CI gates regressions.**
 
 [![CI](https://github.com/gcfialho/docfunnel/actions/workflows/ci.yml/badge.svg)](https://github.com/gcfialho/docfunnel/actions/workflows/ci.yml)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
@@ -10,19 +10,23 @@
 [![Ruff](https://img.shields.io/badge/lint-ruff-d7ff64)](https://docs.astral.sh/ruff/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Getting an LLM to return JSON for a demo takes minutes. Running it in production takes more work: the output has to be checked against a schema and against business rules, bad answers need repairing, outages need a fallback, documents the system is unsure about have to go to a person, and you need a way to tell whether a prompt or model change made things better or worse. This repository covers that part, using receipts and invoices as the domain.
+Most of the cost of document AI is the LLM call, not the parsing. Reading the text layer of a digital PDF takes milliseconds per page and OCR on a CPU is cheap, so the plan is to do as much as possible before the LLM: get exact text where the PDF has it, OCR only the pages that need it, keep page numbers and character offsets so answers can cite their source, and send the model only what it needs. This repository builds that pipeline in stages. Phase 1, implemented here, is the parse stage and its evaluation; it feeds the LLM extraction step that already handles schema validation, repair, fallback, human-review routing and cost tracking. The [roadmap](#limitations--roadmap) lists the next stages (classification, retrieval, question answering with verified citations).
 
 ## Highlights
 
+- **Fast CPU parse stage.** PDFs are read with `pypdfium2` (PDFium, the engine in Chrome). Each page is turned into the same structure, `ParsedDocument -> Page -> Block`, with the page number, character span into the page text, bounding box and source (`text_layer` or `ocr`) of every block, so later stages can cite page and span.
+- **OCR only where it is needed, decided per page.** Cheap signals from the text layer (alphanumeric characters, broken-encoding markers, share of the page covered by images) route each page to the text layer or to OCR, so a digital invoice with one scanned annex gets OCR on that one page only. OCR runs on the CPU: RapidOCR (PP-OCR models on ONNX Runtime, no torch) by default, Tesseract as the baseline.
+- **Page-level process pool.** The unit of work is `(file, page)`, so one long document does not hold up the other workers. Workers are processes because PDFium is not thread-safe; the OCR model loads once per worker, and a failure or timeout on one page is recorded on that page without failing the document.
+- **Multi-page synthetic PDFs with exact ground truth.** A seeded generator renders multi-page invoices (line items across pages, totals on the last page) and contracts (clauses, schedule, signatures) to PDF in four locales, plus scanned versions with deterministic rotation, blur, low contrast, noise and JPEG artefacts. It records the text of every page, which pages are scanned, and where each field is printed (page, quote, character span).
+- **Stage-level parse eval.** OCR routing precision and recall, CER and WER by noise level, field recall (is the printed value in the parsed text of its page?), and throughput with the hardware written into the report. `docfunnel compare-parse` gates the quality metrics in CI.
 - **Schema-constrained extraction.** A Pydantic contract (`ReceiptExtraction`) covers vendor, tax ID, document number, date, currency, subtotal, tax, total, payment method and line items, plus a confidence score for each field. Money is stored as `Decimal`, and inputs like `"1.234,50 €"`, `"R$ 15.120,00"` and `"15/03/2024"` are normalized.
 - **Business-rule validation.** Line items must sum to the subtotal, subtotal plus tax must equal the total, quantity times unit price must equal the line total, dates must be plausible, and required fields must be present. Each result comes back with a `needs_review` flag and machine-readable reasons such as `total_mismatch:subtotal,tax,total` or `low_confidence:date`.
 - **Failure handling, cheapest fix first.** Markdown fences and surrounding prose are stripped in code. Invalid JSON or a schema error triggers a repair prompt that includes the exact validation errors. Rate limits and 5xx errors are retried with exponential backoff and jitter. Once a model has used up its attempts, a fallback chain takes over. The pipeline never raises on bad model output.
 - **Provider-agnostic.** OpenAI, Anthropic and Gemini can be selected with environment variables or CLI flags. There is also a deterministic offline `fake` provider and a record/replay cassette provider, so CI needs no API keys or network.
 - **Cost and latency per call.** Every call records tokens, USD cost from a configurable price table, latency, attempt number and purpose (`extract` or `repair`). Reports aggregate p50 and p95 latency.
-- **Evaluation harness.** Scores field-level accuracy with normalization, document exact match, schema compliance (first attempt and final), hallucination rate, line-item F1, review-flag precision and recall, retry and fallback rates, cost and latency. It breaks results down by layout, locale and noise, and writes a JSON and a Markdown report.
-- **Regression gate.** `docfunnel compare baseline.json candidate.json` exits non-zero when quality drops or cost rises beyond configurable thresholds. CI runs it on every push.
-- **Several ways in.** A CLI (`extract`, `eval`, `compare`), a FastAPI service (`POST /extract`), an MCP server exposing an `extract_document` tool, and a Docker image.
-- **No real or personal data.** The 60-document labelled dataset is generated by a seeded script, so the labels are correct by construction and there are no licensing questions.
+- **Extraction eval and regression gate.** Field-level accuracy with normalization, document exact match, schema compliance, hallucination rate, line-item F1, review-flag precision and recall, retry and fallback rates, cost and latency, broken down by layout, locale and noise. `docfunnel compare` exits non-zero when quality drops or cost rises beyond configurable thresholds.
+- **Several ways in.** A CLI (`parse`, `extract`, `eval`, `eval-parse`, `compare`, `compare-parse`, `generate-dataset`, `generate-pdfs`), a FastAPI service (`POST /extract`), an MCP server exposing an `extract_document` tool, and a Docker image.
+- **No real or personal data.** Both datasets are generated by seeded scripts, so the labels are correct by construction and there are no licensing questions.
 
 ## Quickstart
 
@@ -31,18 +35,29 @@ Requires [uv](https://docs.astral.sh/uv/). The steps below work offline with the
 ```bash
 git clone https://github.com/gcfialho/docfunnel.git
 cd docfunnel
-uv sync --all-extras
+uv sync --all-extras        # or: uv sync --extra cpu  (pypdfium2 + RapidOCR only)
+
+# Parse a PDF: one line per page with the OCR decision, source, blocks and time
+uv run docfunnel parse examples/invoice_mixed_scan.pdf
+#   p1: text_layer                 source=text_layer blocks=83 ...
+#   p2: ocr:scan_with_stray_text   source=ocr        blocks=30 ...
+uv run docfunnel parse examples/invoice_multipage.pdf --format json   # pages, blocks, spans, boxes
 
 # Extract one document (prints validated JSON, review decision and per-call accounting)
 uv run docfunnel extract examples/receipt_us.txt
 uv run docfunnel extract examples/receipt_misprinted.txt --fail-on-review   # exit code 3
 
-# Evaluate on the labelled dataset -> reports/latest/report.{json,md}
+# LLM-step eval on the labelled dataset -> reports/latest/report.{json,md}
 uv run docfunnel eval --fallback fake:fake-pro
-
-# Regression check against the committed baseline
 uv run docfunnel compare reports/baseline/fake-mini+fallback/report.json reports/latest/report.json
+
+# Parse-stage eval on the synthetic PDF set -> reports/parse-latest/report.{json,md}
+uv run docfunnel generate-pdfs                       # 50 PDFs + manifest.jsonl in data/synthetic/pdf
+uv run docfunnel eval-parse --ocr-engine rapidocr    # add --ocr-engine tesseract to compare
+uv run docfunnel compare-parse reports/baseline/parse/report.json reports/parse-latest/report.json
 ```
+
+The two example PDFs are copies of `pdf-037` and `pdf-010` from the generated set. Tesseract needs the system binary (`brew install tesseract` or `apt-get install tesseract-ocr`); without it, the Tesseract tests are skipped.
 
 With a real model (keys are read from the environment; see [`.env.example`](.env.example)):
 
@@ -61,7 +76,7 @@ curl -s localhost:8000/extract -H 'content-type: application/json' \
   -d "{\"text\": $(jq -Rs . < examples/receipt_us.txt)}"
 ```
 
-`POST /extract` accepts `{"text": ...}` or `{"path": ...}`. Path input (txt, PDF with a text layer, or an image through the optional Tesseract loader) only works inside the directory set by `DOCFUNNEL_INPUT_DIR` and is disabled by default.
+`POST /extract` accepts `{"text": ...}` or `{"path": ...}`. Path input (txt, PDF, or an image) goes through the parse stage and only works inside the directory set by `DOCFUNNEL_INPUT_DIR`; it is disabled by default.
 
 **Docker**
 
@@ -70,6 +85,8 @@ docker build -t docfunnel .
 docker run --rm -p 8000:8000 docfunnel                     # fake provider
 docker run --rm -p 8000:8000 -e DOCFUNNEL_PROVIDER=openai -e OPENAI_API_KEY docfunnel
 ```
+
+The image includes the PDF text layer but not the OCR extras, to stay small (454 MB on linux/arm64); scanned pages are flagged with `OCR needed but no OCR engine is installed`.
 
 **MCP server** (stdio), for example in an MCP client config:
 
@@ -90,30 +107,100 @@ docker run --rm -p 8000:8000 -e DOCFUNNEL_PROVIDER=openai -e OPENAI_API_KEY docf
 
 ```mermaid
 flowchart LR
-    A["Document<br/>txt · pdf · image"] -->|"loader / OCR plugin"| B["Text"]
-    B --> C["Prompt<br/>JSON Schema + extraction rules"]
-    C --> D{{"LLM provider<br/>OpenAI · Anthropic · Gemini · fake · replay"}}
-    D --> E["Parse JSON<br/>(strip fences / prose)"]
-    E -->|"invalid JSON or<br/>schema error"| R["Repair prompt<br/>+ backoff"]
-    R --> D
-    D -.->|"attempts exhausted /<br/>non-retryable error"| F["Next model in<br/>fallback chain"]
-    F --> E
-    E -->|valid| G["Pydantic schema<br/>ReceiptExtraction"]
-    G --> H["Business rules<br/>sums · dates · required fields"]
-    H --> I{"needs_review?<br/>rule errors or<br/>low confidence"}
-    I -->|no| J["Auto-accept"]
-    I -->|yes| K["Human review<br/>(with reasons)"]
-    D -.->|"tokens · cost · latency"| L[("CallRecord")]
+    A["File<br/>pdf · image · txt"] --> B["Split into pages<br/>(page pool: one task per page)"]
+    B --> C{"Page has a usable<br/>text layer?"}
+    C -->|yes| D["pypdfium2<br/>text + line boxes"]
+    C -->|"no text · garbled ·<br/>scan with stray text"| E["Render page<br/>CPU OCR: RapidOCR | Tesseract"]
+    D --> F["ParsedDocument<br/>pages · blocks · spans · source"]
+    E --> F
+    F --> P["Prompt<br/>JSON Schema + extraction rules"]
+    P --> M{{"LLM provider<br/>OpenAI · Anthropic · Gemini · fake · replay"}}
+    M --> J["Parse JSON<br/>(strip fences / prose)"]
+    J -->|"invalid JSON or<br/>schema error"| R["Repair prompt<br/>+ backoff"]
+    R --> M
+    M -.->|"attempts exhausted /<br/>non-retryable error"| N["Next model in<br/>fallback chain"]
+    N --> J
+    J -->|valid| G["Pydantic schema<br/>+ business rules"]
+    G --> H{"needs_review?"}
+    H -->|no| K["Auto-accept"]
+    H -->|yes| L["Human review<br/>(with reasons)"]
+    M -.->|"tokens · cost · latency"| Q[("CallRecord")]
 ```
 
 Design choices:
 
+- **Decide OCR per page, from signals PDFium already has.** A page goes to OCR when it has fewer than 40 alphanumeric characters, when more than 5% of its text is broken-encoding markers, or when images cover more than half of it and it has fewer than 200 characters (a scan with a digital stamp). The thresholds come from the design notes and similar libraries, and are measured rather than trusted: the parse eval reports routing precision and recall on pages labelled scanned or digital. `--force-ocr` covers PDFs with an old, bad invisible OCR layer.
+- **Processes, not threads, and one thread per process.** PDFium is not thread-safe. OpenCV, BLAS and ONNX Runtime each default to "all cores", which oversubscribes the CPU when there are N workers, so each worker is limited to one thread. On the machine below, 12 processes with 1 thread each parsed the set 3x faster than 1 process with 12 threads.
+- **Reading order for OCR is rebuilt in code.** OCR engines return one box per table cell, and on a skewed scan the boxes of one row drift apart vertically. Box centres are deskewed with the median baseline angle before grouping them into rows, so `Description  Qty  Unit  Amount` stays on one line.
 - **Problems with the answer get retried. Problems with the document go to review.** A schema error means the model made a mistake, so it gets a repair turn. A total that doesn't add up may be what's actually printed on the page, so retrying won't help. That case goes to a human with the reason attached.
 - **Every field is nullable.** The prompt tells the model to return `null` for anything not printed. Without that option, the schema would push the model to invent values. Allowing null also makes hallucination measurable: a value returned where the label is null counts as a hallucinated field.
 - **Normalization is shared.** `docfunnel.normalize` is the single definition of when two values are equal. Schema coercion, business rules and eval metrics all use it, so `"1.234,50"` and `1234.5` are treated the same everywhere.
 - **SDK-level retries are disabled.** The extractor controls the retry policy, so every attempt shows up in the accounting.
 
-## Evaluation
+## Evaluation: parse stage
+
+### Dataset
+
+`docfunnel generate-pdfs` (seed 11) writes 50 PDFs with 134 pages and a `manifest.jsonl` with the ground truth. The PDFs are not committed; CI regenerates them, and the eval checks the manifest hash against the baseline.
+
+| Dimension | Values |
+| --- | --- |
+| Document types | multi-page invoice (line items across pages, repeated table header, totals on the last page, optional terms), contract (parties, clauses with term, fee, notice period, liability cap and governing law, a schedule, signatures) |
+| Locales | US (Letter), UK, DE, BR (A4); the currency, number and date formats of the receipt dataset |
+| Variants | digital, scanned light (200 dpi, up to 0.8° rotation, light blur and noise, JPEG q70), scanned heavy (150 dpi, up to 2° rotation, lower contrast, more noise, speckle, JPEG q35), mixed (one scanned page in a digital PDF) |
+| Pages | 78 digital, 30 scanned light, 26 scanned heavy; 1 to 4 pages per document |
+| Hard cases | digital pages printed over a full-page letterhead image; scans with a digital scanner stamp (`ocr:scan_with_stray_text`) |
+| Ground truth | reference text of every page, scanned/digital label, and for each field its value, gold page, printed quote and character span |
+
+### Metrics
+
+| Metric | Definition |
+| --- | --- |
+| OCR routing precision / recall | Over pages: "routed to OCR" against "page is a scanned image". |
+| CER / WER | Levenshtein distance over characters / words divided by the reference length, after collapsing whitespace. Micro-averaged over pages. |
+| Field recall | Share of labelled fields whose printed value (whitespace ignored) appears in the parsed text of its gold page: an upper bound on what the LLM step can extract. |
+| Throughput | Pages per second. Text extraction is measured in one process (best of 3). The pipeline is measured in the page pool after warm-up, with cold start, per-page OCR latency inside a worker and peak worker memory reported separately. |
+
+### Results
+
+Command: `uv run docfunnel eval-parse --ocr-engine rapidocr --ocr-engine tesseract --out reports/baseline/parse` (full report: [`reports/baseline/parse/report.md`](reports/baseline/parse/report.md)). Hardware: Apple M4 Pro (12 cores), 24 GB RAM, macOS (Darwin 25.6, arm64), Python 3.12.12; pypdfium2 5.14.0, RapidOCR 3.10.0 with ONNX Runtime 1.31.1, Tesseract 5.5.3 with the `eng` model; 12 worker processes, OCR at 200 dpi.
+
+OCR routing: accuracy 99.3%, precision 98.2%, recall 100.0%. All 56 scanned pages went to OCR. The one false positive is a short last page of a digital invoice printed over a full-page letterhead image, which the "scan with stray text" rule takes for a scan. It costs one unnecessary OCR call; it does not lose text.
+
+| Pages | Engine | CER | WER | Field recall |
+| --- | --- | ---: | ---: | ---: |
+| digital (78) | text layer | 0.0% | 0.0% | 100.0% |
+| scanned light (30) | RapidOCR | 1.6% | 1.9% | 100.0% |
+| scanned heavy (26) | RapidOCR | 5.5% | 18.9% | 73.7% |
+| scanned light (30) | Tesseract | 6.0% | 14.3% | 90.7% |
+| scanned heavy (26) | Tesseract | 37.3% | 75.2% | 27.4% |
+
+| Throughput | Result |
+| --- | ---: |
+| Text extraction, 1 process: pypdfium2 / pypdf (the previous loader) | 1,745 / 252 pages/s (6.9x) |
+| pypdfium2 with OCR decision and line blocks with boxes, 1 process | 905 pages/s |
+| Full set, 12 workers, RapidOCR: all pages / OCR pages | 3.05 / 1.3 pages/s |
+| Full set, 12 workers, Tesseract: all pages / OCR pages | 25.2 / 10.7 pages/s |
+| OCR latency per page inside a worker, p50: RapidOCR / Tesseract | 9.2 / 0.97 s |
+| Cold start: spawn 12 workers and load RapidOCR in each | 0.75 s |
+| Peak memory of one RapidOCR worker | 1.86 GB |
+| Full set, RapidOCR, 1 process x 12 threads (`--workers 1 --ocr-threads 12`) | 1.03 pages/s |
+
+What this shows:
+
+- **Digital pages need no OCR, and the text layer is exact.** CER is 0.0% on all 78 digital pages, and every field printed on them is found.
+- **RapidOCR is more accurate, Tesseract is faster.** On heavy scans RapidOCR keeps CER at 5.5% where Tesseract reaches 37.3%, and finds 73.7% of the printed field values against 27.4%. Tesseract is about 8x faster on this machine. The `eng` Tesseract model also reads `ä` as `a` and `ã` as `a`, which counts as errors on DE and BR documents.
+- **Heavy scans lose field values even when CER looks low.** WER on heavy scans (18.9%) is much higher than CER (5.5%): a single wrong character breaks a word, and amounts and IDs are single words. A quarter of the field values on heavy scans are not recoverable as printed; this is the slice where a better OCR model or a GPU would pay off.
+- **pypdfium2 is 6.9x faster than pypdf on these PDFs**, not the ~30x reported by the py-pdf benchmark. The generated PDFs are simple (standard fonts, no compressed object streams), which favours pypdf. Either way, text extraction is not the bottleneck: OCR is, at 1 to 11 pages/s against hundreds.
+- **Rendering at 150 instead of 200 dpi** (`--dpi 150`) gave 1.5 instead of 1.3 OCR pages/s with RapidOCR, with CER 1.3% (light) and 6.9% (heavy). 200 dpi stays the default because heavy scans are where errors matter.
+
+Throughput depends heavily on hardware. CI reports it but gates only quality metrics, plus one relative check in the same job: pypdfium2 must stay at least 3x faster than pypdf.
+
+OCR output is not bit-identical across platforms. Running the CI job in a Linux arm64 container (`python:3.12-slim`, 4 workers) on the same generated set gave the same routing and digital-page results, RapidOCR CER 1.7% (light) and 4.5% (heavy), and field recall 95.1% against 94.2% here; the gate tolerances (1 pp CER, 2 pp field recall) cover this. The x86 GitHub runner has not been checked yet because the repository has no remote.
+
+## Evaluation: LLM step
+
+The extraction step is scored on short receipts and invoices given as text.
 
 ### Dataset
 
@@ -200,6 +287,12 @@ Prices come from [`src/docfunnel/pricing.json`](src/docfunnel/pricing.json) (USD
 
 ```text
 src/docfunnel/
+├── parse/
+│   ├── model.py         # ParsedDocument -> Page -> Block: page numbers, char spans, boxes, source
+│   ├── pdf.py           # pypdfium2 text layer, page signals, per-page OCR decision
+│   ├── ocr.py           # RapidOCR / Tesseract behind one interface, deskewed row assembly
+│   └── pipeline.py      # parse_file, PagePool (page-level process pool), timeouts, error isolation
+├── synthetic_pdf.py     # seeded multi-page invoices/contracts -> PDF, scan simulation, ground truth
 ├── schema.py            # Pydantic contracts: ReceiptExtraction, ExtractionResult, CallRecord
 ├── normalize.py         # amounts, dates, currencies, identifiers: one definition of "equal"
 ├── validation.py        # business rules + needs_review decision
@@ -208,42 +301,53 @@ src/docfunnel/
 ├── pricing.py/.json     # configurable price table
 ├── config.py            # env-driven settings, extractor factory
 ├── providers/           # openai, anthropic, gemini, fake (offline), replay/record cassettes
-├── evals/               # dataset, metrics, runner, JSON/Markdown reports, regression compare
-├── synthetic.py         # seeded receipt/invoice generator with ground truth
-├── loaders.py           # txt / pdf (pypdf) / image (tesseract) - pluggable
+├── evals/               # LLM-step eval (dataset, metrics, runner, reports, compare) and parse_eval.py
+├── synthetic.py         # seeded receipt/invoice text generator with ground truth
+├── loaders.py           # file -> text for the extractor, through the parse stage
 ├── api.py               # FastAPI app
 ├── mcp_server.py        # MCP server with the extract_document tool
-└── cli.py               # docfunnel extract | eval | compare | generate-dataset | serve | mcp
-data/synthetic/          # bundled labelled dataset (generated)
-reports/baseline/        # committed fake-provider baselines used by the CI gate
+└── cli.py               # docfunnel parse | extract | eval | eval-parse | compare | compare-parse | ...
+data/synthetic/          # bundled receipt dataset; generated PDFs go to data/synthetic/pdf (git-ignored)
+reports/baseline/        # committed baselines used by the CI gates (LLM step and parse stage)
 examples/                # sample documents for the quickstart
-tests/                   # unit, integration (fake provider), API, CLI, MCP, SDK-adapter tests
+tests/                   # unit, integration, API, CLI, MCP, SDK-adapter, parse and parse-eval tests
 ```
 
 ## Testing
 
 ```bash
-uv run pytest                      # 177 tests, about 2 s, no network or API keys
-uv run pytest --cov=docfunnel     # about 96% line coverage
+uv run pytest                      # 213 tests, about 20 s on the machine above, no network or API keys
+uv run pytest --cov=docfunnel      # 95% line coverage
 uv run ruff check . && uv run ruff format --check .
 ```
 
-- **Unit:** normalization edge cases (separators, locales, ambiguous dates), schema coercion and rejection, every business rule, JSON parsing, metrics (field outcomes, one-to-one line-item matching, percentiles), price lookup.
+- **Unit:** normalization edge cases (separators, locales, ambiguous dates), schema coercion and rejection, every business rule, JSON parsing, metrics (field outcomes, one-to-one line-item matching, percentiles, CER/WER), price lookup, OCR routing rules, row assembly on skewed scans.
+- **Parse stage:** text-layer pages, blocks, spans and boxes; image-only and stray-text pages with and without OCR; RapidOCR and Tesseract on a rendered scan (skipped when the engine is missing); page-level error isolation; the process pool against sequential parsing.
+- **Synthetic PDFs:** deterministic ground truth, field spans that point at the printed quote, invoice labels that obey the business rules, and rendered PDFs that match the reference text.
 - **Extractor:** a scripted provider drives the repair, backoff, transient-error retry, fallback, total-failure and cost-accounting paths.
 - **Provider adapters:** OpenAI, Anthropic and Gemini adapters are tested against stubbed SDK clients (request mapping, token usage, retryable or non-retryable classification) with no network.
-- **Integration:** the full eval through the fake provider (determinism, fallback effect, report round-trip, regression detection), the FastAPI app via `TestClient`, the CLI via `CliRunner`, and the MCP tool via `list_tools` and `call_tool`.
+- **Integration:** the full LLM eval through the fake provider, the parse eval on a small generated set, both regression gates, the FastAPI app via `TestClient`, the CLI via `CliRunner`, and the MCP tool via `list_tools` and `call_tool`.
 
-CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint and tests, then the **eval regression gate** against the committed baseline (the comparison goes to the job summary), then a Docker build and smoke test.
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint and tests (with Tesseract installed), the **LLM eval regression gate** with the fake provider, the **parse eval gate** (regenerates the PDF set, runs RapidOCR on the CPU, compares routing, CER and field recall against the committed baseline), and a Docker build with smoke tests. No job needs an API key or a GPU.
 
 ## Limitations & roadmap
 
-- **Synthetic data is easier than real scans.** The layouts are regular, and the fake provider was written for them. Next step: score real models on a small, properly licensed public sample (for example CORD or SROIE, after checking their terms) next to the synthetic set.
-- **Text first.** Images go through basic Tesseract OCR, and PDFs need a text layer. Planned: send page images straight to vision-capable models and compare against OCR plus text.
-- **Prompt-and-validate structured output.** This works the same way across providers. Native strict modes (OpenAI `json_schema`, Anthropic structured outputs, Gemini `response_schema`) would cut repair turns and are next on the list.
-- **Uncalibrated confidence.** Per-field confidence is self-reported. Planned: calibration on labelled data (reliability curves) and threshold tuning per field.
-- **Domain coverage.** Discounts, tips, multiple tax rates per document and multi-page invoices aren't modelled yet.
-- **Throughput.** The extractor is synchronous with a thread-pool option for evals. Async clients, provider batch APIs and response caching are not implemented.
-- **Review is a flag.** There is no review UI or queue. The API returns the decision and the reasons for a downstream workflow to act on.
+Phase 1 (this version) is the parse stage and its evaluation. Known limitations:
+
+- **The parse stage is not yet connected to citations.** Blocks carry page numbers and spans, but the extractor still receives flat text. Using them for evidence comes in phase 3.
+- **Synthetic scans are easier than real ones.** The noise is simulated; real phone photos, thermal receipts and fax artefacts are not covered. There is no public, permissively licensed scan set in the repo yet (phase 2 adds CORD v2 and olmOCR-bench subsets).
+- **No `garbled` test pages.** The rule for broken text layers (fonts without a Unicode map) exists and is unit-tested, but the generator does not produce such PDFs yet.
+- **Lines, not layout.** Blocks are text lines. Paragraphs, tables and multi-column reading order need a layout model (Docling as an optional extra, planned).
+- **Tesseract runs with the `eng` model only**, which costs it accuracy on German and Portuguese text; `ParseOptions(tesseract_lang="eng+deu+por")` is available when those models are installed.
+- **The LLM step is still evaluated only with the fake provider.** No real-model numbers are published.
+
+Next phases, from the design notes:
+
+- **Phase 2: classify and retrieve.** More document types in the generator (bank statements, NDAs, purchase orders, letters and hard negatives); a cascade classifier (rules, then TF-IDF with logistic regression, then static embeddings, then the LLM only when confidence is low) with macro-F1 and risk-coverage curves; layout-aware chunking; BM25, dense and hybrid retrieval (RRF) with recall@k; a local benchmark on CORD v2 and olmOCR-bench subsets.
+- **Phase 3: LLM modes and the experiment matrix.** Free-form QA, fixed question sets per document type and structured extraction behind one `Task` interface; a schema per document type; native structured output for OpenAI, Anthropic and Gemini; evidence inside the schema (`chunk_id` + quote) checked in code, with grounded-answer rate and page-citation accuracy; an end-to-end matrix recorded in cassettes, a quality-vs-cost Pareto chart and per-stage cost and latency.
+- **Phase 4 (optional): GPU benchmark.** A single, reproducible run of GPU OCR and layout models (Docling, PaddleOCR-VL, olmOCR-2) on the same pages, with price and date recorded, to find which pages (likely the heavy scans) justify a GPU route.
+
+Also pending before publishing: updating the default model names and the price table.
 
 ## Author
 
