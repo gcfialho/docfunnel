@@ -22,7 +22,7 @@ DEFAULT_MODELS: dict[str, str] = {
     "anthropic": "claude-haiku-5-5",
     "gemini": "gemini-3.5-flash-lite",
 }
-"""The cheapest current general model of each provider; prices are in ``pricing.json``."""
+"""The low-cost tier of each provider's current model family (prices in ``pricing.json``)."""
 
 
 def get_provider(name: str, *, cassette: Path | None = None) -> LLMProvider:

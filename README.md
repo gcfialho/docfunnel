@@ -15,7 +15,7 @@ Most of the cost of document AI is the LLM call, not the parsing. Reading the te
 
 ## Highlights
 
-- **Fast CPU parse stage.** PDFs are read with `pypdfium2` (PDFium, the engine in Chrome). Each page is turned into the same structure, `ParsedDocument -> Page -> Block`, with the page number, character span into the page text, bounding box and source (`text_layer` or `ocr`) of every block, so later stages can cite page and span.
+- **Fast CPU parse stage.** PDFs are read with `pypdfium2` (PDFium, the engine in Chrome). Each page is turned into the same structure, `ParsedDocument -> Page -> Block`, with the page number, character span into the page text, bounding box and source (`text_layer` or `ocr`) of every block, so later stages can cite page and span. The result can be printed as JSON, plain text or Markdown (a `## Page N` section per page, with a note on pages that came from OCR).
 - **OCR only where it is needed, decided per page.** Cheap signals from the text layer (alphanumeric characters, broken-encoding markers, share of the page covered by images) route each page to the text layer or to OCR, so a digital invoice with one scanned annex gets OCR on that one page only. OCR runs on the CPU: RapidOCR (PP-OCR models on ONNX Runtime, no torch) by default, Tesseract as the baseline.
 - **Page-level process pool.** The unit of work is `(file, page)`, so one long document does not hold up the other workers. Workers are processes because PDFium is not thread-safe; the OCR model loads once per worker, and a failure or timeout on one page is recorded on that page without failing the document.
 - **Multi-page synthetic PDFs with exact ground truth.** A seeded generator renders multi-page invoices (line items across pages, totals on the last page) and contracts (clauses, schedule, signatures) to PDF in four locales, plus scanned versions with deterministic rotation, blur, low contrast, noise and JPEG artefacts. It records the text of every page, which pages are scanned, and where each field is printed (page, quote, character span).
@@ -43,6 +43,7 @@ uv run docfunnel parse examples/invoice_mixed_scan.pdf
 #   p1: text_layer                 source=text_layer blocks=83 ...
 #   p2: ocr:scan_with_stray_text   source=ocr        blocks=30 ...
 uv run docfunnel parse examples/invoice_multipage.pdf --format json   # pages, blocks, spans, boxes
+uv run docfunnel parse examples/invoice_mixed_scan.pdf --format markdown   # one section per page
 
 # Extract one document (prints validated JSON, review decision and per-call accounting)
 uv run docfunnel extract examples/receipt_us.txt
@@ -65,9 +66,11 @@ With a real model (keys are read from the environment; see [`.env.example`](.env
 ```bash
 export OPENAI_API_KEY=...
 uv run docfunnel extract examples/invoice_br.txt \
-  --provider openai --model gpt-4o-mini \
-  --fallback anthropic:claude-haiku-4-5
+  --provider openai --model gpt-6-luna \
+  --fallback anthropic:claude-haiku-5-5
 ```
+
+Each provider defaults to the low-cost tier of its current model family: `gpt-6-luna` (OpenAI, $0.10 / $0.50 per 1M input / output tokens), `claude-haiku-5-5` (Anthropic, $0.10 / $0.50 up to 100K input tokens) and `gemini-3.5-flash-lite` (Gemini, $0.30 / $2.50). For a fallback that steps up in capability rather than switching vendor, use `openai:gpt-6.1-terra` or `anthropic:claude-sonnet-5-5`.
 
 **HTTP API**
 
@@ -269,20 +272,20 @@ Example regression gate output, comparing the no-fallback run against the baseli
 ```bash
 uv sync --all-extras
 export OPENAI_API_KEY=...            # or ANTHROPIC_API_KEY / GEMINI_API_KEY
-uv run docfunnel eval --provider openai --model gpt-4o-mini \
-  --out reports/openai-gpt-4o-mini --workers 4 \
-  --record cassettes/gpt-4o-mini.json        # keep every response for offline re-scoring
+uv run docfunnel eval --provider openai --model gpt-6-luna \
+  --out reports/openai-gpt-6-luna --workers 4 \
+  --record cassettes/gpt-6-luna.json         # keep every response for offline re-scoring
 
 # Re-score later with no network or cost, e.g. after changing a metric:
-uv run docfunnel eval --provider replay --model gpt-4o-mini \
-  --cassette cassettes/gpt-4o-mini.json --out reports/replay
+uv run docfunnel eval --provider replay --model gpt-6-luna \
+  --cassette cassettes/gpt-6-luna.json --out reports/replay
 
 # Gate a prompt/model change:
-uv run docfunnel compare reports/openai-gpt-4o-mini/report.json reports/candidate/report.json \
+uv run docfunnel compare reports/openai-gpt-6-luna/report.json reports/candidate/report.json \
   --max-cost-increase 0.10 --max-p95-latency-increase 0.25
 ```
 
-Prices come from [`src/docfunnel/pricing.json`](src/docfunnel/pricing.json) (USD per 1M tokens). They are illustrative list prices: check them against the provider's current pricing, or point `DOCFUNNEL_PRICING_FILE` at your own table. Models missing from the table are reported with cost "unknown", never as $0.
+Prices come from [`src/docfunnel/pricing.json`](src/docfunnel/pricing.json): standard list prices in USD per 1M tokens, copied from the official OpenAI, Anthropic and Google pricing pages on 2026-11-03. Each entry records its source URL and that date. Where a provider charges more for long prompts, the entry has a `long_context` tier that applies to the whole call above the threshold (Claude Haiku 5.5 above 100K input tokens, GPT-6 models above 272K). Batch and cache discounts are not modelled. Prices change, so re-check the source pages, or point `DOCFUNNEL_PRICING_FILE` at your own table. Models missing from the table are reported with cost "unknown", never as $0.
 
 ## Project structure
 
@@ -292,14 +295,15 @@ src/docfunnel/
 │   ├── model.py         # ParsedDocument -> Page -> Block: page numbers, char spans, boxes, source
 │   ├── pdf.py           # pypdfium2 text layer, page signals, per-page OCR decision
 │   ├── ocr.py           # RapidOCR / Tesseract behind one interface, deskewed row assembly
-│   └── pipeline.py      # parse_file, PagePool (page-level process pool), timeouts, error isolation
+│   ├── pipeline.py      # parse_file, PagePool (page-level process pool), timeouts, error isolation
+│   └── markdown.py      # ParsedDocument -> Markdown: page sections, paragraphs, OCR notes
 ├── synthetic_pdf.py     # seeded multi-page invoices/contracts -> PDF, scan simulation, ground truth
 ├── schema.py            # Pydantic contracts: ReceiptExtraction, ExtractionResult, CallRecord
 ├── normalize.py         # amounts, dates, currencies, identifiers: one definition of "equal"
 ├── validation.py        # business rules + needs_review decision
 ├── prompts.py           # system / user / repair prompts, tolerant JSON parsing
 ├── extractor.py         # retry -> repair -> fallback loop, cost & latency accounting
-├── pricing.py/.json     # configurable price table
+├── pricing.py/.json     # price table with sources, check dates and long-context tiers
 ├── config.py            # env-driven settings, extractor factory
 ├── providers/           # openai, anthropic, gemini, fake (offline), replay/record cassettes
 ├── evals/               # LLM-step eval (dataset, metrics, runner, reports, compare) and parse_eval.py
@@ -317,14 +321,14 @@ tests/                   # unit, integration, API, CLI, MCP, SDK-adapter, parse 
 ## Testing
 
 ```bash
-uv run pytest                      # 213 tests, about 20 s on the machine above, no network or API keys
-uv run pytest --cov=docfunnel      # 95% line coverage
+uv run pytest                      # 237 tests, about 20 s on the machine above, no network or API keys
+uv run pytest --cov=docfunnel      # 96% line coverage
 uv run ruff check . && uv run ruff format --check .
 uv run mypy                        # typed (mypy --strict) over src/ and tests/; needs all extras
 ```
 
-- **Unit:** normalization edge cases (separators, locales, ambiguous dates), schema coercion and rejection, every business rule, JSON parsing, metrics (field outcomes, one-to-one line-item matching, percentiles, CER/WER), price lookup, OCR routing rules, row assembly on skewed scans.
-- **Parse stage:** text-layer pages, blocks, spans and boxes; image-only and stray-text pages with and without OCR; RapidOCR and Tesseract on a rendered scan (skipped when the engine is missing); page-level error isolation; the process pool against sequential parsing.
+- **Unit:** normalization edge cases (separators, locales, ambiguous dates), schema coercion and rejection, every business rule, JSON parsing, metrics (field outcomes, one-to-one line-item matching, percentiles, CER/WER), price lookup and long-context tiers, OCR routing rules, row assembly on skewed scans.
+- **Parse stage:** text-layer pages, blocks, spans and boxes; image-only and stray-text pages with and without OCR; RapidOCR and Tesseract on a rendered scan (skipped when the engine is missing); page-level error isolation; the process pool against sequential parsing; Markdown export (row and paragraph grouping, OCR notes, escaping).
 - **Synthetic PDFs:** deterministic ground truth, field spans that point at the printed quote, invoice labels that obey the business rules, and rendered PDFs that match the reference text.
 - **Extractor:** a scripted provider drives the repair, backoff, transient-error retry, fallback, total-failure and cost-accounting paths.
 - **Provider adapters:** OpenAI, Anthropic and Gemini adapters are tested against stubbed SDK clients (request mapping, token usage, retryable or non-retryable classification) with no network.
@@ -348,8 +352,6 @@ Next phases, from the design notes:
 - **Phase 2: classify and retrieve.** More document types in the generator (bank statements, NDAs, purchase orders, letters and hard negatives); a cascade classifier (rules, then TF-IDF with logistic regression, then static embeddings, then the LLM only when confidence is low) with macro-F1 and risk-coverage curves; layout-aware chunking; BM25, dense and hybrid retrieval (RRF) with recall@k; a local benchmark on CORD v2 and olmOCR-bench subsets.
 - **Phase 3: LLM modes and the experiment matrix.** Free-form QA, fixed question sets per document type and structured extraction behind one `Task` interface; a schema per document type; native structured output for OpenAI, Anthropic and Gemini; evidence inside the schema (`chunk_id` + quote) checked in code, with grounded-answer rate and page-citation accuracy; an end-to-end matrix recorded in cassettes, a quality-vs-cost Pareto chart and per-stage cost and latency.
 - **Phase 4 (optional): GPU benchmark.** A single, reproducible run of GPU OCR and layout models (Docling, PaddleOCR-VL, olmOCR-2) on the same pages, with price and date recorded, to find which pages (likely the heavy scans) justify a GPU route.
-
-Also pending before publishing: updating the default model names and the price table.
 
 ## Author
 
