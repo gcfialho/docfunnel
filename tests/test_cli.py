@@ -105,5 +105,15 @@ def test_parse_command(tmp_path: Path) -> None:
     assert json.loads(as_json.output)["pages"][1]["blocks"][0]["char_span"] == [0, 57]
     as_text = runner.invoke(app, ["parse", str(pdf), "--format", "text", "--ocr-engine", "none"])
     assert "also with enough text" in as_text.output
+    as_markdown = runner.invoke(
+        app, ["parse", str(pdf), "--format", "markdown", "--ocr-engine", "none"]
+    )
+    assert as_markdown.exit_code == 0, as_markdown.output
+    # Page 1 is short enough to be routed to OCR; with no engine it keeps the text layer.
+    assert as_markdown.output.startswith(
+        "# two\n\n## Page 1\n\n> Page error: OCR needed but no OCR engine is installed\n\n"
+        "first page of the document"
+    )
+    assert "\n\n## Page 2\n\nsecond page, also with enough text" in as_markdown.output
     bad = runner.invoke(app, ["parse", str(pdf), "--format", "xml"])
     assert bad.exit_code == 2

@@ -217,14 +217,16 @@ def parse(
     force_ocr: Annotated[
         bool, typer.Option(help="OCR every page, ignoring the text layer")
     ] = False,
-    output: Annotated[str, typer.Option("--format", help="summary | text | json")] = "summary",
+    output: Annotated[
+        str, typer.Option("--format", help="summary | text | json | markdown")
+    ] = "summary",
 ) -> None:
     """Parse one document into pages and blocks (no LLM call)."""
-    from docfunnel.parse import ParseOptions, parse_file
+    from docfunnel.parse import ParseOptions, parse_file, to_markdown
     from docfunnel.parse.ocr import OcrUnavailableError
 
-    if output not in {"summary", "text", "json"}:
-        raise _fail("--format must be summary, text or json")
+    if output not in {"summary", "text", "json", "markdown"}:
+        raise _fail("--format must be summary, text, json or markdown")
     try:
         options = ParseOptions(ocr_engine=ocr_engine, dpi=dpi, force_ocr=force_ocr)
         document = parse_file(source, options)
@@ -235,6 +237,9 @@ def parse(
         return
     if output == "text":
         typer.echo(document.text)
+        return
+    if output == "markdown":
+        typer.echo(to_markdown(document), nl=False)
         return
     typer.echo(f"{document.doc_id}: {len(document.pages)} page(s), parser {document.parser}")
     for page in document.pages:
