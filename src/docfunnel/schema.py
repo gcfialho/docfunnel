@@ -162,14 +162,18 @@ class ValidationIssue(BaseModel):
     fields: list[str] = Field(default_factory=list)
 
 
+CallPurpose = Literal["extract", "repair"]
+CallStatus = Literal["ok", "invalid_json", "schema_error", "provider_error"]
+
+
 class CallRecord(BaseModel):
     """One LLM call: the unit of cost and latency accounting."""
 
     provider: str
     model: str
     attempt: int
-    purpose: Literal["extract", "repair"]
-    status: Literal["ok", "invalid_json", "schema_error", "provider_error"]
+    purpose: CallPurpose
+    status: CallStatus
     input_tokens: int = 0
     output_tokens: int = 0
     cost_usd: float | None = None

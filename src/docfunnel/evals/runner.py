@@ -161,8 +161,8 @@ def aggregate(scores: Sequence[DocumentScore]) -> Metrics:
     li_precision, li_recall = safe_div(tp, tp + fp), safe_div(tp, tp + fn)
     flagged = [s for s in scores if s.needs_review]
     should = [s for s in scores if s.should_review]
-    costs = [s.cost_usd for s in scores]
-    total_cost = None if any(c is None for c in costs) else sum(costs)
+    known_costs = [s.cost_usd for s in scores if s.cost_usd is not None]
+    total_cost = sum(known_costs) if len(known_costs) == len(scores) else None
     latencies = [s.latency_ms for s in scores]
     return Metrics(
         documents=n,

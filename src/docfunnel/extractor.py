@@ -23,6 +23,7 @@ import random
 import time
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
+from typing import TypedDict
 
 from pydantic import ValidationError
 
@@ -42,7 +43,9 @@ from docfunnel.providers.base import (
     ProviderError,
 )
 from docfunnel.schema import (
+    CallPurpose,
     CallRecord,
+    CallStatus,
     ExtractionResult,
     ReceiptExtraction,
     UsageSummary,
@@ -74,8 +77,16 @@ class RetryPolicy:
         """Exponential backoff with "equal jitter" for the n-th retry (1-based)."""
         if self.backoff_base_s <= 0:
             return 0.0
-        ceiling = min(self.backoff_max_s, self.backoff_base_s * 2 ** (retry_number - 1))
+        ceiling = min(self.backoff_max_s, self.backoff_base_s * 2.0 ** (retry_number - 1))
         return ceiling / 2 + rng.uniform(0, ceiling / 2)
+
+
+class _ResponseUsage(TypedDict):
+    """What a provider reported for one successful call, as ``_record`` keyword arguments."""
+
+    input_tokens: int
+    output_tokens: int
+    model: str
 
 
 @dataclass
@@ -139,7 +150,7 @@ class Extractor:
         for attempt in range(1, self.retry.max_attempts + 1):
             if attempt > 1:
                 self._sleep(self.retry.delay(attempt - 1, self._rng))
-            purpose = "repair" if len(messages) > 2 else "extract"
+            purpose: CallPurpose = "repair" if len(messages) > 2 else "extract"
             request = CompletionRequest(
                 model=target.model,
                 messages=tuple(messages),
@@ -156,7 +167,7 @@ class Extractor:
                     return None
                 continue
 
-            record = {
+            record: _ResponseUsage = {
                 "input_tokens": response.input_tokens,
                 "output_tokens": response.output_tokens,
                 "model": response.model,
@@ -199,8 +210,8 @@ class Extractor:
         self,
         target: ModelTarget,
         attempt: int,
-        purpose: str,
-        status: str,
+        purpose: CallPurpose,
+        status: CallStatus,
         t0: float,
         *,
         input_tokens: int = 0,
@@ -235,12 +246,13 @@ class Extractor:
     ) -> ExtractionResult:
         issues = check_business_rules(document, self.review) if document else []
         needs_review, reasons = review_decision(document, issues, self.review)
-        costs = [c.cost_usd for c in calls]
+        known_costs = [c.cost_usd for c in calls if c.cost_usd is not None]
         usage = UsageSummary(
             calls=len(calls),
             input_tokens=sum(c.input_tokens for c in calls),
             output_tokens=sum(c.output_tokens for c in calls),
-            cost_usd=None if any(c is None for c in costs) else round(sum(costs), 8),
+            # One unpriced call makes the total unknown rather than silently too low.
+            cost_usd=round(sum(known_costs), 8) if len(known_costs) == len(calls) else None,
             latency_ms=round((self._clock() - started) * 1000, 3),
         )
         return ExtractionResult(
