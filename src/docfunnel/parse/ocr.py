@@ -69,9 +69,17 @@ class RapidOcrEngine:
 
     def recognize(self, image: Any) -> list[OcrLine]:
         import numpy as np
+        from rapidocr.utils.output import RapidOCROutput
 
         result = self._engine(np.asarray(image.convert("RGB")))
-        if result.boxes is None or result.txts is None:
+        # Only a full det+rec run yields RapidOCROutput; when recognition fails RapidOCR
+        # returns the bare detection output (boxes, no texts), which has nothing to read.
+        if (
+            not isinstance(result, RapidOCROutput)
+            or result.boxes is None
+            or result.txts is None
+            or result.scores is None
+        ):
             return []
         lines = []
         for quad, text, score in zip(result.boxes, result.txts, result.scores, strict=True):
