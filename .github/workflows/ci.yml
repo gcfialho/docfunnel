@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    name: Lint & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install (Python version from .python-version)
+        run: uv sync --locked --all-extras
+      - name: Ruff lint
+        run: uv run ruff check .
+      - name: Ruff format
+        run: uv run ruff format --check .
+      - name: Tests (offline - fake provider, no API keys)
+        run: uv run pytest --cov=docextract --cov-report=term-missing
+
+  eval-regression:
+    name: Eval regression gate
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Run eval on the synthetic dataset (fake provider)
+        run: >
+          uv run docextract eval
+          --provider fake --model fake-mini --fallback fake:fake-pro
+          --out reports/ci --run-name "ci-${{ github.sha }}"
+      - name: Compare against committed baseline
+        run: >
+          uv run docextract compare
+          reports/baseline/fake-mini+fallback/report.json reports/ci/report.json
+          --out reports/ci/comparison.md
+      - name: Publish summary
+        if: always()
+        run: |
+          cat reports/ci/comparison.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: reports/ci/
+
+  docker:
+    name: Docker build & smoke test
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t docextract:ci .
+      - name: Smoke test CLI inside the image
+        run: docker run --rm docextract:ci docextract extract examples/receipt_us.txt --no-include-calls
