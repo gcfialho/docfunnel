@@ -82,3 +82,28 @@ def test_generate_dataset(tmp_path: Path) -> None:
     result = runner.invoke(app, ["generate-dataset", "--out", str(out), "--n", "5"])
     assert result.exit_code == 0
     assert len(out.read_text().splitlines()) == 5
+
+
+def test_parse_command(tmp_path: Path) -> None:
+    pytest.importorskip("reportlab")
+    from reportlab.pdfgen.canvas import Canvas
+
+    pdf = tmp_path / "two.pdf"
+    canvas = Canvas(str(pdf), invariant=1)
+    for text in (
+        "first page of the document with enough text",
+        "second page, also with enough text to keep its text layer",
+    ):
+        canvas.drawString(60, 700, text)
+        canvas.showPage()
+    canvas.save()
+    summary = runner.invoke(app, ["parse", str(pdf), "--ocr-engine", "none"])
+    assert summary.exit_code == 0, summary.output
+    assert "2 page(s)" in summary.output
+    assert "p2: text_layer" in summary.output
+    as_json = runner.invoke(app, ["parse", str(pdf), "--format", "json", "--ocr-engine", "none"])
+    assert json.loads(as_json.output)["pages"][1]["blocks"][0]["char_span"] == [0, 57]
+    as_text = runner.invoke(app, ["parse", str(pdf), "--format", "text", "--ocr-engine", "none"])
+    assert "also with enough text" in as_text.output
+    bad = runner.invoke(app, ["parse", str(pdf), "--format", "xml"])
+    assert bad.exit_code == 2

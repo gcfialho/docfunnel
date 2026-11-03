@@ -204,6 +204,48 @@ def compare(
         raise typer.Exit(1)
 
 
+OcrEngineOpt = Annotated[
+    str, typer.Option("--ocr-engine", help="auto | none | rapidocr | tesseract")
+]
+
+
+@app.command()
+def parse(
+    source: Annotated[Path, typer.Argument(help="File (pdf/image/txt)")],
+    ocr_engine: OcrEngineOpt = "auto",
+    dpi: Annotated[int, typer.Option(help="Render resolution for OCR")] = 200,
+    force_ocr: Annotated[
+        bool, typer.Option(help="OCR every page, ignoring the text layer")
+    ] = False,
+    output: Annotated[str, typer.Option("--format", help="summary | text | json")] = "summary",
+) -> None:
+    """Parse one document into pages and blocks (no LLM call)."""
+    from docfunnel.parse import ParseOptions, parse_file
+    from docfunnel.parse.ocr import OcrUnavailableError
+
+    if output not in {"summary", "text", "json"}:
+        raise _fail("--format must be summary, text or json")
+    try:
+        options = ParseOptions(ocr_engine=ocr_engine, dpi=dpi, force_ocr=force_ocr)
+        document = parse_file(source, options)
+    except (OSError, UnsupportedDocumentError, OcrUnavailableError, ValueError) as exc:
+        raise _fail(str(exc)) from exc
+    if output == "json":
+        typer.echo(document.model_dump_json(indent=2))
+        return
+    if output == "text":
+        typer.echo(document.text)
+        return
+    typer.echo(f"{document.doc_id}: {len(document.pages)} page(s), parser {document.parser}")
+    for page in document.pages:
+        total = page.timings_ms.get("total", 0.0)
+        line = (
+            f"  p{page.number}: {page.route:<26} source={page.source:<10} "
+            f"blocks={len(page.blocks):<4} chars={len(page.text):<6} {total:8.1f} ms"
+        )
+        typer.echo(line + (f"  error: {page.error}" if page.error else ""))
+
+
 @app.command("generate-dataset")
 def generate_dataset(
     out: Annotated[Path, typer.Option(help="Output JSONL path")] = DEFAULT_DATASET,
