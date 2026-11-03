@@ -67,8 +67,36 @@ class Settings:
             input_dir=path("DOCFUNNEL_INPUT_DIR"),
         )
 
-    def with_overrides(self, **overrides: object) -> Settings:
-        return replace(self, **{k: v for k, v in overrides.items() if v is not None})
+    def with_overrides(
+        self,
+        *,
+        provider: str | None = None,
+        model: str | None = None,
+        fallbacks: tuple[tuple[str, str], ...] | None = None,
+        max_attempts: int | None = None,
+        backoff_base_s: float | None = None,
+        review_min_confidence: float | None = None,
+        pricing_file: Path | None = None,
+        cassette: Path | None = None,
+        input_dir: Path | None = None,
+    ) -> Settings:
+        """Copy with the given fields replaced; ``None`` keeps the current value."""
+        return replace(
+            self,
+            provider=self.provider if provider is None else provider,
+            model=self.model if model is None else model,
+            fallbacks=self.fallbacks if fallbacks is None else fallbacks,
+            max_attempts=self.max_attempts if max_attempts is None else max_attempts,
+            backoff_base_s=self.backoff_base_s if backoff_base_s is None else backoff_base_s,
+            review_min_confidence=(
+                self.review_min_confidence
+                if review_min_confidence is None
+                else review_min_confidence
+            ),
+            pricing_file=self.pricing_file if pricing_file is None else pricing_file,
+            cassette=self.cassette if cassette is None else cassette,
+            input_dir=self.input_dir if input_dir is None else input_dir,
+        )
 
     @property
     def primary(self) -> tuple[str, str]:
