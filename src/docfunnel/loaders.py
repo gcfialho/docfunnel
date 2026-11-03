@@ -1,9 +1,11 @@
-"""Turn input files into text. OCR is pluggable and optional.
+"""Turn input files into text for the extraction step.
 
-The extraction pipeline is text-in. Text files are read directly; PDFs use their
-embedded text layer (``pypdf``, extra ``pdf``); images go through Tesseract
-(``pytesseract`` + the ``tesseract`` binary, extra ``ocr``). Register another
-backend (a cloud OCR, a layout model) with :func:`register_loader`.
+Built-in file types go through the parse stage (:mod:`docfunnel.parse`): text files
+are read directly, PDFs use the ``pypdfium2`` text layer with OCR only on the pages
+that need it, and images go to the installed OCR engine (RapidOCR, else Tesseract).
+Use :func:`docfunnel.parse.parse_file` directly when you need pages, blocks and
+offsets instead of a flat string. Register another backend (a cloud OCR, a layout
+model) for a suffix with :func:`register_loader`.
 """
 
 from __future__ import annotations
@@ -11,47 +13,43 @@ from __future__ import annotations
 from collections.abc import Callable
 from pathlib import Path
 
+from docfunnel.parse.pipeline import (
+    IMAGE_SUFFIXES,
+    PDF_SUFFIXES,
+    TEXT_SUFFIXES,
+    ParseOptions,
+    UnsupportedDocumentError,
+    parse_file,
+)
+
 Loader = Callable[[Path], str]
 
-
-class UnsupportedDocumentError(ValueError):
-    """No loader for this file type, or the optional dependency is missing."""
+__all__ = [
+    "Loader",
+    "UnsupportedDocumentError",
+    "load_document",
+    "register_loader",
+    "supported_suffixes",
+]
 
 
 def load_text_file(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
-def load_pdf(path: Path) -> str:
-    try:
-        from pypdf import PdfReader
-    except ImportError as exc:
-        raise UnsupportedDocumentError("PDF input requires the 'pdf' extra (pypdf)") from exc
-    text = "\n".join(page.extract_text() or "" for page in PdfReader(path).pages).strip()
+def load_parsed(path: Path, options: ParseOptions | None = None) -> str:
+    document = parse_file(path, options)
+    text = document.text.strip()
     if not text:
-        raise UnsupportedDocumentError(
-            f"{path.name} has no text layer; rasterize it and use an OCR loader"
-        )
+        missing_ocr = any(page.source == "none" for page in document.pages)
+        hint = "; install the 'ocr' extra to OCR scanned pages" if missing_ocr else ""
+        raise UnsupportedDocumentError(f"no text found in {path.name}{hint}")
     return text
 
 
-def load_image(path: Path) -> str:
-    try:
-        import pytesseract
-        from PIL import Image
-    except ImportError as exc:
-        raise UnsupportedDocumentError(
-            "image input requires the 'ocr' extra and the tesseract binary"
-        ) from exc
-    with Image.open(path) as image:
-        return pytesseract.image_to_string(image)
-
-
 _LOADERS: dict[str, Loader] = {
-    ".txt": load_text_file,
-    ".md": load_text_file,
-    ".pdf": load_pdf,
-    **dict.fromkeys((".png", ".jpg", ".jpeg", ".tif", ".tiff", ".webp"), load_image),
+    **dict.fromkeys(TEXT_SUFFIXES, load_text_file),
+    **dict.fromkeys(PDF_SUFFIXES | IMAGE_SUFFIXES, load_parsed),
 }
 
 

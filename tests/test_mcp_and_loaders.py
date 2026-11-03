@@ -54,5 +54,5 @@ def test_pdf_loader(tmp_path: Path) -> None:
     writer.add_blank_page(width=200, height=200)
     with path.open("wb") as handle:
         writer.write(handle)
-    with pytest.raises(UnsupportedDocumentError, match="no text layer"):
+    with pytest.raises(UnsupportedDocumentError, match="no text found"):
         load_document(path)
