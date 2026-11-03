@@ -25,3 +25,6 @@ cassettes/
 .DS_Store
 .idea/
 .vscode/
+
+# Generated PDF dataset (docfunnel generate-pdfs); regenerate instead of committing
+data/synthetic/pdf/

@@ -259,6 +259,25 @@ def generate_dataset(
     typer.echo(f"Wrote {count} documents to {out}")
 
 
+@app.command("generate-pdfs")
+def generate_pdfs(
+    out: Annotated[Path, typer.Option(help="Output directory (PDFs + manifest.jsonl)")] = Path(
+        "data/synthetic/pdf"
+    ),
+    n: Annotated[int, typer.Option(help="Number of documents")] = 50,
+    seed: Annotated[int, typer.Option(help="Random seed")] = 11,
+) -> None:
+    """Generate multi-page invoice/contract PDFs (digital, scanned, mixed) with ground truth."""
+    try:
+        from docfunnel.synthetic_pdf import write_pdf_dataset
+    except ImportError as exc:  # pragma: no cover - only without the extra
+        raise _fail("generate-pdfs requires the 'synthetic' extra") from exc
+    truths = write_pdf_dataset(out, n=n, seed=seed)
+    pages = sum(len(t.pages) for t in truths)
+    scanned = sum(p.scanned for t in truths for p in t.pages)
+    typer.echo(f"Wrote {len(truths)} documents ({pages} pages, {scanned} scanned) to {out}")
+
+
 @app.command()
 def serve(
     host: str = "127.0.0.1",
