@@ -29,6 +29,8 @@ jobs:
         run: uv run ruff check .
       - name: Ruff format
         run: uv run ruff format --check .
+      - name: Type check (mypy --strict, config in pyproject.toml)
+        run: uv run mypy
       - name: Tests (offline - fake provider, no API keys)
         run: uv run pytest --cov=docfunnel --cov-report=term-missing
 
