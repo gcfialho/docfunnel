@@ -69,8 +69,8 @@ class AnthropicProvider:
             }
         if output_config:
             kwargs["output_config"] = output_config
-        if model.disable_thinking:
-            kwargs["thinking"] = {"type": "disabled"}
+        # ``thinking`` is never sent: models that think do so adaptively by default, and
+        # effort is the documented control (disabling it is rejected on several models).
         return kwargs
 
     def complete(self, request: CompletionRequest) -> CompletionResponse:

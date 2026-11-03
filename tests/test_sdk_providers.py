@@ -261,17 +261,17 @@ class TestAnthropic:
         assert "temperature" not in captured  # API version 2026-10-21 rejects it
         assert (response.input_tokens, response.output_tokens) == (20, 5)
 
-    def test_haiku_5_5_thinking_off_low_effort_structured_output(self) -> None:
+    def test_haiku_5_5_low_effort_structured_output(self) -> None:
         from docfunnel.providers.anthropic_provider import AnthropicProvider
 
         params = AnthropicProvider.build_params(request_for("claude-haiku-5-5"))
 
-        assert params["thinking"] == {"type": "disabled"}
+        assert "thinking" not in params  # adaptive by default; effort is the control
         assert params["output_config"] == {
             "effort": "low",
             "format": {"type": "json_schema", "schema": SCHEMA},
         }
-        assert params["max_tokens"] == 4096
+        assert params["max_tokens"] == 8192  # room for any thinking plus the answer
         assert "temperature" not in params
 
     def test_haiku_4_5_gets_structured_output_but_no_effort_or_thinking(self) -> None:
@@ -284,7 +284,7 @@ class TestAnthropic:
         assert params["max_tokens"] == 2048
 
     @pytest.mark.parametrize("model", ["claude-sonnet-5-5", "claude-opus-5-5", "claude-fable-5-1"])
-    def test_models_that_cannot_disable_thinking_lower_effort_instead(self, model: str) -> None:
+    def test_larger_models_lower_effort_instead_of_disabling_thinking(self, model: str) -> None:
         from docfunnel.providers.anthropic_provider import AnthropicProvider
 
         params = AnthropicProvider.build_params(request_for(model))

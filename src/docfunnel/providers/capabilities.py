@@ -46,8 +46,6 @@ class AnthropicModel:
     """Send ``output_config.format`` (available on every model per the docs)."""
     effort: AnthropicEffort | None = None
     """``output_config.effort``; ``None`` leaves it out (it errors on Haiku 4.5)."""
-    disable_thinking: bool = False
-    """Send ``thinking: {"type": "disabled"}``. Only where the model accepts it."""
     min_output_tokens: int = 0
     """Floor for ``max_tokens``, which also covers thinking tokens."""
 
@@ -87,10 +85,11 @@ ANTHROPIC_DEFAULT = AnthropicModel()
 ANTHROPIC_MODELS: dict[str, AnthropicModel] = {
     # Haiku 4.5: no effort parameter (it errors), thinking off unless requested.
     "claude-haiku-4-5": AnthropicModel(),
-    # Haiku 5.5: adaptive thinking on by default at effort "medium", and it counts
-    # against max_tokens. "disabled" is accepted at effort low/medium/high; the new
-    # tokenizer uses ~30% more tokens for the same text.
-    "claude-haiku-5-5": AnthropicModel(effort="low", disable_thinking=True, min_output_tokens=4096),
+    # Haiku 5.5: adaptive thinking is on by default (effort "medium"), billed as output
+    # and counted against max_tokens. The migration guide says to leave thinking unset
+    # and lower effort: at "low" the model minimizes thinking and skips it on simple
+    # tasks. The new tokenizer also uses ~30% more tokens for the same text.
+    "claude-haiku-5-5": AnthropicModel(effort="low", min_output_tokens=8192),
     # Sonnet 5.5: "disabled" returns 400; keep adaptive thinking, lower the effort.
     "claude-sonnet-5-5": AnthropicModel(effort="low", min_output_tokens=8192),
     # Opus 5.5 and Fable 5.1: thinking cannot be disabled; effort is the only control.

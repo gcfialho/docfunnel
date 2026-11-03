@@ -115,9 +115,9 @@ def test_anthropic_claude_haiku_5_5_wire_body(monkeypatch: pytest.MonkeyPatch) -
     assert seen[0].url.path == "/v1/messages"
     assert seen[0].headers["anthropic-version"] == "2026-10-21"
     assert body["model"] == "claude-haiku-5-5"
-    assert body["max_tokens"] == 4096
+    assert body["max_tokens"] == 8192
     assert body["system"] == "SYSTEM"
-    assert body["thinking"] == {"type": "disabled"}
+    assert "thinking" not in body
     assert body["output_config"] == {
         "effort": "low",
         "format": {"type": "json_schema", "schema": output_schema()},
