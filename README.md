@@ -8,6 +8,7 @@
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
 [![uv](https://img.shields.io/badge/packaged%20with-uv-6340ac)](https://docs.astral.sh/uv/)
 [![Ruff](https://img.shields.io/badge/lint-ruff-d7ff64)](https://docs.astral.sh/ruff/)
+[![mypy: strict](https://img.shields.io/badge/mypy-strict-2a6db2)](https://mypy.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 Most of the cost of document AI is the LLM call, not the parsing. Reading the text layer of a digital PDF takes milliseconds per page and OCR on a CPU is cheap, so the plan is to do as much as possible before the LLM: get exact text where the PDF has it, OCR only the pages that need it, keep page numbers and character offsets so answers can cite their source, and send the model only what it needs. This repository builds that pipeline in stages. Phase 1, implemented here, is the parse stage and its evaluation; it feeds the LLM extraction step that already handles schema validation, repair, fallback, human-review routing and cost tracking. The [roadmap](#limitations--roadmap) lists the next stages (classification, retrieval, question answering with verified citations).
@@ -319,6 +320,7 @@ tests/                   # unit, integration, API, CLI, MCP, SDK-adapter, parse 
 uv run pytest                      # 213 tests, about 20 s on the machine above, no network or API keys
 uv run pytest --cov=docfunnel      # 95% line coverage
 uv run ruff check . && uv run ruff format --check .
+uv run mypy                        # typed (mypy --strict) over src/ and tests/; needs all extras
 ```
 
 - **Unit:** normalization edge cases (separators, locales, ambiguous dates), schema coercion and rejection, every business rule, JSON parsing, metrics (field outcomes, one-to-one line-item matching, percentiles, CER/WER), price lookup, OCR routing rules, row assembly on skewed scans.
@@ -328,7 +330,7 @@ uv run ruff check . && uv run ruff format --check .
 - **Provider adapters:** OpenAI, Anthropic and Gemini adapters are tested against stubbed SDK clients (request mapping, token usage, retryable or non-retryable classification) with no network.
 - **Integration:** the full LLM eval through the fake provider, the parse eval on a small generated set, both regression gates, the FastAPI app via `TestClient`, the CLI via `CliRunner`, and the MCP tool via `list_tools` and `call_tool`.
 
-CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint and tests (with Tesseract installed), the **LLM eval regression gate** with the fake provider, the **parse eval gate** (regenerates the PDF set, runs RapidOCR on the CPU, compares routing, CER and field recall against the committed baseline), and a Docker build with smoke tests. No job needs an API key or a GPU.
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs lint, type checking (mypy --strict) and tests (with Tesseract installed), the **LLM eval regression gate** with the fake provider, the **parse eval gate** (regenerates the PDF set, runs RapidOCR on the CPU, compares routing, CER and field recall against the committed baseline), and a Docker build with smoke tests. No job needs an API key or a GPU.
 
 ## Limitations & roadmap
 
