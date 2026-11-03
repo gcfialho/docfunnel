@@ -21,6 +21,8 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
+      - name: Install Tesseract (baseline OCR engine, exercised by the parse tests)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr
       - name: Install (Python version from .python-version)
         run: uv sync --locked --all-extras
       - name: Ruff lint
@@ -60,6 +62,39 @@ jobs:
           name: eval-report
           path: reports/ci/
 
+  parse-eval:
+    name: Parse-stage eval gate (CPU, RapidOCR)
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      # RapidOCR's ONNX models ship inside its wheel, so the uv cache covers them.
+      - run: uv sync --locked --extra cpu --extra synthetic
+      - name: Generate the synthetic PDF set (seeded, same manifest as the baseline)
+        run: uv run docfunnel generate-pdfs --out data/synthetic/pdf
+      - name: Run the parse eval
+        run: >
+          uv run docfunnel eval-parse --data data/synthetic/pdf
+          --ocr-engine rapidocr --out reports/ci-parse --run-name "ci-${{ github.sha }}"
+      - name: Compare against committed baseline (quality gated, throughput reported)
+        run: >
+          uv run docfunnel compare-parse
+          reports/baseline/parse/report.json reports/ci-parse/report.json
+          --out reports/ci-parse/comparison.md
+      - name: Publish summary
+        if: always()
+        run: |
+          cat reports/ci-parse/comparison.md >> "$GITHUB_STEP_SUMMARY" || true
+          cat reports/ci-parse/report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: parse-eval-report
+          path: reports/ci-parse/
+
   docker:
     name: Docker build & smoke test
     needs: lint-and-test
@@ -69,4 +104,6 @@ jobs:
       - name: Build image
         run: docker build -t docfunnel:ci .
       - name: Smoke test CLI inside the image
-        run: docker run --rm docfunnel:ci docfunnel extract examples/receipt_us.txt --no-include-calls
+        run: |
+          docker run --rm docfunnel:ci docfunnel extract examples/receipt_us.txt --no-include-calls
+          docker run --rm docfunnel:ci docfunnel parse examples/invoice_multipage.pdf
