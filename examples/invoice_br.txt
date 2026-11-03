@@ -1,0 +1,19 @@
+NOTA FISCAL DE SERVIÇO
+
+Papelaria Estrela
+Rua das Flores, 120 - Niterói/RJ
+CNPJ: 32.319.487/0001-57
+
+Nota nº F-2023-9118
+Data de emissão: 03/11/2023
+Tomador: Comércio Fictício S.A.
+
+Descrição | Qtd | Valor unit. | Valor
+Licença de software | 8 | 1.890,00 | 15.120,00
+Consultoria (horas) | 10 | 150,00 | 1.500,00
+Serviço de manutenção | 8 | 380,00 | 3.040,00
+
+Subtotal: R$ 19.660,00
+ISS 2%: R$ 393,20
+Valor total (BRL): 20.053,20
+Pagamento: Cartão de débito
