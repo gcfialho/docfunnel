@@ -6,12 +6,18 @@ accounting) and the retryable/non-retryable error classification.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from types import SimpleNamespace
-from typing import Any
+from typing import TYPE_CHECKING, Any, NoReturn
 
 import pytest
 
 from docfunnel.providers.base import CompletionRequest, Message, ProviderError
+
+if TYPE_CHECKING:
+    from docfunnel.providers.anthropic_provider import AnthropicProvider
+    from docfunnel.providers.gemini_provider import GeminiProvider
+    from docfunnel.providers.openai_provider import OpenAIProvider
 
 REQUEST = CompletionRequest(
     model="some-model",
@@ -34,8 +40,8 @@ def make_error(cls: type[Exception], **attrs: Any) -> Exception:
     return error
 
 
-def raiser(error: Exception):
-    def fail(**_: Any) -> Any:
+def raiser(error: Exception) -> Callable[..., NoReturn]:
+    def fail(**_: Any) -> NoReturn:
         raise error
 
     return fail
@@ -43,13 +49,15 @@ def raiser(error: Exception):
 
 class TestOpenAI:
     @pytest.fixture
-    def provider(self):
+    def provider(self) -> OpenAIProvider:
         pytest.importorskip("openai")
         from docfunnel.providers.openai_provider import OpenAIProvider
 
         return OpenAIProvider(api_key="test-key")
 
-    def test_request_mapping_and_usage(self, provider) -> None:
+    def test_request_mapping_and_usage(
+        self, provider: OpenAIProvider, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         captured: dict[str, Any] = {}
 
         def create(**kwargs: Any) -> Any:
@@ -60,8 +68,10 @@ class TestOpenAI:
                 usage=SimpleNamespace(prompt_tokens=11, completion_tokens=7),
             )
 
-        provider._client = SimpleNamespace(
-            chat=SimpleNamespace(completions=SimpleNamespace(create=create))
+        monkeypatch.setattr(
+            provider,
+            "_client",
+            SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=create))),
         )
         response = provider.complete(REQUEST)
 
@@ -83,12 +93,22 @@ class TestOpenAI:
             ("BadRequestError", False),
         ],
     )
-    def test_error_classification(self, provider, error_name: str, retryable: bool) -> None:
+    def test_error_classification(
+        self,
+        provider: OpenAIProvider,
+        monkeypatch: pytest.MonkeyPatch,
+        error_name: str,
+        retryable: bool,
+    ) -> None:
         import openai
 
         error = make_error(getattr(openai, error_name))
-        provider._client = SimpleNamespace(
-            chat=SimpleNamespace(completions=SimpleNamespace(create=raiser(error)))
+        monkeypatch.setattr(
+            provider,
+            "_client",
+            SimpleNamespace(
+                chat=SimpleNamespace(completions=SimpleNamespace(create=raiser(error)))
+            ),
         )
         with pytest.raises(ProviderError) as info:
             provider.complete(REQUEST)
@@ -97,13 +117,15 @@ class TestOpenAI:
 
 class TestAnthropic:
     @pytest.fixture
-    def provider(self):
+    def provider(self) -> AnthropicProvider:
         pytest.importorskip("anthropic")
         from docfunnel.providers.anthropic_provider import AnthropicProvider
 
         return AnthropicProvider(api_key="test-key")
 
-    def test_system_prompt_is_passed_separately(self, provider) -> None:
+    def test_system_prompt_is_passed_separately(
+        self, provider: AnthropicProvider, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         captured: dict[str, Any] = {}
 
         def create(**kwargs: Any) -> Any:
@@ -114,7 +136,9 @@ class TestAnthropic:
                 usage=SimpleNamespace(input_tokens=20, output_tokens=5),
             )
 
-        provider._client = SimpleNamespace(messages=SimpleNamespace(create=create))
+        monkeypatch.setattr(
+            provider, "_client", SimpleNamespace(messages=SimpleNamespace(create=create))
+        )
         response = provider.complete(REQUEST)
 
         assert captured["system"] == "SYSTEM"
@@ -123,11 +147,19 @@ class TestAnthropic:
         assert (response.input_tokens, response.output_tokens) == (20, 5)
 
     @pytest.mark.parametrize(("status", "retryable"), [(429, True), (529, True), (400, False)])
-    def test_error_classification(self, provider, status: int, retryable: bool) -> None:
+    def test_error_classification(
+        self,
+        provider: AnthropicProvider,
+        monkeypatch: pytest.MonkeyPatch,
+        status: int,
+        retryable: bool,
+    ) -> None:
         import anthropic
 
         error = make_error(anthropic.APIStatusError, status_code=status)
-        provider._client = SimpleNamespace(messages=SimpleNamespace(create=raiser(error)))
+        monkeypatch.setattr(
+            provider, "_client", SimpleNamespace(messages=SimpleNamespace(create=raiser(error)))
+        )
         with pytest.raises(ProviderError) as info:
             provider.complete(REQUEST)
         assert info.value.retryable is retryable
@@ -135,13 +167,15 @@ class TestAnthropic:
 
 class TestGemini:
     @pytest.fixture
-    def provider(self):
+    def provider(self) -> GeminiProvider:
         pytest.importorskip("google.genai")
         from docfunnel.providers.gemini_provider import GeminiProvider
 
         return GeminiProvider(api_key="test-key")
 
-    def test_roles_and_json_mime_type(self, provider) -> None:
+    def test_roles_and_json_mime_type(
+        self, provider: GeminiProvider, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         captured: dict[str, Any] = {}
 
         def generate_content(**kwargs: Any) -> Any:
@@ -151,8 +185,10 @@ class TestGemini:
                 usage_metadata=SimpleNamespace(prompt_token_count=30, candidates_token_count=4),
             )
 
-        provider._client = SimpleNamespace(
-            models=SimpleNamespace(generate_content=generate_content)
+        monkeypatch.setattr(
+            provider,
+            "_client",
+            SimpleNamespace(models=SimpleNamespace(generate_content=generate_content)),
         )
         response = provider.complete(REQUEST)
 
@@ -162,11 +198,17 @@ class TestGemini:
         assert (response.input_tokens, response.output_tokens) == (30, 4)
 
     @pytest.mark.parametrize(("code", "retryable"), [(429, True), (503, True), (400, False)])
-    def test_error_classification(self, provider, code: int, retryable: bool) -> None:
+    def test_error_classification(
+        self, provider: GeminiProvider, monkeypatch: pytest.MonkeyPatch, code: int, retryable: bool
+    ) -> None:
         from google.genai import errors
 
         error = make_error(errors.APIError, code=code)
-        provider._client = SimpleNamespace(models=SimpleNamespace(generate_content=raiser(error)))
+        monkeypatch.setattr(
+            provider,
+            "_client",
+            SimpleNamespace(models=SimpleNamespace(generate_content=raiser(error))),
+        )
         with pytest.raises(ProviderError) as info:
             provider.complete(REQUEST)
         assert info.value.retryable is retryable

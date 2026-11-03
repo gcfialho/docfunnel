@@ -4,7 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from pathlib import Path
+from typing import Protocol
 
+from docfunnel.extractor import Extractor
 from docfunnel.providers.base import CompletionRequest, CompletionResponse, ProviderError
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -61,3 +63,14 @@ class ScriptedProvider:
         return CompletionResponse(
             text=item, model=request.model, input_tokens=1000, output_tokens=200
         )
+
+
+class MakeExtractor(Protocol):
+    """Signature of the ``make_extractor`` fixture: an extractor plus its recorded sleeps."""
+
+    def __call__(
+        self,
+        *targets: tuple[ScriptedProvider, str],
+        max_attempts: int = ...,
+        backoff_base_s: float = ...,
+    ) -> tuple[Extractor, list[float]]: ...

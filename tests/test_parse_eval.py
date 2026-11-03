@@ -60,7 +60,9 @@ def test_report_scores_routing_text_and_fields(report: ParseEvalReport) -> None:
     assert result.quality["digital"].cer == 0.0
     assert result.field_recall["digital"].recall == 1.0
     # Without an OCR engine, scanned pages have (almost) no text.
-    assert result.quality["scanned"].cer > 0.9
+    scanned_cer = result.quality["scanned"].cer
+    assert scanned_cer is not None
+    assert scanned_cer > 0.9
     assert result.page_errors == 0
     assert report.text_layer.pages == result.quality["digital"].pages
     assert report.text_layer.pypdfium2_pages_per_s > 0

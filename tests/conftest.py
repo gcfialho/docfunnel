@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
 
 import pytest
 
 from docfunnel.extractor import Extractor, ModelTarget, RetryPolicy
 from docfunnel.pricing import PriceTable
 
-from helpers import VALID_PAYLOAD, ScriptedProvider
+from helpers import VALID_PAYLOAD, MakeExtractor, ScriptedProvider
 
 
 @pytest.fixture
@@ -27,7 +26,7 @@ def prices() -> PriceTable:
 
 
 @pytest.fixture
-def make_extractor(prices: PriceTable) -> Callable[..., tuple[Extractor, list[float]]]:
+def make_extractor(prices: PriceTable) -> MakeExtractor:
     def factory(
         *targets: tuple[ScriptedProvider, str], max_attempts: int = 3, backoff_base_s: float = 0.0
     ) -> tuple[Extractor, list[float]]:

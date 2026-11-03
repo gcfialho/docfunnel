@@ -19,16 +19,21 @@ def test_extract_document_tool_returns_json_compatible_data() -> None:
 
 def test_mcp_server_lists_and_calls_the_tool() -> None:
     pytest.importorskip("mcp")
+    from mcp.types import CallToolResult, TextContent, Tool
+
     server = mcp_server.build_server()
 
-    async def roundtrip() -> tuple[list, object]:
+    async def roundtrip() -> tuple[list[Tool], object]:
         tools = await server.list_tools()
         result = await server.call_tool("extract_document", {"text": US_RECEIPT})
         return tools, result
 
     tools, result = asyncio.run(roundtrip())
     assert [t.name for t in tools] == ["extract_document"]
-    payload = json.loads(result.content[0].text)
+    assert isinstance(result, CallToolResult)
+    content = result.content[0]
+    assert isinstance(content, TextContent)
+    payload = json.loads(content.text)
     assert payload["document"]["vendor_name"] == "Maple Street Hardware"
 
 

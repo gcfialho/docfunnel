@@ -54,6 +54,7 @@ def test_extract_flags_inconsistent_document(client: TestClient) -> None:
 
 
 def test_extract_from_allowed_path(client: TestClient, settings: Settings) -> None:
+    assert settings.input_dir is not None
     (settings.input_dir / "receipt.txt").write_text(US_RECEIPT)
     response = client.post("/extract", json={"path": "receipt.txt"})
     assert response.status_code == 200
@@ -70,11 +71,14 @@ def test_extract_from_allowed_path(client: TestClient, settings: Settings) -> No
         ({"path": "missing.txt"}, 404),
     ],
 )
-def test_extract_rejects_bad_requests(client: TestClient, payload: dict, status: int) -> None:
+def test_extract_rejects_bad_requests(
+    client: TestClient, payload: dict[str, str], status: int
+) -> None:
     assert client.post("/extract", json=payload).status_code == status
 
 
 def test_unsupported_file_type(client: TestClient, settings: Settings) -> None:
+    assert settings.input_dir is not None
     (settings.input_dir / "receipt.docx").write_bytes(b"PK")
     assert client.post("/extract", json={"path": "receipt.docx"}).status_code == 415
 

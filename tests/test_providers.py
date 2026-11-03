@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -9,7 +10,12 @@ from docfunnel.prompts import OutputParseError, parse_json_object, system_prompt
 from docfunnel.providers import ProviderNotConfiguredError, get_provider
 from docfunnel.providers.base import CompletionRequest, Message, ProviderError
 from docfunnel.providers.fake import FakeProvider, FaultProfile, heuristic_extract
-from docfunnel.providers.replay import RecordingProvider, ReplayProvider, request_key
+from docfunnel.providers.replay import (
+    CassetteEntry,
+    RecordingProvider,
+    ReplayProvider,
+    request_key,
+)
 from docfunnel.schema import ReceiptExtraction
 
 from helpers import US_RECEIPT
@@ -27,6 +33,9 @@ def test_heuristic_extract_reads_a_clean_receipt() -> None:
     assert doc.vendor_name == "Maple Street Hardware"
     assert doc.document_number == "924402"
     assert str(doc.date) == "2023-08-26"
+    assert doc.subtotal is not None
+    assert doc.tax is not None
+    assert doc.total is not None
     assert (doc.currency, float(doc.subtotal), float(doc.tax), float(doc.total)) == (
         "USD",
         27.24,
@@ -34,9 +43,9 @@ def test_heuristic_extract_reads_a_clean_receipt() -> None:
         29.42,
     )
     assert doc.payment_method == "cash"
-    assert [(i.description, float(i.quantity)) for i in doc.line_items] == [
-        ("Iced Tea", 3.0),
-        ("Hammer 16oz", 1.0),
+    assert [(i.description, i.quantity) for i in doc.line_items] == [
+        ("Iced Tea", Decimal(3)),
+        ("Hammer 16oz", Decimal(1)),
     ]
     assert doc.vendor_tax_id is None  # absent, and not invented
 
@@ -103,7 +112,7 @@ def test_record_then_replay_offline(tmp_path: Path) -> None:
 def test_replay_of_a_hand_written_cassette(tmp_path: Path) -> None:
     """Cassettes are plain JSON, so real-model quirks can be pinned as fixtures."""
     request = request_for(US_RECEIPT, "gpt-4o-mini")
-    cassette = {
+    cassette: dict[str, CassetteEntry] = {
         request_key(request): {
             "text": '```json\n{"vendor_name": "Maple Street Hardware", "total": "29.42"}\n```',
             "model": "gpt-4o-mini-2024-07-18",
@@ -133,7 +142,9 @@ def test_get_provider_rejects_unknown_names() -> None:
 @pytest.mark.parametrize(
     ("name", "env"), [("openai", "OPENAI_API_KEY"), ("anthropic", "ANTHROPIC_API_KEY")]
 )
-def test_real_providers_need_credentials(monkeypatch, name: str, env: str) -> None:
+def test_real_providers_need_credentials(
+    monkeypatch: pytest.MonkeyPatch, name: str, env: str
+) -> None:
     pytest.importorskip(name)
     monkeypatch.delenv(env, raising=False)
     with pytest.raises(ProviderNotConfiguredError, match=env):

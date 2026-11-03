@@ -16,7 +16,11 @@ from helpers import DATASET
 pytestmark = pytest.mark.integration
 
 
-def run(fallbacks=(("fake", "fake-pro"),), model: str = "fake-mini", limit=None) -> EvalReport:
+def run(
+    fallbacks: tuple[tuple[str, str], ...] = (("fake", "fake-pro"),),
+    model: str = "fake-mini",
+    limit: int | None = None,
+) -> EvalReport:
     extractor = build_extractor(Settings(provider="fake", model=model, fallbacks=fallbacks))
     return run_eval(
         extractor,
@@ -49,6 +53,7 @@ def test_metrics_are_well_formed(report: EvalReport) -> None:
     assert m.total_cost_usd == 0.0  # fake models are priced at zero
     assert m.input_tokens > 0
     assert m.latency_p50_ms is not None
+    assert m.latency_p95_ms is not None
     assert m.latency_p50_ms <= m.latency_p95_ms
 
 

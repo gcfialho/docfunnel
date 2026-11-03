@@ -52,7 +52,7 @@ def test_confidence_is_clamped_and_unknown_keys_dropped() -> None:
         {"date": "someday"},
     ],
 )
-def test_schema_violations_are_rejected(payload: dict) -> None:
+def test_schema_violations_are_rejected(payload: dict[str, object]) -> None:
     with pytest.raises(ValidationError):
         ReceiptExtraction.model_validate(payload)
 

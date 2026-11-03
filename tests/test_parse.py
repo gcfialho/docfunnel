@@ -5,6 +5,7 @@ from __future__ import annotations
 import io
 import math
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -27,6 +28,9 @@ from docfunnel.parse.ocr import (
 )
 from docfunnel.parse.pdf import OcrThresholds
 
+if TYPE_CHECKING:
+    from reportlab.pdfgen.canvas import Canvas
+
 pytest.importorskip("pypdfium2")
 reportlab = pytest.importorskip("reportlab")
 
@@ -39,7 +43,7 @@ LINES = [
 HAS_OCR = bool(available_engines())
 
 
-def _draw_lines(canvas, lines: list[str], size: float = 12) -> None:
+def _draw_lines(canvas: Canvas, lines: list[str], size: float = 12) -> None:
     y = 760.0
     for line in lines:
         canvas.setFont("Helvetica", size)
@@ -61,6 +65,7 @@ def make_text_pdf(path: Path, pages: list[list[str]]) -> Path:
 def make_scanned_pdf(path: Path, lines: list[str], stray: str | None = None) -> Path:
     """Render a digital page to an image and rebuild it as an image-only page."""
     import pypdfium2 as pdfium
+    from reportlab import rl_config
     from reportlab.lib.utils import ImageReader
     from reportlab.pdfgen.canvas import Canvas
 
@@ -69,7 +74,7 @@ def make_scanned_pdf(path: Path, lines: list[str], stray: str | None = None) -> 
     buffer = io.BytesIO()
     image.save(buffer, format="PNG")
     canvas = Canvas(str(path), invariant=1)
-    width, height = canvas._pagesize
+    width, height = rl_config.defaultPageSize  # what Canvas uses when no pagesize is given
     canvas.drawImage(ImageReader(io.BytesIO(buffer.getvalue())), 0, 0, width, height)
     if stray:
         canvas.setFont("Helvetica", 6)
@@ -124,6 +129,8 @@ def test_text_layer_pages_blocks_and_offsets(tmp_path: Path) -> None:
     assert [b.text for b in first.blocks] == LINES
     for page in doc.pages:
         for block in page.blocks:
+            assert block.char_span is not None
+            assert block.bbox is not None
             start, end = block.char_span
             assert page.text[start:end] == block.text
             assert block.id.startswith(f"doc:p{page.number}:b")
@@ -131,7 +138,10 @@ def test_text_layer_pages_blocks_and_offsets(tmp_path: Path) -> None:
             assert 0 <= x0 < x1 <= page.width
             assert 0 <= y0 < y1 <= page.height
     # Top-left origin: lines further down the page have larger y.
-    assert first.blocks[0].bbox[1] < first.blocks[-1].bbox[1]
+    top, bottom = first.blocks[0].bbox, first.blocks[-1].bbox
+    assert top is not None
+    assert bottom is not None
+    assert top[1] < bottom[1]
     # Document-level offsets.
     assert doc.text == PAGE_SEPARATOR.join(p.text for p in doc.pages)
     last = doc.pages[1].blocks[-1]
