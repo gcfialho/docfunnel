@@ -4,7 +4,7 @@ from decimal import Decimal
 import pytest
 
 from docfunnel.extractor import RetryPolicy
-from docfunnel.prompts import REPAIR_MARKER
+from docfunnel.prompts import REPAIR_MARKER, output_schema
 from docfunnel.providers.base import ProviderError
 
 from helpers import US_RECEIPT, VALID_PAYLOAD, MakeExtractor, ScriptedProvider
@@ -31,6 +31,7 @@ def test_happy_path_tracks_tokens_cost_and_latency(
     assert result.usage.cost_usd == pytest.approx(0.0014)
     assert result.calls[0].latency_ms >= 0
     assert sleeps == []
+    assert provider.requests[0].response_schema == output_schema()
 
 
 def test_invalid_json_triggers_repair_prompt(

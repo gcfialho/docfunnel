@@ -55,6 +55,70 @@ def system_prompt() -> str:
     return _SYSTEM_TEMPLATE.format(schema=schema, fields=", ".join(CONFIDENCE_FIELDS))
 
 
+OUTPUT_SCHEMA_NAME = "receipt_extraction"
+
+# Keywords that OpenAI strict Structured Outputs, Anthropic structured outputs and Gemini
+# ``response_json_schema`` all accept. Everything else (``title``, ``default``,
+# ``minLength``, ``$ref``...) is dropped or inlined; pydantic still enforces the full
+# schema on the answer, and a violation goes through the normal repair turn.
+_COPIED_KEYWORDS = frozenset({"type", "enum", "description"})
+_PORTABLE_FORMATS = frozenset({"date", "date-time"})
+
+
+def _strict(node: dict[str, Any], defs: dict[str, Any]) -> dict[str, Any]:
+    ref = node.get("$ref")
+    if isinstance(ref, str):
+        resolved = _strict(defs[ref.rsplit("/", 1)[-1]], defs)
+        # Keep a description written next to the $ref (pydantic puts field docs there).
+        if "description" in node:
+            resolved["description"] = node["description"]
+        return resolved
+    out: dict[str, Any] = {}
+    for key, value in node.items():
+        if key == "properties":
+            out[key] = {name: _strict(child, defs) for name, child in value.items()}
+        elif key == "items":
+            out[key] = _strict(value, defs)
+        elif key == "anyOf":
+            out[key] = [_strict(variant, defs) for variant in value]
+        elif key in _COPIED_KEYWORDS or (key == "format" and value in _PORTABLE_FORMATS):
+            out[key] = value
+    if out.get("type") == "object":
+        # Strict modes need every property listed as required and no extra keys;
+        # optional fields are expressed as ``anyOf [..., null]`` instead.
+        out["required"] = list(out.get("properties", {}))
+        out["additionalProperties"] = False
+    return out
+
+
+@cache
+def _output_schema() -> str:
+    source = ReceiptExtraction.model_json_schema(mode="serialization")
+    schema = _strict(source, source.get("$defs", {}))
+    # A free-form ``dict[str, float]`` is not allowed in strict mode: spell out one
+    # nullable score per scored field instead (null = the field is not on the document).
+    confidence = {"anyOf": [{"type": "number"}, {"type": "null"}]}
+    schema["properties"]["field_confidence"] = {
+        "type": "object",
+        "description": "Confidence in [0, 1] per field; null when the field is not present.",
+        "properties": {name: dict(confidence) for name in CONFIDENCE_FIELDS},
+        "required": list(CONFIDENCE_FIELDS),
+        "additionalProperties": False,
+    }
+    return json.dumps(schema)
+
+
+def output_schema() -> dict[str, Any]:
+    """The extraction schema in the JSON Schema subset all three providers enforce natively.
+
+    Adapters send it as a decoding constraint (OpenAI ``json_schema``, Anthropic
+    ``output_config.format``, Gemini ``response_json_schema``) on models whose
+    capability profile allows it. A fresh copy is returned on every call.
+    """
+    schema: dict[str, Any] = json.loads(_output_schema())
+    return schema
+
+
 def user_prompt(document_text: str) -> str:
     return (
         f"Extract the data from this document.\n{DOCUMENT_OPEN}\n{document_text}\n{DOCUMENT_CLOSE}"

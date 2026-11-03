@@ -31,6 +31,7 @@ from docfunnel.pricing import PriceTable
 from docfunnel.prompts import (
     OutputParseError,
     format_validation_errors,
+    output_schema,
     parse_json_object,
     repair_prompt,
     system_prompt,
@@ -147,6 +148,7 @@ class Extractor:
     def _run_target(
         self, target: ModelTarget, messages: list[Message], calls: list[CallRecord]
     ) -> ReceiptExtraction | None:
+        schema = output_schema()
         for attempt in range(1, self.retry.max_attempts + 1):
             if attempt > 1:
                 self._sleep(self.retry.delay(attempt - 1, self._rng))
@@ -155,6 +157,7 @@ class Extractor:
                 model=target.model,
                 messages=tuple(messages),
                 max_output_tokens=self.max_output_tokens,
+                response_schema=schema,
             )
             t0 = self._clock()
             try:

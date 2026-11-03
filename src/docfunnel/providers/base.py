@@ -7,8 +7,9 @@ repair, fallback and accounting live in :mod:`docfunnel.extractor`, not here.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Literal, Protocol, runtime_checkable
+from typing import Any, Literal, Protocol, runtime_checkable
 
 Role = Literal["system", "user", "assistant"]
 
@@ -26,6 +27,9 @@ class CompletionRequest:
     max_output_tokens: int = 2048
     temperature: float | None = 0.0
     json_mode: bool = True
+    response_schema: Mapping[str, Any] | None = None
+    """JSON Schema for native structured output; adapters use it only where the model's
+    capability profile allows (see :mod:`docfunnel.providers.capabilities`)."""
 
     @property
     def system(self) -> str:
