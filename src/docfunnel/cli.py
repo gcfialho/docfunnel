@@ -1,4 +1,9 @@
-"""Command-line interface for extraction, evaluation, comparison and serving."""
+"""``docfunnel`` command line: parse, extract, evaluate, generate datasets, serve.
+
+Commands are grouped in the help output the same way the package is laid out:
+pipeline stages first, then their evaluations and regression gates, then the
+dataset generators and the servers.
+"""
 
 from __future__ import annotations
 
@@ -11,20 +16,30 @@ from typing import Annotated
 import typer
 
 from docfunnel.config import Settings, build_extractor, parse_target
+from docfunnel.datasets.pdfs import DEFAULT_PDF_DIR, MANIFEST_NAME
 from docfunnel.evals.extract.compare import Thresholds, compare_reports, render_comparison
 from docfunnel.evals.extract.dataset import DEFAULT_DATASET, file_sha256, load_dataset
 from docfunnel.evals.extract.report import load_report, summary_rows, write_report
 from docfunnel.evals.extract.runner import run_eval
+from docfunnel.evals.parse.compare import ParseThresholds
 from docfunnel.extract.extractor import ModelTarget
 from docfunnel.loaders import UnsupportedDocumentError, load_document
 from docfunnel.providers.base import ProviderNotConfiguredError
 from docfunnel.providers.replay import RecordingProvider
 
 app = typer.Typer(
-    help="LLM structured extraction for receipts/invoices, with an evaluation harness.",
+    help=(
+        "CPU-first document pipeline: parse PDFs and scans page by page (OCR only where "
+        "needed), extract validated JSON with an LLM, and evaluate every stage."
+    ),
     no_args_is_help=True,
     add_completion=False,
 )
+
+PIPELINE = "Pipeline"
+EVALUATE = "Evaluate & gate"
+DATASETS = "Datasets"
+SERVE = "Serve"
 
 ProviderOpt = Annotated[
     str | None,
@@ -71,6 +86,20 @@ def _fail(message: str, code: int = 2) -> typer.Exit:
     return typer.Exit(code)
 
 
+def _print_summary(rows: list[tuple[str, str]], written: tuple[Path, Path]) -> None:
+    width = max(len(name) for name, _ in rows)
+    for name, value in rows:
+        typer.echo(f"{name:<{width}}  {value}")
+    typer.echo(f"\nWrote {written[0]} and {written[1]}")
+
+
+def _emit_markdown(markdown: str, out: Path | None) -> None:
+    typer.echo(markdown)
+    if out is not None:
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(markdown, encoding="utf-8")
+
+
 @app.callback()
 def _main(verbose: Annotated[bool, typer.Option("--verbose", "-v")] = False) -> None:
     logging.basicConfig(
@@ -79,7 +108,54 @@ def _main(verbose: Annotated[bool, typer.Option("--verbose", "-v")] = False) -> 
     )
 
 
-@app.command()
+OcrEngineOpt = Annotated[
+    str, typer.Option("--ocr-engine", help="auto | none | rapidocr | tesseract")
+]
+
+
+@app.command(rich_help_panel=PIPELINE)
+def parse(
+    source: Annotated[Path, typer.Argument(help="File (pdf/image/txt)")],
+    ocr_engine: OcrEngineOpt = "auto",
+    dpi: Annotated[int, typer.Option(help="Render resolution for OCR")] = 200,
+    force_ocr: Annotated[
+        bool, typer.Option(help="OCR every page, ignoring the text layer")
+    ] = False,
+    output: Annotated[
+        str, typer.Option("--format", help="summary | text | json | markdown")
+    ] = "summary",
+) -> None:
+    """Parse one document into pages and blocks (no LLM call)."""
+    from docfunnel.parse import ParseOptions, parse_file, to_markdown
+    from docfunnel.parse.ocr import OcrUnavailableError
+
+    if output not in {"summary", "text", "json", "markdown"}:
+        raise _fail("--format must be summary, text, json or markdown")
+    try:
+        options = ParseOptions(ocr_engine=ocr_engine, dpi=dpi, force_ocr=force_ocr)
+        document = parse_file(source, options)
+    except (OSError, UnsupportedDocumentError, OcrUnavailableError, ValueError) as exc:
+        raise _fail(str(exc)) from exc
+    if output == "json":
+        typer.echo(document.model_dump_json(indent=2))
+        return
+    if output == "text":
+        typer.echo(document.text)
+        return
+    if output == "markdown":
+        typer.echo(to_markdown(document), nl=False)
+        return
+    typer.echo(f"{document.doc_id}: {len(document.pages)} page(s), parser {document.parser}")
+    for page in document.pages:
+        total = page.timings_ms.get("total", 0.0)
+        line = (
+            f"  p{page.number}: {page.route:<26} source={page.source:<10} "
+            f"blocks={len(page.blocks):<4} chars={len(page.text):<6} {total:8.1f} ms"
+        )
+        typer.echo(line + (f"  error: {page.error}" if page.error else ""))
+
+
+@app.command(rich_help_panel=PIPELINE)
 def extract(
     source: Annotated[str, typer.Argument(help="File (txt/pdf/image) or '-' for stdin")],
     provider: ProviderOpt = None,
@@ -104,7 +180,85 @@ def extract(
         raise typer.Exit(3)
 
 
-@app.command("eval")
+@app.command("eval-parse", rich_help_panel=EVALUATE)
+def eval_parse(
+    data: Annotated[Path, typer.Option(help="Directory from generate-pdfs")] = DEFAULT_PDF_DIR,
+    out: Annotated[Path, typer.Option(help="Output directory for report.json/report.md")] = Path(
+        "reports/parse-latest"
+    ),
+    ocr_engine: Annotated[
+        list[str] | None,
+        typer.Option("--ocr-engine", help="auto | none | rapidocr | tesseract (repeatable)"),
+    ] = None,
+    workers: Annotated[int | None, typer.Option(help="Worker processes (default: CPUs)")] = None,
+    ocr_threads: Annotated[int, typer.Option(help="ONNX Runtime threads per worker")] = 1,
+    dpi: Annotated[int, typer.Option(help="Render resolution for OCR")] = 200,
+    run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
+) -> None:
+    """Evaluate the parse stage: OCR routing, CER/WER, field recall and throughput."""
+    from docfunnel.evals.parse import (
+        ParseEvalConfig,
+        run_parse_eval,
+        summary_rows,
+        write_parse_report,
+    )
+
+    if not (data / MANIFEST_NAME).is_file():
+        raise _fail(f"{data}/{MANIFEST_NAME} not found; run 'docfunnel generate-pdfs' first")
+    config = ParseEvalConfig(
+        dataset=data,
+        engines=ocr_engine or ["auto"],
+        workers=workers,
+        ocr_threads=ocr_threads,
+        dpi=dpi,
+        run_name=run_name,
+    )
+    try:
+        report = run_parse_eval(config)
+    except (ImportError, ValueError, RuntimeError) as exc:
+        raise _fail(str(exc)) from exc
+    _print_summary(summary_rows(report), write_parse_report(report, out))
+
+
+@app.command("compare-parse", rich_help_panel=EVALUATE)
+def compare_parse(
+    baseline: Annotated[Path, typer.Argument(help="Baseline parse report.json")],
+    candidate: Annotated[Path, typer.Argument(help="Candidate parse report.json")],
+    max_routing_drop: float | None = ParseThresholds.max_routing_drop,
+    max_digital_cer_increase: float | None = ParseThresholds.max_digital_cer_increase,
+    max_scanned_cer_increase: float | None = ParseThresholds.max_scanned_cer_increase,
+    max_field_recall_drop: float | None = ParseThresholds.max_field_recall_drop,
+    min_speedup_vs_pypdf: Annotated[
+        float | None, typer.Option(help="pypdfium2 vs pypdf in the candidate run; 0 disables")
+    ] = ParseThresholds.min_speedup_vs_pypdf,
+    out: Annotated[Path | None, typer.Option(help="Also write the comparison as Markdown")] = None,
+) -> None:
+    """Compare two parse eval runs; exit 1 on a quality regression."""
+    from docfunnel.evals.parse import (
+        compare_parse_reports,
+        load_parse_report,
+        render_parse_comparison,
+    )
+
+    try:
+        base, cand = load_parse_report(baseline), load_parse_report(candidate)
+    except (OSError, ValueError) as exc:
+        raise _fail(str(exc)) from exc
+    thresholds = ParseThresholds(
+        max_routing_drop=max_routing_drop,
+        max_digital_cer_increase=max_digital_cer_increase,
+        max_scanned_cer_increase=max_scanned_cer_increase,
+        max_field_recall_drop=max_field_recall_drop,
+        min_speedup_vs_pypdf=min_speedup_vs_pypdf or None,
+    )
+    comparison = compare_parse_reports(base, cand, thresholds)
+    markdown = render_parse_comparison(comparison, base, cand)
+    _emit_markdown(markdown, out)
+    if not comparison.passed:
+        raise typer.Exit(1)
+
+
+@app.command("eval", rich_help_panel=EVALUATE)
 def eval_command(
     dataset: Annotated[Path, typer.Option(help="Labelled JSONL dataset")] = DEFAULT_DATASET,
     out: Annotated[Path, typer.Option(help="Output directory for report.json/report.md")] = Path(
@@ -156,14 +310,10 @@ def eval_command(
     )
     if interactive:
         typer.echo("", err=True)
-    json_path, md_path = write_report(report, out)
-    width = max(len(name) for name, _ in summary_rows(report))
-    for name, value in summary_rows(report):
-        typer.echo(f"{name:<{width}}  {value}")
-    typer.echo(f"\nWrote {json_path} and {md_path}")
+    _print_summary(summary_rows(report), write_report(report, out))
 
 
-@app.command()
+@app.command(rich_help_panel=EVALUATE)
 def compare(
     baseline: Annotated[Path, typer.Argument(help="Baseline report.json")],
     candidate: Annotated[Path, typer.Argument(help="Candidate report.json")],
@@ -196,62 +346,12 @@ def compare(
     )
     comparison = compare_reports(base, cand, thresholds)
     markdown = render_comparison(comparison, base, cand)
-    typer.echo(markdown)
-    if out is not None:
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(markdown, encoding="utf-8")
+    _emit_markdown(markdown, out)
     if not comparison.passed:
         raise typer.Exit(1)
 
 
-OcrEngineOpt = Annotated[
-    str, typer.Option("--ocr-engine", help="auto | none | rapidocr | tesseract")
-]
-
-
-@app.command()
-def parse(
-    source: Annotated[Path, typer.Argument(help="File (pdf/image/txt)")],
-    ocr_engine: OcrEngineOpt = "auto",
-    dpi: Annotated[int, typer.Option(help="Render resolution for OCR")] = 200,
-    force_ocr: Annotated[
-        bool, typer.Option(help="OCR every page, ignoring the text layer")
-    ] = False,
-    output: Annotated[
-        str, typer.Option("--format", help="summary | text | json | markdown")
-    ] = "summary",
-) -> None:
-    """Parse one document into pages and blocks (no LLM call)."""
-    from docfunnel.parse import ParseOptions, parse_file, to_markdown
-    from docfunnel.parse.ocr import OcrUnavailableError
-
-    if output not in {"summary", "text", "json", "markdown"}:
-        raise _fail("--format must be summary, text, json or markdown")
-    try:
-        options = ParseOptions(ocr_engine=ocr_engine, dpi=dpi, force_ocr=force_ocr)
-        document = parse_file(source, options)
-    except (OSError, UnsupportedDocumentError, OcrUnavailableError, ValueError) as exc:
-        raise _fail(str(exc)) from exc
-    if output == "json":
-        typer.echo(document.model_dump_json(indent=2))
-        return
-    if output == "text":
-        typer.echo(document.text)
-        return
-    if output == "markdown":
-        typer.echo(to_markdown(document), nl=False)
-        return
-    typer.echo(f"{document.doc_id}: {len(document.pages)} page(s), parser {document.parser}")
-    for page in document.pages:
-        total = page.timings_ms.get("total", 0.0)
-        line = (
-            f"  p{page.number}: {page.route:<26} source={page.source:<10} "
-            f"blocks={len(page.blocks):<4} chars={len(page.text):<6} {total:8.1f} ms"
-        )
-        typer.echo(line + (f"  error: {page.error}" if page.error else ""))
-
-
-@app.command("generate-dataset")
+@app.command("generate-dataset", rich_help_panel=DATASETS)
 def generate_dataset(
     out: Annotated[Path, typer.Option(help="Output JSONL path")] = DEFAULT_DATASET,
     n: Annotated[int, typer.Option(help="Number of documents")] = 60,
@@ -264,115 +364,27 @@ def generate_dataset(
     typer.echo(f"Wrote {count} documents to {out}")
 
 
-@app.command("generate-pdfs")
+@app.command("generate-pdfs", rich_help_panel=DATASETS)
 def generate_pdfs(
-    out: Annotated[Path, typer.Option(help="Output directory (PDFs + manifest.jsonl)")] = Path(
-        "data/synthetic/pdf"
-    ),
+    out: Annotated[
+        Path, typer.Option(help="Output directory (PDFs + manifest.jsonl)")
+    ] = DEFAULT_PDF_DIR,
     n: Annotated[int, typer.Option(help="Number of documents")] = 50,
     seed: Annotated[int, typer.Option(help="Random seed")] = 11,
 ) -> None:
     """Generate multi-page invoice/contract PDFs (digital, scanned, mixed) with ground truth."""
+    from docfunnel.datasets.pdfs import write_pdf_dataset
+
     try:
-        from docfunnel.datasets.pdfs import write_pdf_dataset
+        truths = write_pdf_dataset(out, n=n, seed=seed)
     except ImportError as exc:  # pragma: no cover - only without the extra
         raise _fail("generate-pdfs requires the 'synthetic' extra") from exc
-    truths = write_pdf_dataset(out, n=n, seed=seed)
     pages = sum(len(t.pages) for t in truths)
     scanned = sum(p.scanned for t in truths for p in t.pages)
     typer.echo(f"Wrote {len(truths)} documents ({pages} pages, {scanned} scanned) to {out}")
 
 
-@app.command("eval-parse")
-def eval_parse(
-    data: Annotated[Path, typer.Option(help="Directory from generate-pdfs")] = Path(
-        "data/synthetic/pdf"
-    ),
-    out: Annotated[Path, typer.Option(help="Output directory for report.json/report.md")] = Path(
-        "reports/parse-latest"
-    ),
-    ocr_engine: Annotated[
-        list[str] | None,
-        typer.Option("--ocr-engine", help="auto | none | rapidocr | tesseract (repeatable)"),
-    ] = None,
-    workers: Annotated[int | None, typer.Option(help="Worker processes (default: CPUs)")] = None,
-    ocr_threads: Annotated[int, typer.Option(help="ONNX Runtime threads per worker")] = 1,
-    dpi: Annotated[int, typer.Option(help="Render resolution for OCR")] = 200,
-    run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
-) -> None:
-    """Evaluate the parse stage: OCR routing, CER/WER, field recall and throughput."""
-    from docfunnel.evals.parse import (
-        ParseEvalConfig,
-        run_parse_eval,
-        summary_rows,
-        write_parse_report,
-    )
-
-    if not (data / "manifest.jsonl").is_file():
-        raise _fail(f"{data}/manifest.jsonl not found; run 'docfunnel generate-pdfs' first")
-    config = ParseEvalConfig(
-        dataset=data,
-        engines=ocr_engine or ["auto"],
-        workers=workers,
-        ocr_threads=ocr_threads,
-        dpi=dpi,
-        run_name=run_name,
-    )
-    try:
-        report = run_parse_eval(config)
-    except (ImportError, ValueError, RuntimeError) as exc:
-        raise _fail(str(exc)) from exc
-    json_path, md_path = write_parse_report(report, out)
-    rows = summary_rows(report)
-    width = max(len(name) for name, _ in rows)
-    for name, value in rows:
-        typer.echo(f"{name:<{width}}  {value}")
-    typer.echo(f"\nWrote {json_path} and {md_path}")
-
-
-@app.command("compare-parse")
-def compare_parse(
-    baseline: Annotated[Path, typer.Argument(help="Baseline parse report.json")],
-    candidate: Annotated[Path, typer.Argument(help="Candidate parse report.json")],
-    max_routing_drop: float = 0.0,
-    max_digital_cer_increase: float = 0.001,
-    max_scanned_cer_increase: float = 0.01,
-    max_field_recall_drop: float = 0.02,
-    min_speedup_vs_pypdf: Annotated[
-        float | None, typer.Option(help="pypdfium2 vs pypdf in the candidate run; 0 disables")
-    ] = 3.0,
-    out: Annotated[Path | None, typer.Option(help="Also write the comparison as Markdown")] = None,
-) -> None:
-    """Compare two parse eval runs; exit 1 on a quality regression."""
-    from docfunnel.evals.parse import (
-        ParseThresholds,
-        compare_parse_reports,
-        load_parse_report,
-        render_parse_comparison,
-    )
-
-    try:
-        base, cand = load_parse_report(baseline), load_parse_report(candidate)
-    except (OSError, ValueError) as exc:
-        raise _fail(str(exc)) from exc
-    thresholds = ParseThresholds(
-        max_routing_drop=max_routing_drop,
-        max_digital_cer_increase=max_digital_cer_increase,
-        max_scanned_cer_increase=max_scanned_cer_increase,
-        max_field_recall_drop=max_field_recall_drop,
-        min_speedup_vs_pypdf=min_speedup_vs_pypdf or None,
-    )
-    comparison = compare_parse_reports(base, cand, thresholds)
-    markdown = render_parse_comparison(comparison, base, cand)
-    typer.echo(markdown)
-    if out is not None:
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(markdown, encoding="utf-8")
-    if not comparison.passed:
-        raise typer.Exit(1)
-
-
-@app.command()
+@app.command(rich_help_panel=SERVE)
 def serve(
     host: str = "127.0.0.1",
     port: int = 8000,
@@ -383,7 +395,7 @@ def serve(
     uvicorn.run("docfunnel.api:app", host=host, port=port)
 
 
-@app.command("mcp")
+@app.command("mcp", rich_help_panel=SERVE)
 def mcp_command() -> None:
     """Run the MCP server over stdio (requires the 'mcp' extra)."""
     from docfunnel.mcp_server import build_server

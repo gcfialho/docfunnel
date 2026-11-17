@@ -21,9 +21,13 @@ from docfunnel.loaders import UnsupportedDocumentError, load_document
 from docfunnel.service import get_extractor, get_settings
 
 app = FastAPI(
-    title="LLM document extraction",
+    title="docfunnel",
     version=__version__,
-    description="Schema-constrained extraction of receipts and invoices with review routing.",
+    description=(
+        "Schema-validated LLM extraction of receipts and invoices, with business-rule "
+        "checks and human-review routing. Text, PDF and image input go through the "
+        "CPU parse stage first."
+    ),
 )
 
 
