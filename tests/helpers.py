@@ -6,7 +6,7 @@ from collections.abc import Iterable
 from pathlib import Path
 from typing import Protocol
 
-from docfunnel.extractor import Extractor
+from docfunnel.extract.extractor import Extractor
 from docfunnel.providers.base import CompletionRequest, CompletionResponse, ProviderError
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

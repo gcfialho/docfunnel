@@ -42,7 +42,7 @@ def load_parsed(path: Path, options: ParseOptions | None = None) -> str:
     text = document.text.strip()
     if not text:
         missing_ocr = any(page.source == "none" for page in document.pages)
-        hint = "; install the 'ocr' extra to OCR scanned pages" if missing_ocr else ""
+        hint = "; scanned pages need OCR: uv sync --extra ocr" if missing_ocr else ""
         raise UnsupportedDocumentError(f"no text found in {path.name}{hint}")
     return text
 

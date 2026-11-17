@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import cache
 
 from docfunnel.config import Settings, build_extractor
-from docfunnel.extractor import Extractor
+from docfunnel.extract.extractor import Extractor
 
 
 @cache

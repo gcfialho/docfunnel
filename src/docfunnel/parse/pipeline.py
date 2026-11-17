@@ -212,7 +212,7 @@ def parse_image(path: Path, doc_id: str, options: ParseOptions) -> ParsedDocumen
     engine = _engine_for(options)
     if engine is None:
         raise UnsupportedDocumentError(
-            "image input needs an OCR engine: install the 'ocr' (RapidOCR) or 'tesseract' extra"
+            "image input requires an OCR engine: uv sync --extra ocr (or --extra tesseract)"
         )
     with Image.open(path) as image:
         dpi = int(image.info.get("dpi", (options.dpi,))[0]) or options.dpi

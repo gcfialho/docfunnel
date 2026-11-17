@@ -30,7 +30,10 @@ class GeminiProvider:
             ) from exc
         api_key = api_key or os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
         if not api_key:
-            raise ProviderNotConfiguredError("GEMINI_API_KEY (or GOOGLE_API_KEY) is not set")
+            raise ProviderNotConfiguredError(
+                "GEMINI_API_KEY (or GOOGLE_API_KEY) is not set; "
+                "set it, or choose another provider with --provider"
+            )
         self._types = types
         self._errors = errors
         self._client = genai.Client(api_key=api_key)

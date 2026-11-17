@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-from docfunnel.prompts import OUTPUT_SCHEMA_NAME
+from docfunnel.extract.prompts import OUTPUT_SCHEMA_NAME
 from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,
@@ -41,7 +41,9 @@ class OpenAIProvider:
             ) from exc
         api_key = api_key or os.environ.get("OPENAI_API_KEY")
         if not api_key:
-            raise ProviderNotConfiguredError("OPENAI_API_KEY is not set")
+            raise ProviderNotConfiguredError(
+                "OPENAI_API_KEY is not set; set it, or choose another provider with --provider"
+            )
         self._openai = openai
         # SDK-level retries are disabled: the extractor owns retry policy and accounting.
         self._client = openai.OpenAI(api_key=api_key, timeout=timeout_s, max_retries=0)
