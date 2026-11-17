@@ -53,6 +53,26 @@ EXTRACT_DESCRIPTION = (
     "Only for receipts and invoices; use parse_document to read other documents."
 )
 
+# MCP tool annotations, in the protocol's field names. Both tools only read: temporary
+# downloads are deleted when the call ends, so they are read-only, non-destructive and
+# idempotent. Both are open-world: they may fetch URLs, and extraction calls an LLM API.
+ANNOTATIONS: dict[str, dict[str, str | bool]] = {
+    "parse_document": {
+        "title": "Parse document",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": True,
+    },
+    "extract_document": {
+        "title": "Extract receipt or invoice",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": True,
+    },
+}
+
 
 def parse_document(
     source: str,
@@ -141,11 +161,19 @@ def build_server() -> MCPServer:
                 "the MCP server requires the 'mcp' extra: uv sync --extra mcp"
             ) from exc
         server = FastMCP("docfunnel")  # same constructor and .tool()/.run() API in 1.x
+    from mcp.types import ToolAnnotations
+
     for name, fn, description in (
         ("parse_document", parse_document, PARSE_DESCRIPTION),
         ("extract_document", extract_document, EXTRACT_DESCRIPTION),
     ):
-        server.tool(name=name, description=description)(_reporting(fn, ToolError))
+        annotations = ToolAnnotations.model_validate(ANNOTATIONS[name])
+        server.tool(
+            name=name,
+            title=annotations.title,
+            description=description,
+            annotations=annotations,
+        )(_reporting(fn, ToolError))
     return server
 
 

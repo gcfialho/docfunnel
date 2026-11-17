@@ -141,3 +141,20 @@ def test_anticipated_tool_failures_reach_the_model(mcp_settings: Settings) -> No
     with pytest.raises(ToolError, match=r"pages \[99\] do not exist") as info:
         asyncio.run(call())
     assert not isinstance(info.value, UnexpectedToolError)
+
+
+def test_tools_declare_all_four_annotation_hints() -> None:
+    pytest.importorskip("mcp")
+    from mcp.types import Tool
+
+    async def listed() -> list[Tool]:
+        return await mcp_server.build_server().list_tools()
+
+    for tool in asyncio.run(listed()):
+        assert tool.annotations is not None
+        hints = tool.annotations.model_dump(by_alias=True)
+        for hint in ("readOnlyHint", "destructiveHint", "idempotentHint", "openWorldHint"):
+            assert isinstance(hints[hint], bool), (tool.name, hint)
+        assert hints["readOnlyHint"] is True
+        assert hints["destructiveHint"] is False
+        assert tool.title

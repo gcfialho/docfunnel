@@ -11,7 +11,7 @@ The bridge is an [MCP](https://modelcontextprotocol.io) server over stdio, so on
 | `parse_document` | `source` (local path or http(s) URL), `format` (`markdown` or `text`), `pages` (list of page numbers), `max_chars` (default 40,000) | `content`, plus `page_count`, a per-page summary (`route`, `source`, `chars`, `error`) and `truncated` | No |
 | `extract_document` | `source` or `text` | Receipt or invoice fields, per-field confidence, business-rule `issues`, `needs_review` with reasons, token and cost totals | Yes, with the model set by `DOCFUNNEL_PROVIDER` / `DOCFUNNEL_MODEL` |
 
-`parse_document` works on any document and needs no API key. `extract_document` only knows the receipt and invoice schema; its default provider, `fake`, is the offline test double, so set a real provider for real documents.
+Both tools are annotated read-only, non-destructive, idempotent and open-world (they may fetch URLs, and extraction calls an LLM API), so hosts can decide when to ask before a call. `parse_document` works on any document and needs no API key. `extract_document` only knows the receipt and invoice schema; its default provider, `fake`, is the offline test double, so set a real provider for real documents.
 
 ## Run the server
 
