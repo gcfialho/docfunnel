@@ -1,0 +1,21 @@
+name: Bug report
+description: Something parses, extracts or scores wrongly, or a command fails
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: Command you ran, what you expected, what you got (paste the error).
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: Input
+      description: A minimal document or the generator seed that reproduces it. No real personal data, please.
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "docfunnel 0.1.0, Python 3.12, macOS arm64, extras: cpu,providers"
