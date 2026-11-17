@@ -107,6 +107,13 @@ GEMINI_MODELS: dict[str, GeminiModel] = {
     "gemini-3.5-flash-lite": GeminiModel(
         structured_outputs=True, thinking_level="minimal", min_output_tokens=8192
     ),
+    # Gemini 3.1 Flash-Lite: JSON Schema output; thinking left at the model default.
+    "gemini-3.1-flash-lite": GeminiModel(structured_outputs=True, min_output_tokens=8192),
+    # Gemini 3.8 Flash: thinking on by default at "medium"; "minimal" is rejected, so the
+    # lowest level is "low".
+    "gemini-3.8-flash": GeminiModel(
+        structured_outputs=True, thinking_level="low", min_output_tokens=8192
+    ),
 }
 
 

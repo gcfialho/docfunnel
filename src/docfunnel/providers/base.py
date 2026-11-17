@@ -21,6 +21,14 @@ class Message:
 
 
 @dataclass(frozen=True, slots=True)
+class Attachment:
+    """A file sent to the model itself (native PDF or image input), not as parsed text."""
+
+    data: bytes
+    media_type: str  # "application/pdf", "image/png", "image/jpeg", ...
+
+
+@dataclass(frozen=True, slots=True)
 class CompletionRequest:
     model: str
     messages: tuple[Message, ...]
@@ -30,6 +38,9 @@ class CompletionRequest:
     response_schema: Mapping[str, Any] | None = None
     """JSON Schema for native structured output; adapters use it only where the model's
     capability profile allows (see :mod:`docfunnel.providers.capabilities`)."""
+    attachments: tuple[Attachment, ...] = ()
+    """Files placed before the text of the first user message. Supported by the Gemini
+    and Anthropic adapters; others raise a non-retryable :class:`ProviderError`."""
 
     @property
     def system(self) -> str:

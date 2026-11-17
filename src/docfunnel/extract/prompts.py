@@ -11,7 +11,7 @@ from pydantic import ValidationError
 
 from docfunnel.extract.schema import CONFIDENCE_FIELDS, ReceiptExtraction
 
-PROMPT_VERSION = "v1"
+PROMPT_VERSION = "v2"  # v2: field_confidence is 0, not null, for absent fields
 
 DOCUMENT_OPEN = "<document>"
 DOCUMENT_CLOSE = "</document>"
@@ -33,7 +33,8 @@ Rules:
 - subtotal is the amount before tax; tax is the total tax amount; total is the amount due.
 - line_items: one entry per purchased item, with the printed line total.
 - field_confidence: a number in [0, 1] for each of {fields} that reflects how sure you
-  are the value is correct (lower it for blurry, ambiguous or inferred values).
+  are the value is correct (lower it for blurry, ambiguous or inferred values; use 0 for
+  a field that is not on the document).
 """
 
 _REPAIR_TEMPLATE = """\
@@ -95,12 +96,14 @@ def _strict(node: dict[str, Any], defs: dict[str, Any]) -> dict[str, Any]:
 def _output_schema() -> str:
     source = ReceiptExtraction.model_json_schema(mode="serialization")
     schema = _strict(source, source.get("$defs", {}))
-    # A free-form ``dict[str, float]`` is not allowed in strict mode: spell out one
-    # nullable score per scored field instead (null = the field is not on the document).
-    confidence = {"anyOf": [{"type": "number"}, {"type": "null"}]}
+    # A free-form ``dict[str, float]`` is not allowed in strict mode: spell out one score
+    # per scored field instead. Scores are plain numbers (0 = the field is not on the
+    # document), not nullable: Anthropic rejects schemas with more than 16 union-typed
+    # parameters, and the nullable header fields already use 11.
+    confidence = {"type": "number"}
     schema["properties"]["field_confidence"] = {
         "type": "object",
-        "description": "Confidence in [0, 1] per field; null when the field is not present.",
+        "description": "Confidence in [0, 1] per field; 0 when the field is not on the document.",
         "properties": {name: dict(confidence) for name in CONFIDENCE_FIELDS},
         "required": list(CONFIDENCE_FIELDS),
         "additionalProperties": False,
@@ -123,6 +126,9 @@ def user_prompt(document_text: str) -> str:
     return (
         f"Extract the data from this document.\n{DOCUMENT_OPEN}\n{document_text}\n{DOCUMENT_CLOSE}"
     )
+
+
+ATTACHED_DOCUMENT_PROMPT = "Extract the data from the attached document."
 
 
 def repair_prompt(previous_output: str, errors: list[str]) -> str:

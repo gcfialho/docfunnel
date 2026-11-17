@@ -29,6 +29,7 @@ from pydantic import ValidationError
 
 from docfunnel.extract.pricing import PriceTable
 from docfunnel.extract.prompts import (
+    ATTACHED_DOCUMENT_PROMPT,
     OutputParseError,
     format_validation_errors,
     output_schema,
@@ -47,6 +48,7 @@ from docfunnel.extract.schema import (
 )
 from docfunnel.extract.validation import ReviewPolicy, check_business_rules, review_decision
 from docfunnel.providers.base import (
+    Attachment,
     CompletionRequest,
     LLMProvider,
     Message,
@@ -123,18 +125,27 @@ class Extractor:
         self._clock = clock
         self._rng = rng or random.Random()
 
-    def extract(self, text: str) -> ExtractionResult:
-        if not text or not text.strip():
+    def extract(
+        self, text: str = "", *, attachments: Sequence[Attachment] = ()
+    ) -> ExtractionResult:
+        """Extract from ``text``, or from ``attachments`` sent to the model as files.
+
+        Attachments are native document input (a PDF or an image read by the model
+        itself, without the parse stage); only the Gemini and Anthropic adapters send them.
+        """
+        files = tuple(attachments)
+        if not files and not text.strip():
             raise ValueError("document text is empty")
         if len(text) > MAX_DOCUMENT_CHARS:
             raise ValueError(f"document exceeds {MAX_DOCUMENT_CHARS} characters")
 
         calls: list[CallRecord] = []
         started = self._clock()
-        base = [Message("system", system_prompt()), Message("user", user_prompt(text))]
+        prompt = user_prompt(text) if text.strip() else ATTACHED_DOCUMENT_PROMPT
+        base = [Message("system", system_prompt()), Message("user", prompt)]
 
         for index, target in enumerate(self.targets):
-            document = self._run_target(target, list(base), calls)
+            document = self._run_target(target, list(base), calls, files)
             if document is not None:
                 return self._finish(document, target, calls, started, used_fallback=index > 0)
             logger.warning(
@@ -146,7 +157,11 @@ class Extractor:
         return self._finish(None, None, calls, started, used_fallback=len(self.targets) > 1)
 
     def _run_target(
-        self, target: ModelTarget, messages: list[Message], calls: list[CallRecord]
+        self,
+        target: ModelTarget,
+        messages: list[Message],
+        calls: list[CallRecord],
+        attachments: tuple[Attachment, ...] = (),
     ) -> ReceiptExtraction | None:
         schema = output_schema()
         for attempt in range(1, self.retry.max_attempts + 1):
@@ -158,6 +173,7 @@ class Extractor:
                 messages=tuple(messages),
                 max_output_tokens=self.max_output_tokens,
                 response_schema=schema,
+                attachments=attachments,
             )
             t0 = self._clock()
             try:

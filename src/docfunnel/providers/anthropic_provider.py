@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import base64
 import os
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal, cast
 
 from docfunnel.providers.base import (
+    Attachment,
     CompletionRequest,
     CompletionResponse,
     Message,
@@ -15,8 +17,17 @@ from docfunnel.providers.base import (
 from docfunnel.providers.capabilities import anthropic_model
 
 if TYPE_CHECKING:
-    from anthropic.types import MessageParam, OutputConfigParam
+    from anthropic.types import (
+        ContentBlockParam,
+        ImageBlockParam,
+        MessageParam,
+        OutputConfigParam,
+    )
     from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+
+
+_ImageType = Literal["image/png", "image/jpeg", "image/gif", "image/webp"]
+_IMAGE_TYPES = frozenset({"image/png", "image/jpeg", "image/gif", "image/webp"})
 
 
 def _message_param(message: Message) -> MessageParam:
@@ -26,6 +37,37 @@ def _message_param(message: Message) -> MessageParam:
     if message.role == "assistant":
         return {"role": "assistant", "content": message.content}
     return {"role": "system", "content": message.content}
+
+
+def _attachment_block(attachment: Attachment) -> ContentBlockParam:
+    data = base64.standard_b64encode(attachment.data).decode("ascii")
+    if attachment.media_type == "application/pdf":
+        return {
+            "type": "document",
+            "source": {"type": "base64", "media_type": "application/pdf", "data": data},
+        }
+    if attachment.media_type in _IMAGE_TYPES:
+        image: ImageBlockParam = {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": cast(_ImageType, attachment.media_type),
+                "data": data,
+            },
+        }
+        return image
+    raise ProviderError(
+        f"anthropic cannot take {attachment.media_type!r} attachments", retryable=False
+    )
+
+
+def _messages(request: CompletionRequest) -> list[MessageParam]:
+    messages = [_message_param(m) for m in request.conversation]
+    if request.attachments and messages:
+        blocks = [_attachment_block(a) for a in request.attachments]
+        blocks.append({"type": "text", "text": request.conversation[0].content})
+        messages[0] = {"role": "user", "content": blocks}
+    return messages
 
 
 class AnthropicProvider:
@@ -59,7 +101,7 @@ class AnthropicProvider:
             # Thinking, where the model runs it, is counted against max_tokens.
             "max_tokens": max(request.max_output_tokens, model.min_output_tokens),
             "system": request.system,
-            "messages": [_message_param(m) for m in request.conversation],
+            "messages": _messages(request),
         }
         output_config: OutputConfigParam = {}
         if model.effort is not None:

@@ -77,6 +77,11 @@ class OpenAIProvider:
         return kwargs
 
     def complete(self, request: CompletionRequest) -> CompletionResponse:
+        if request.attachments:
+            raise ProviderError(
+                "the openai adapter does not send attachments yet; use gemini or anthropic",
+                retryable=False,
+            )
         openai = self._openai
         kwargs = self.build_params(request)
         try:

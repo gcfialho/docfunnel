@@ -117,9 +117,22 @@ def test_an_answer_shaped_by_the_output_schema_validates() -> None:
         {"description": "Coffee", "quantity": None, "unit_price": None, "total": 3.5}
     ]
     answer["total"] = 3.5
-    confidence: dict[str, float | None] = dict.fromkeys(CONFIDENCE_FIELDS)
+    confidence = dict.fromkeys(CONFIDENCE_FIELDS, 0.0)  # 0 = not on the document
     answer["field_confidence"] = confidence | {"total": 0.9}
 
     document = ReceiptExtraction.model_validate(answer)
 
-    assert document.field_confidence == {"total": 0.9}  # nulls are dropped
+    assert document.field_confidence["total"] == 0.9
+    assert document.field_confidence["tax"] == 0.0
+
+
+def test_output_schema_stays_within_anthropic_union_limit() -> None:
+    # Anthropic structured outputs reject schemas with more than 16 parameters whose
+    # type is a union (anyOf or a type array): found with the first real API call.
+    schema = output_schema()
+    unions = sum(
+        1 for node in _nodes(schema) if "anyOf" in node or isinstance(node.get("type"), list)
+    )
+    assert unions <= 16
+    scores = schema["properties"]["field_confidence"]["properties"].values()
+    assert all(score == {"type": "number"} for score in scores)

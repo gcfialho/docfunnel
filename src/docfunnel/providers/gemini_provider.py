@@ -70,6 +70,12 @@ class GeminiProvider:
             )
             for m in request.conversation
         ]
+        if request.attachments and contents:
+            files = [
+                types.Part.from_bytes(data=a.data, mime_type=a.media_type)
+                for a in request.attachments
+            ]
+            contents[0].parts = [*files, *(contents[0].parts or [])]
         try:
             response = self._client.models.generate_content(
                 model=request.model, contents=contents, config=self.build_config(request)
