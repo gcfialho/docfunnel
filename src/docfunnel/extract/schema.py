@@ -176,6 +176,7 @@ class CallRecord(BaseModel):
     status: CallStatus
     input_tokens: int = 0
     output_tokens: int = 0
+    reasoning_tokens: int | None = None
     cost_usd: float | None = None
     latency_ms: float
     error: str | None = None
@@ -185,6 +186,8 @@ class UsageSummary(BaseModel):
     calls: int
     input_tokens: int
     output_tokens: int
+    reasoning_tokens: int | None = None
+    """Thinking share of ``output_tokens``; ``None`` when no call reported it."""
     cost_usd: float | None
     latency_ms: float
 

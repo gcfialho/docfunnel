@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import random
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from typing import TypedDict
 
@@ -89,6 +89,7 @@ class _ResponseUsage(TypedDict):
 
     input_tokens: int
     output_tokens: int
+    reasoning_tokens: int | None
     model: str
 
 
@@ -99,6 +100,11 @@ class _Attempt:
     messages: list[Message]
     retries: int = 0
     calls: list[CallRecord] = field(default_factory=list)
+
+
+def _sum_known(values: Iterable[int | None]) -> int | None:
+    known = [v for v in values if v is not None]
+    return sum(known) if known else None
 
 
 class Extractor:
@@ -189,6 +195,7 @@ class Extractor:
             record: _ResponseUsage = {
                 "input_tokens": response.input_tokens,
                 "output_tokens": response.output_tokens,
+                "reasoning_tokens": response.reasoning_tokens,
                 "model": response.model,
             }
             try:
@@ -235,6 +242,7 @@ class Extractor:
         *,
         input_tokens: int = 0,
         output_tokens: int = 0,
+        reasoning_tokens: int | None = None,
         model: str | None = None,
         error: str | None = None,
     ) -> CallRecord:
@@ -247,6 +255,7 @@ class Extractor:
             status=status,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            reasoning_tokens=reasoning_tokens,
             cost_usd=self.prices.cost(target.model, input_tokens, output_tokens),
             latency_ms=round(latency_ms, 3),
             error=error,
@@ -270,6 +279,7 @@ class Extractor:
             calls=len(calls),
             input_tokens=sum(c.input_tokens for c in calls),
             output_tokens=sum(c.output_tokens for c in calls),
+            reasoning_tokens=_sum_known(c.reasoning_tokens for c in calls),
             # One unpriced call makes the total unknown rather than silently too low.
             cost_usd=round(sum(known_costs), 8) if len(known_costs) == len(calls) else None,
             latency_ms=round((self._clock() - started) * 1000, 3),

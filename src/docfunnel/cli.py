@@ -440,6 +440,10 @@ def eval_e2e(
         float, typer.Option(help="Spending cap per provider; later calls are skipped")
     ] = 4.0,
     limit: Annotated[int | None, typer.Option(help="Only the first N documents")] = None,
+    where: Annotated[
+        list[str] | None,
+        typer.Option(help="Only documents with this tag, e.g. scan=has_scanned_pages, size=large"),
+    ] = None,
     workers: Annotated[int, typer.Option(help="Concurrent documents per model")] = 4,
     run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
 ) -> None:
@@ -460,6 +464,7 @@ def eval_e2e(
         routes=routes,
         default_budget_usd=budget_usd,
         limit=limit,
+        where=dict(w.split("=", 1) for w in where or []),
         workers=workers,
         run_name=run_name,
     )

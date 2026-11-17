@@ -57,6 +57,8 @@ class CompletionResponse:
     model: str
     input_tokens: int
     output_tokens: int
+    reasoning_tokens: int | None = None
+    """Part of ``output_tokens`` spent thinking, when the provider reports it apart."""
 
 
 class ProviderError(RuntimeError):

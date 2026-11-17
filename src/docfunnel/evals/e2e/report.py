@@ -24,19 +24,22 @@ def _group_row(report: E2EReport, group: E2EGroup) -> str:
     m = group.metrics
     per_1k = None if m.cost_per_doc_usd is None else m.cost_per_doc_usd * 1000
     parse = parse_cpu_ms(report, group.model, group.route, group.slice)
+    thinking = "n/a" if m.reasoning_tokens is None else _per_doc(m.reasoning_tokens, m.documents)
     return (
         f"| `{group.model}` | {group.route} | {m.documents} | {fmt_pct(m.field_accuracy)} "
         f"| {fmt_pct(m.exact_match_rate)} | {fmt_pct(m.line_items_f1)} "
         f"| {fmt_pct(m.schema_compliance_rate)} | {_per_doc(m.input_tokens, m.documents)} "
-        f"| {_per_doc(m.output_tokens, m.documents)} | {_usd(m.cost_per_doc_usd, 5)} "
+        f"| {_per_doc(m.output_tokens, m.documents)} | {thinking} | {_usd(m.cost_per_doc_usd, 5)} "
         f"| {_usd(per_1k, 2)} | {_seconds(m.latency_p50_ms)} | {_seconds(parse)} |"
     )
 
 
 _HEADER = [
     "| Model | Route | Docs | Field accuracy | Exact match | Line items F1 | Schema valid "
-    "| Input tok/doc | Output tok/doc | Cost/doc | Cost per 1k docs | LLM p50 | Parse CPU/doc |",
-    "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    "| Input tok/doc | Output tok/doc | of which thinking | Cost/doc | Cost per 1k docs | LLM p50 "
+    "| Parse CPU/doc |",
+    "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: "
+    "| ---: |",
 ]
 
 

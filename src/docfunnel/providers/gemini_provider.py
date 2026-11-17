@@ -96,4 +96,5 @@ class GeminiProvider:
             model=request.model,
             input_tokens=(usage.prompt_token_count or 0) if usage else 0,
             output_tokens=candidates + thoughts,
+            reasoning_tokens=thoughts,
         )

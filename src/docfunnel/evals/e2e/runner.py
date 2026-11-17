@@ -97,6 +97,8 @@ class E2EConfig:
     parse_options: ParseOptions = field(default_factory=lambda: ParseOptions(ocr_engine="auto"))
     run_name: str | None = None
     hybrid_dpi: int = 150
+    where: dict[str, str] = field(default_factory=dict)
+    """Only documents whose tags match, e.g. ``{"scan": "has_scanned_pages"}``."""
 
 
 class _Budget:
@@ -167,7 +169,11 @@ def run_e2e(
     make_extractor: Callable[[str, str, E2EConfig], Extractor] | None = None,
     on_row: Callable[[E2ERow], None] | None = None,
 ) -> E2EReport:
-    docs = load_e2e_set(config.dataset)[: config.limit]
+    docs = [
+        d
+        for d in load_e2e_set(config.dataset)
+        if all(d.tags.get(k) == v for k, v in config.where.items())
+    ][: config.limit]
     routes = sorted(config.routes, key=ROUTES.index)  # docfunnel before hybrid, for reuse
     parsed: dict[str, ParsedDocument] = {}
     if {"docfunnel", "hybrid"} & set(routes):
