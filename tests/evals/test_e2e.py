@@ -119,7 +119,7 @@ def test_hybrid_sends_images_of_scanned_pages_and_reuses_digital_results(
         dataset=e2e_dir,
         targets=[("scripted", "m")],
         routes=("hybrid", "docfunnel"),  # run in docfunnel-first order regardless
-        workers=1,
+        workers=4,  # page images are rendered before the threads start (PDFium)
     )
     report = run_e2e(config, make_extractor=make)
 

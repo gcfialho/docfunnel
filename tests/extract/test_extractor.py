@@ -3,7 +3,8 @@ from decimal import Decimal
 
 import pytest
 
-from docfunnel.extract.extractor import RetryPolicy
+from docfunnel.extract.extractor import Extractor, ModelTarget, RetryPolicy
+from docfunnel.extract.pricing import PriceTable
 from docfunnel.extract.prompts import REPAIR_MARKER, output_schema
 from docfunnel.providers.base import ProviderError
 
@@ -165,3 +166,17 @@ def test_rejects_empty_or_oversized_input(make_extractor: MakeExtractor, text: s
     extractor, _ = make_extractor((ScriptedProvider([]), "test-model"))
     with pytest.raises(ValueError, match="document"):
         extractor.extract(text)
+
+
+def test_compact_output_is_expanded_before_validation(prices: PriceTable) -> None:
+    item = {"d": "Tea", "q": 3, "u": 2.75, "t": 8.25}
+    compact = json.dumps({"total": 8.25, "currency": "USD", "line_items": [item]})
+    provider = ScriptedProvider([compact])
+    extractor = Extractor([ModelTarget(provider, "test-model")], prices=prices, compact_output=True)
+    result = extractor.extract(US_RECEIPT)
+    assert result.schema_valid
+    assert result.document is not None
+    assert result.document.line_items[0].description == "Tea"
+    request = provider.requests[0]
+    assert request.response_schema is not None
+    assert "d" in request.response_schema["properties"]["line_items"]["items"]["properties"]

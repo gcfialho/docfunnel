@@ -445,6 +445,9 @@ def eval_e2e(
         typer.Option(help="Only documents with this tag, e.g. scan=has_scanned_pages, size=large"),
     ] = None,
     workers: Annotated[int, typer.Option(help="Concurrent documents per model")] = 4,
+    compact_output: Annotated[
+        bool, typer.Option(help="One-letter line-item keys in the model's answer")
+    ] = False,
     run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
 ) -> None:
     """Compare the docfunnel route (CPU parse, then text) with native PDF input, per model.
@@ -465,6 +468,7 @@ def eval_e2e(
         default_budget_usd=budget_usd,
         limit=limit,
         where=dict(w.split("=", 1) for w in where or []),
+        compact_output=compact_output,
         workers=workers,
         run_name=run_name,
     )

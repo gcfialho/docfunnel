@@ -48,12 +48,41 @@ Previous answer:
 Return ONLY the corrected JSON object for the same document, conforming to the schema."""
 
 
+# Compact output: line items are most of the output tokens (one object per printed line,
+# each repeating four key names), and output tokens are most of the cost. The model can
+# use one-letter keys; expand_compact_items restores the names before validation.
+COMPACT_ITEM_KEYS = {"description": "d", "quantity": "q", "unit_price": "u", "total": "t"}
+_COMPACT_RULE = (
+    "- line_items use one-letter keys to keep the answer short: "
+    "d = description, q = quantity, u = unit price, t = line total.\n"
+)
+
+
 @cache
-def system_prompt() -> str:
+def system_prompt(compact: bool = False) -> str:
+    if compact:
+        schema = json.dumps(output_schema(compact=True), separators=(",", ":"))
+        rules = _SYSTEM_TEMPLATE.format(schema=schema, fields=", ".join(CONFIDENCE_FIELDS))
+        return rules + _COMPACT_RULE
     schema = json.dumps(
         ReceiptExtraction.model_json_schema(mode="serialization"), separators=(",", ":")
     )
     return _SYSTEM_TEMPLATE.format(schema=schema, fields=", ".join(CONFIDENCE_FIELDS))
+
+
+def expand_compact_items(data: dict[str, Any]) -> dict[str, Any]:
+    """Rename one-letter line-item keys back to the schema's names (others untouched)."""
+    items = data.get("line_items")
+    if not isinstance(items, list):
+        return data
+    short = {v: k for k, v in COMPACT_ITEM_KEYS.items()}
+    data["line_items"] = [
+        {short.get(key, key): value for key, value in item.items()}
+        if isinstance(item, dict)
+        else item
+        for item in items
+    ]
+    return data
 
 
 OUTPUT_SCHEMA_NAME = "receipt_extraction"
@@ -111,7 +140,7 @@ def _output_schema() -> str:
     return json.dumps(schema)
 
 
-def output_schema() -> dict[str, Any]:
+def output_schema(compact: bool = False) -> dict[str, Any]:
     """The extraction schema in the JSON Schema subset all three providers enforce natively.
 
     Adapters send it as a decoding constraint (OpenAI ``json_schema``, Anthropic
@@ -119,6 +148,12 @@ def output_schema() -> dict[str, Any]:
     capability profile allows it. A fresh copy is returned on every call.
     """
     schema: dict[str, Any] = json.loads(_output_schema())
+    if compact:
+        item = schema["properties"]["line_items"]["items"]
+        item["properties"] = {
+            COMPACT_ITEM_KEYS[name]: value for name, value in item["properties"].items()
+        }
+        item["required"] = [COMPACT_ITEM_KEYS[name] for name in item["required"]]
     return schema
 
 

@@ -91,6 +91,7 @@ class E2EConfig:
     budget_usd: dict[str, float] = field(default_factory=dict)
     default_budget_usd: float = 4.0
     max_attempts: int = 2
+    compact_output: bool = False
     max_output_tokens: int = 16_384  # a 170-line invoice is ~6k tokens of JSON, plus thinking
     workers: int = 4
     limit: int | None = None
@@ -179,6 +180,14 @@ def run_e2e(
     if {"docfunnel", "hybrid"} & set(routes):
         parsed = _parse_all(docs, config.dataset, config.parse_options)
     text_scores: dict[tuple[str, str], DocumentScore] = {}
+    # PDFium is not thread-safe: render the hybrid route's page images here, once per
+    # document and in this thread, before the model calls run in the worker threads.
+    hybrid: dict[str, tuple[str, list[Attachment]]] = {}
+    if "hybrid" in routes:
+        hybrid = {
+            d.id: hybrid_inputs(parsed[d.id], config.dataset / d.file, config.hybrid_dpi)
+            for d in docs
+        }
     budget = _Budget(config.budget_usd, config.default_budget_usd)
     factory = make_extractor or _default_extractor
     rows: list[E2ERow] = []
@@ -200,7 +209,7 @@ def run_e2e(
                 result = extractor.extract(attachments=[Attachment(data, "application/pdf")])
             else:
                 row.parse_cpu_ms = _cpu_ms(parsed[doc.id])
-                text, images = hybrid_inputs(parsed[doc.id], pdf, config.hybrid_dpi)
+                text, images = hybrid[doc.id]
                 if not images and (model, doc.id) in text_scores:
                     row.score, row.reused = text_scores[(model, doc.id)], True
                 else:
@@ -232,7 +241,7 @@ def run_e2e(
         run_name=config.run_name or f"e2e ({len(config.targets)} models)",
         created_at=dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
         package_version=__version__,
-        prompt_version=PROMPT_VERSION,
+        prompt_version=PROMPT_VERSION + ("-compact" if config.compact_output else ""),
         dataset=config.dataset.as_posix(),
         documents=len(docs),
         pages=sum(d.pages for d in docs),
@@ -251,6 +260,7 @@ def _default_extractor(provider: str, model: str, config: E2EConfig) -> Extracto
         model=model,
         max_attempts=config.max_attempts,
         max_output_tokens=config.max_output_tokens,
+        compact_output=config.compact_output,
     )
     return build_extractor(settings)
 

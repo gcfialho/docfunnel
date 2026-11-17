@@ -31,6 +31,7 @@ from docfunnel.extract.pricing import PriceTable
 from docfunnel.extract.prompts import (
     ATTACHED_DOCUMENT_PROMPT,
     OutputParseError,
+    expand_compact_items,
     format_validation_errors,
     output_schema,
     parse_json_object,
@@ -116,6 +117,7 @@ class Extractor:
         review: ReviewPolicy | None = None,
         prices: PriceTable | None = None,
         max_output_tokens: int = 2048,
+        compact_output: bool = False,
         sleep: Callable[[float], None] = time.sleep,
         clock: Callable[[], float] = time.perf_counter,
         rng: random.Random | None = None,
@@ -127,6 +129,7 @@ class Extractor:
         self.review = review or ReviewPolicy()
         self.prices = prices or PriceTable.load()
         self.max_output_tokens = max_output_tokens
+        self.compact_output = compact_output
         self._sleep = sleep
         self._clock = clock
         self._rng = rng or random.Random()
@@ -148,7 +151,7 @@ class Extractor:
         calls: list[CallRecord] = []
         started = self._clock()
         prompt = user_prompt(text) if text.strip() else ATTACHED_DOCUMENT_PROMPT
-        base = [Message("system", system_prompt()), Message("user", prompt)]
+        base = [Message("system", system_prompt(self.compact_output)), Message("user", prompt)]
 
         for index, target in enumerate(self.targets):
             document = self._run_target(target, list(base), calls, files)
@@ -169,7 +172,7 @@ class Extractor:
         calls: list[CallRecord],
         attachments: tuple[Attachment, ...] = (),
     ) -> ReceiptExtraction | None:
-        schema = output_schema()
+        schema = output_schema(compact=self.compact_output)
         for attempt in range(1, self.retry.max_attempts + 1):
             if attempt > 1:
                 self._sleep(self.retry.delay(attempt - 1, self._rng))
@@ -200,6 +203,8 @@ class Extractor:
             }
             try:
                 data = parse_json_object(response.text)
+                if self.compact_output:
+                    data = expand_compact_items(data)
                 document = ReceiptExtraction.model_validate(data)
             except OutputParseError as exc:
                 calls.append(
