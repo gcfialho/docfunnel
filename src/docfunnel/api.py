@@ -64,7 +64,7 @@ def _resolve_input(path: str, settings: Settings) -> Path:
     root = settings.input_dir.resolve()
     candidate = (root / path).resolve()
     if not candidate.is_relative_to(root):
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "path escapes the input directory")
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "path must stay inside DOCFUNNEL_INPUT_DIR")
     if not candidate.is_file():
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"file not found: {path}")
     return candidate

@@ -101,7 +101,11 @@ def _emit_markdown(markdown: str, out: Path | None) -> None:
 
 
 @app.callback()
-def _main(verbose: Annotated[bool, typer.Option("--verbose", "-v")] = False) -> None:
+def _main(
+    verbose: Annotated[
+        bool, typer.Option("--verbose", "-v", help="Log retries, fallbacks and progress")
+    ] = False,
+) -> None:
     logging.basicConfig(
         level=logging.INFO if verbose else logging.WARNING,
         format="%(levelname)s %(name)s: %(message)s",
@@ -357,7 +361,7 @@ def generate_dataset(
     n: Annotated[int, typer.Option(help="Number of documents")] = 60,
     seed: Annotated[int, typer.Option(help="Random seed")] = 7,
 ) -> None:
-    """(Re)generate the synthetic labelled dataset deterministically."""
+    """Regenerate the labelled receipt dataset (seeded, so the output is identical)."""
     from docfunnel.datasets.receipts import write_dataset
 
     count = write_dataset(out, n=n, seed=seed)
@@ -378,7 +382,9 @@ def generate_pdfs(
     try:
         truths = write_pdf_dataset(out, n=n, seed=seed)
     except ImportError as exc:  # pragma: no cover - only without the extra
-        raise _fail("generate-pdfs requires the 'synthetic' extra") from exc
+        raise _fail(
+            "generate-pdfs requires the 'synthetic' extra: uv sync --extra synthetic"
+        ) from exc
     pages = sum(len(t.pages) for t in truths)
     scanned = sum(p.scanned for t in truths for p in t.pages)
     typer.echo(f"Wrote {len(truths)} documents ({pages} pages, {scanned} scanned) to {out}")
@@ -389,7 +395,7 @@ def serve(
     host: str = "127.0.0.1",
     port: int = 8000,
 ) -> None:
-    """Run the FastAPI server."""
+    """Run the HTTP API (FastAPI, OpenAPI docs at /docs)."""
     import uvicorn
 
     uvicorn.run("docfunnel.api:app", host=host, port=port)

@@ -46,7 +46,10 @@ def get_provider(name: str, *, cassette: Path | None = None) -> LLMProvider:
             from docfunnel.providers.replay import ReplayProvider
 
             if cassette is None:
-                raise ProviderNotConfiguredError("the replay provider needs a cassette path")
+                raise ProviderNotConfiguredError(
+                    "the replay provider needs a cassette: "
+                    "pass --cassette or set DOCFUNNEL_CASSETTE"
+                )
             return ReplayProvider(cassette)
         case _:
             raise ValueError(f"unknown provider {name!r}; expected one of {PROVIDER_NAMES}")
