@@ -82,7 +82,12 @@ def render_e2e_markdown(report: E2EReport) -> str:
         "",
         f"- Dataset: `{meta.dataset}`: {meta.documents} invoices, {meta.pages} pages",
         f"- Models: {', '.join(f'`{t}`' for t in meta.targets)}; routes: {', '.join(meta.routes)}",
-        f"- Spend: {spent}; skipped calls (budget reached): {meta.skipped_calls}",
+        f"- Spend: {spent}; skipped calls (budget reached or provider stopped): "
+        f"{meta.skipped_calls}",
+        *[
+            f"- **{provider} stopped**: repeated calls failed without using a token: {error}"
+            for provider, error in meta.unavailable.items()
+        ],
         f"- Package `{meta.package_version}`, prompt `{meta.prompt_version}`, "
         f"created {meta.created_at}",
         "",

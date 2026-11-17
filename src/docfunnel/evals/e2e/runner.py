@@ -28,7 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from docfunnel import __version__
 from docfunnel.config import Settings, build_extractor
@@ -37,6 +37,7 @@ from docfunnel.evals.extract.dataset import LabeledDocument
 from docfunnel.evals.extract.runner import DocumentScore, Metrics, aggregate, score_document
 from docfunnel.extract.extractor import Extractor
 from docfunnel.extract.prompts import PROMPT_VERSION
+from docfunnel.extract.schema import ExtractionResult
 from docfunnel.parse.model import ParsedDocument
 from docfunnel.parse.pipeline import PagePool, ParseOptions
 from docfunnel.providers.base import Attachment
@@ -50,6 +51,7 @@ class E2ERow(BaseModel):
     model: str
     route: str
     skipped: bool = False
+    skip_reason: str | None = None  # "budget" | "provider_unavailable"
     score: DocumentScore | None = None
     parse_cpu_ms: float = 0.0
     reused: bool = False
@@ -76,6 +78,9 @@ class E2EMeta(BaseModel):
     budget_usd: dict[str, float]
     spent_usd: dict[str, float]
     skipped_calls: int
+    unavailable: dict[str, str] = Field(default_factory=dict)
+    """Providers stopped after repeated calls that failed without using a token
+    (out of credit, bad key, model withdrawn), with the last error."""
 
 
 class E2EReport(BaseModel):
@@ -106,20 +111,42 @@ class E2EConfig:
     """Only documents whose tags match, e.g. ``{"scan": "has_scanned_pages"}``."""
 
 
+# A call that fails at the provider without using a token (no credit, bad key, model
+# withdrawn) will fail the same way for every document; stop after this many in a row.
+DEAD_CALLS_LIMIT = 3
+
+
 class _Budget:
-    """Recorded spend per provider, checked before every document."""
+    """Recorded spend per provider, checked before every document, plus a circuit breaker."""
 
     def __init__(self, limits: dict[str, float], default: float) -> None:
         self._limits, self._default = limits, default
         self.spent: dict[str, float] = {}
+        self.unavailable: dict[str, str] = {}
+        self._dead: dict[str, int] = {}
         self._lock = threading.Lock()
+
+    def record_outcome(self, provider: str, result: ExtractionResult) -> None:
+        dead = (
+            bool(result.calls)
+            and all(c.status == "provider_error" for c in result.calls)
+            and result.usage.input_tokens == 0
+        )
+        with self._lock:
+            self._dead[provider] = self._dead.get(provider, 0) + 1 if dead else 0
+            if dead and self._dead[provider] >= DEAD_CALLS_LIMIT:
+                self.unavailable[provider] = result.calls[-1].error or "provider error"
+
+    def skip_reason(self, provider: str) -> str | None:
+        with self._lock:
+            if provider in self.unavailable:
+                return "provider_unavailable"
+            if self.spent.get(provider, 0.0) >= self.limit(provider):
+                return "budget"
+            return None
 
     def limit(self, provider: str) -> float:
         return self._limits.get(provider, self._default)
-
-    def allows(self, provider: str) -> bool:
-        with self._lock:
-            return self.spent.get(provider, 0.0) < self.limit(provider)
 
     def add(self, provider: str, cost: float | None) -> None:
         with self._lock:
@@ -203,8 +230,8 @@ def run_e2e(
 
     def run_one(extractor: Extractor, provider: str, model: str, route: str, doc: E2EDoc) -> None:
         row = E2ERow(doc_id=doc.id, model=model, route=route)
-        if not budget.allows(provider):
-            row.skipped = True
+        if reason := budget.skip_reason(provider):
+            row.skipped, row.skip_reason = True, reason
         else:
             labeled = LabeledDocument(id=doc.id, text="", label=doc.label, tags=doc.tags)
             pdf = config.dataset / doc.file
@@ -224,6 +251,7 @@ def run_e2e(
                     result = extractor.extract(text, attachments=images)
             if result is not None:
                 budget.add(provider, result.usage.cost_usd)
+                budget.record_outcome(provider, result)
                 row.score = score_document(labeled, result)
                 if route == "docfunnel":
                     with lock:
@@ -258,6 +286,7 @@ def run_e2e(
         budget_usd={p: budget.limit(p) for p, _ in config.targets},
         spent_usd={p: round(v, 6) for p, v in budget.spent.items()},
         skipped_calls=sum(r.skipped for r in rows),
+        unavailable=budget.unavailable,
     )
     return E2EReport(meta=meta, groups=_groups(rows, docs), rows=rows)
 

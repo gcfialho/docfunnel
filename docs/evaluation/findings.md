@@ -2,7 +2,20 @@
 
 A lab notebook: what each run with a real model showed, what it cost, and what changed in the code because of it. Newest entries first. Raw reports are in [`reports/e2e/`](../../reports/e2e/).
 
-Spend so far (cap: US$ 5 per provider key): Gemini ~US$ 3.81, Anthropic ~US$ 0.52.
+Spend so far (cap: US$ 5 per provider key): Gemini ~US$ 3.81 by our price table, after which the key's prepaid credit ran out; Anthropic ~US$ 0.66.
+
+## 2026-11-17: compact line items; the Gemini key runs out of credit
+
+**Setup.** Hybrid route on all 39 invoices with `--compact-output` (one-letter line-item keys), Gemini 3.1 Flash-Lite and Claude Haiku 5.5, compared with the standard answer format on the same documents (hybrid on the 29 with scans, docfunnel on the 10 digital ones). Cost: Anthropic US$ 0.14. Report: [`reports/e2e-compact/`](../../reports/e2e-compact/report.md).
+
+| `claude-haiku-5-5` | Exact match | Line items F1 | Output tok/doc | Cost per 1k docs |
+| --- | ---: | ---: | ---: | ---: |
+| standard keys | 82.1% | 94.3% | 5,216 | $3.60 |
+| compact keys | 89.7% | 98.1% | 5,274 | $3.63 |
+
+1. **Compact keys did not shorten the answer.** Output tokens were unchanged on average and 8% lower (median) on invoices with more than 20 items. Key names such as `"description"` are about one token each; the values (descriptions, numbers) are the output. The accuracy difference is within the run-to-run noise seen above. The option stays, off by default.
+2. **The Gemini key ran out of prepaid credit** (HTTP 402) after ~US$ 3.81 of calls by our price table, below the US$ 5 cap. Either the prepaid balance was lower than the cap, or the bill is higher than our table says. Check the AI Studio billing page before trusting the Gemini cost figures above to the cent.
+3. **The eval scored the 402s as 39 failed extractions.** It now stops a provider after 3 consecutive calls that fail without using a token and reports why (`unavailable` in the report). The Gemini rows were removed from this report.
 
 ## 2026-11-17: hybrid route, images in place
 

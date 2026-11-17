@@ -100,7 +100,7 @@ def test_both_routes_budget_and_report(e2e_dir: Path, tmp_path: Path) -> None:
     markdown = md_path.read_text()
     assert "| `cheap-model` | docfunnel | 3 |" in markdown
     assert "### Against the docfunnel route" in markdown
-    assert "skipped calls (budget reached): 2" in markdown
+    assert "skipped calls (budget reached or provider stopped): 2" in markdown
 
 
 def test_hybrid_sends_images_of_scanned_pages_and_reuses_digital_results(
@@ -136,3 +136,22 @@ def test_hybrid_sends_images_of_scanned_pages_and_reuses_digital_results(
         assert all(a.data.startswith(b"\xff\xd8") for a in request.attachments)
         assert "[[attachment:1]]" in request.messages[1].content
     assert report.meta.routes == ["docfunnel", "hybrid"]
+
+
+def test_a_provider_that_fails_without_tokens_is_stopped(e2e_dir: Path) -> None:
+    from docfunnel.providers.base import ProviderError
+
+    error = ProviderError("402 RESOURCE_EXHAUSTED: credits are depleted", retryable=False)
+    scripted = ScriptedProvider([error] * 50)
+
+    def make(provider: str, model: str, config: E2EConfig) -> Extractor:
+        return Extractor([ModelTarget(scripted, model)], retry=RetryPolicy(max_attempts=1))
+
+    config = E2EConfig(
+        dataset=e2e_dir, targets=[("broke", "m")], routes=("native",), workers=1, limit=6
+    )
+    report = run_e2e(config, make_extractor=make)
+
+    assert len(scripted.requests) == 3  # DEAD_CALLS_LIMIT, then the provider is stopped
+    assert [r.skip_reason for r in report.rows if r.skipped] == ["provider_unavailable"] * 3
+    assert "credits are depleted" in report.meta.unavailable["broke"]
