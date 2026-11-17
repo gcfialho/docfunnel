@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from docfunnel.evals.metrics import char_error_rate
+from docfunnel.evals.text import char_error_rate
 from docfunnel.parse import (
     PageSignals,
     ParseOptions,

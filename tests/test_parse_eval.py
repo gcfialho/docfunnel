@@ -11,8 +11,8 @@ pytest.importorskip("reportlab")
 pytest.importorskip("pypdfium2")
 
 from docfunnel.cli import app
-from docfunnel.evals.metrics import char_error_rate, quote_found, word_error_rate
-from docfunnel.evals.parse_eval import (
+from docfunnel.datasets.pdfs import write_pdf_dataset
+from docfunnel.evals.parse import (
     ParseEvalConfig,
     ParseEvalReport,
     ParseThresholds,
@@ -23,7 +23,7 @@ from docfunnel.evals.parse_eval import (
     run_parse_eval,
     write_parse_report,
 )
-from docfunnel.synthetic_pdf import write_pdf_dataset
+from docfunnel.evals.text import char_error_rate, quote_found, word_error_rate
 
 runner = CliRunner()
 

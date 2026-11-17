@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Any, NoReturn
 
 import pytest
 
-from docfunnel.prompts import output_schema
+from docfunnel.extract.prompts import output_schema
 from docfunnel.providers.base import CompletionRequest, Message, ProviderError
 
 if TYPE_CHECKING:

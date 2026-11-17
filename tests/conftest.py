@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from docfunnel.extractor import Extractor, ModelTarget, RetryPolicy
-from docfunnel.pricing import PriceTable
+from docfunnel.extract.extractor import Extractor, ModelTarget, RetryPolicy
+from docfunnel.extract.pricing import PriceTable
 
 from helpers import VALID_PAYLOAD, MakeExtractor, ScriptedProvider
 

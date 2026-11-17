@@ -10,18 +10,12 @@ from concurrent.futures import ThreadPoolExecutor
 from pydantic import BaseModel, Field
 
 from docfunnel import __version__
-from docfunnel.evals.dataset import LabeledDocument
-from docfunnel.evals.metrics import (
-    Outcome,
-    f1,
-    match_line_items,
-    percentile,
-    safe_div,
-    score_header_fields,
-)
-from docfunnel.extractor import Extractor
-from docfunnel.prompts import PROMPT_VERSION
-from docfunnel.schema import HEADER_FIELDS, ExtractionResult
+from docfunnel.evals.extract.dataset import LabeledDocument
+from docfunnel.evals.extract.metrics import Outcome, match_line_items, score_header_fields
+from docfunnel.evals.stats import f1, percentile, safe_div
+from docfunnel.extract.extractor import Extractor
+from docfunnel.extract.prompts import PROMPT_VERSION
+from docfunnel.extract.schema import HEADER_FIELDS, ExtractionResult
 
 
 class DocumentScore(BaseModel):

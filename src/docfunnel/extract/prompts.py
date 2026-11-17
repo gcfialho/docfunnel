@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from docfunnel.schema import CONFIDENCE_FIELDS, ReceiptExtraction
+from docfunnel.extract.schema import CONFIDENCE_FIELDS, ReceiptExtraction
 
 PROMPT_VERSION = "v1"
 

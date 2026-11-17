@@ -13,7 +13,7 @@ from typing import Any
 import httpx
 import pytest
 
-from docfunnel.prompts import output_schema
+from docfunnel.extract.prompts import output_schema
 from docfunnel.providers.base import CompletionRequest, Message
 
 REQUEST_MESSAGES = (Message("system", "SYSTEM"), Message("user", "USER"))

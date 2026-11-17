@@ -5,7 +5,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from docfunnel.schema import PaymentMethod, ReceiptExtraction
+from docfunnel.extract.schema import PaymentMethod, ReceiptExtraction
 
 
 def test_lenient_coercion_of_llm_style_values() -> None:

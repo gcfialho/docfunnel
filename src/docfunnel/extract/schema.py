@@ -16,7 +16,7 @@ from pydantic import (
     field_validator,
 )
 
-from docfunnel.normalize import normalize_currency, parse_amount, parse_date
+from docfunnel.extract.normalize import normalize_currency, parse_amount, parse_date
 
 
 def _amount(value: Any) -> Decimal | None:

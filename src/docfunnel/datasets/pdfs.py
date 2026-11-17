@@ -1,6 +1,6 @@
 """Seeded multi-page invoices and contracts rendered to PDF, with page-level ground truth.
 
-The short receipts in :mod:`docfunnel.synthetic` test the LLM step; these documents
+The short receipts in :mod:`docfunnel.datasets.receipts` test the LLM step; these documents
 test everything before it (text layer, OCR decision, OCR, reading order) and later
 retrieval over long documents. For every document the generator knows:
 
@@ -32,9 +32,10 @@ from decimal import Decimal
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
-from docfunnel.normalize import CENT
-from docfunnel.schema import LineItem, ReceiptData
-from docfunnel.synthetic import LOCALES, Locale, format_amount
+from docfunnel.datasets.locales import LOCALES, Locale, format_amount
+from docfunnel.datasets.scan import NOISE_LEVELS, simulate_scan
+from docfunnel.extract.normalize import CENT
+from docfunnel.extract.schema import LineItem, ReceiptData
 
 if TYPE_CHECKING:
     from PIL.Image import Image
@@ -49,53 +50,6 @@ MANIFEST_NAME = "manifest.jsonl"
 MARGIN = 54.0
 LEADING = 1.38
 FONT_FAMILIES = (("Helvetica", "Helvetica-Bold"), ("Times-Roman", "Times-Bold"))
-
-
-# ---- scan simulation ----------------------------------------------------------------
-
-
-@dataclass(frozen=True)
-class ScanNoise:
-    dpi: int
-    max_angle: float  # degrees, uniform in [-max, max]
-    blur: float  # Gaussian blur radius in pixels
-    contrast: float  # 1.0 = black ink stays black
-    sigma: float  # Gaussian sensor noise (grey levels)
-    speckle: float  # share of pixels flipped to black or white
-    jpeg_quality: int
-
-
-NOISE_LEVELS: dict[str, ScanNoise] = {
-    "light": ScanNoise(
-        dpi=200, max_angle=0.8, blur=0.5, contrast=0.92, sigma=8, speckle=0, jpeg_quality=70
-    ),
-    "heavy": ScanNoise(
-        dpi=150, max_angle=2.0, blur=0.9, contrast=0.72, sigma=22, speckle=0.004, jpeg_quality=35
-    ),
-}
-
-
-def simulate_scan(page: Any, noise: ScanNoise, seed: int) -> bytes:
-    """Rasterise a PDF page and degrade it like a cheap office scan; returns JPEG bytes."""
-    import numpy as np
-    from PIL import Image, ImageFilter
-
-    rng = np.random.default_rng(seed)
-    image = page.render(scale=noise.dpi / 72, grayscale=True).to_pil().convert("L")
-    angle = float(rng.uniform(-noise.max_angle, noise.max_angle))
-    image = image.rotate(angle, resample=Image.Resampling.BICUBIC, fillcolor=255)
-    if noise.blur:
-        image = image.filter(ImageFilter.GaussianBlur(noise.blur))
-    pixels = np.asarray(image, dtype=np.float32)
-    pixels = 245 - (245 - pixels) * noise.contrast  # grey ink on slightly grey paper
-    pixels += rng.normal(0.0, noise.sigma, pixels.shape)
-    if noise.speckle:
-        mask = rng.random(pixels.shape) < noise.speckle
-        pixels[mask] = rng.choice(np.array([0.0, 255.0], dtype=np.float32), size=int(mask.sum()))
-    out = Image.fromarray(np.clip(pixels, 0, 255).astype(np.uint8), mode="L")
-    buffer = io.BytesIO()
-    out.save(buffer, format="JPEG", quality=noise.jpeg_quality)
-    return buffer.getvalue()
 
 
 # ---- layout primitives -----------------------------------------------------------------

@@ -2,15 +2,14 @@ from decimal import Decimal
 
 import pytest
 
-from docfunnel.evals.metrics import (
+from docfunnel.evals.extract.metrics import (
     Outcome,
     compare_field,
-    f1,
     match_line_items,
-    percentile,
     score_header_fields,
 )
-from docfunnel.schema import LineItem, ReceiptData
+from docfunnel.evals.stats import f1, percentile
+from docfunnel.extract.schema import LineItem, ReceiptData
 
 
 @pytest.mark.parametrize(

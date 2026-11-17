@@ -3,8 +3,8 @@ from decimal import Decimal
 
 import pytest
 
-from docfunnel.extractor import RetryPolicy
-from docfunnel.prompts import REPAIR_MARKER, output_schema
+from docfunnel.extract.extractor import RetryPolicy
+from docfunnel.extract.prompts import REPAIR_MARKER, output_schema
 from docfunnel.providers.base import ProviderError
 
 from helpers import US_RECEIPT, VALID_PAYLOAD, MakeExtractor, ScriptedProvider

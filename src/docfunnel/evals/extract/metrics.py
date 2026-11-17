@@ -15,14 +15,13 @@ the document, how often did the model fill them anyway?
 
 from __future__ import annotations
 
-import math
 from collections.abc import Sequence
 from decimal import Decimal
 from difflib import SequenceMatcher
 from enum import StrEnum
 from typing import Any
 
-from docfunnel.normalize import (
+from docfunnel.extract.normalize import (
     amounts_close,
     normalize_currency,
     normalize_identifier,
@@ -30,7 +29,7 @@ from docfunnel.normalize import (
     parse_amount,
     parse_date,
 )
-from docfunnel.schema import HEADER_FIELDS, LineItem, ReceiptData
+from docfunnel.extract.schema import HEADER_FIELDS, LineItem, ReceiptData
 
 
 class Outcome(StrEnum):
@@ -119,66 +118,3 @@ def match_line_items(
                 del unmatched[i]
                 break
     return tp, len(unmatched), len(expected) - tp
-
-
-def safe_div(numerator: float, denominator: float) -> float | None:
-    return numerator / denominator if denominator else None
-
-
-def f1(precision: float | None, recall: float | None) -> float | None:
-    if precision is None or recall is None or precision + recall == 0:
-        return None
-    return 2 * precision * recall / (precision + recall)
-
-
-def percentile(values: Sequence[float], pct: float) -> float | None:
-    """Linear-interpolated percentile (same convention as numpy's default)."""
-    if not values:
-        return None
-    ordered = sorted(values)
-    rank = (len(ordered) - 1) * pct / 100
-    low, high = math.floor(rank), math.ceil(rank)
-    if low == high:
-        return ordered[low]
-    return ordered[low] + (ordered[high] - ordered[low]) * (rank - low)
-
-
-# ---- text metrics for the parse stage ------------------------------------------------
-
-
-def normalize_whitespace(text: str) -> str:
-    """Collapse every run of whitespace (including line breaks) to one space.
-
-    CER and WER are measured on this form: the parse stage is judged on the
-    characters it recovers and their order, not on how it splits lines or columns.
-    """
-    return " ".join(text.split())
-
-
-def edit_counts(reference: str, hypothesis: str) -> tuple[int, int, int, int]:
-    """``(char_edits, ref_chars, word_edits, ref_words)`` after whitespace normalization."""
-    from rapidfuzz.distance import Levenshtein
-
-    ref, hyp = normalize_whitespace(reference), normalize_whitespace(hypothesis)
-    ref_words, hyp_words = ref.split(), hyp.split()
-    return (
-        Levenshtein.distance(ref, hyp),
-        len(ref),
-        Levenshtein.distance(ref_words, hyp_words),
-        len(ref_words),
-    )
-
-
-def char_error_rate(reference: str, hypothesis: str) -> float:
-    edits, chars, _, _ = edit_counts(reference, hypothesis)
-    return edits / chars if chars else float(bool(normalize_whitespace(hypothesis)))
-
-
-def word_error_rate(reference: str, hypothesis: str) -> float:
-    _, _, edits, words = edit_counts(reference, hypothesis)
-    return edits / words if words else float(bool(normalize_whitespace(hypothesis)))
-
-
-def quote_found(quote: str, text: str) -> bool:
-    """Does the printed value appear in the parsed text? Whitespace is ignored."""
-    return "".join(quote.split()) in "".join(text.split())

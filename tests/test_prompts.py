@@ -4,7 +4,7 @@ from typing import Any
 
 import pytest
 
-from docfunnel.prompts import (
+from docfunnel.extract.prompts import (
     DOCUMENT_OPEN,
     REPAIR_MARKER,
     OutputParseError,
@@ -110,7 +110,7 @@ def test_output_schema_returns_an_independent_copy() -> None:
 
 
 def test_an_answer_shaped_by_the_output_schema_validates() -> None:
-    from docfunnel.schema import CONFIDENCE_FIELDS, ReceiptExtraction
+    from docfunnel.extract.schema import CONFIDENCE_FIELDS, ReceiptExtraction
 
     answer: dict[str, Any] = dict.fromkeys(output_schema()["properties"])
     answer["line_items"] = [

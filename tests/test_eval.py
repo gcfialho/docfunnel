@@ -6,10 +6,11 @@ from pathlib import Path
 import pytest
 
 from docfunnel.config import Settings, build_extractor
-from docfunnel.evals.compare import Status, Thresholds, compare_reports, render_comparison
-from docfunnel.evals.dataset import file_sha256, load_dataset
-from docfunnel.evals.report import load_report, render_markdown, write_report
-from docfunnel.evals.runner import EvalReport, run_eval
+from docfunnel.evals.extract.compare import Thresholds, compare_reports, render_comparison
+from docfunnel.evals.extract.dataset import file_sha256, load_dataset
+from docfunnel.evals.extract.report import load_report, render_markdown, write_report
+from docfunnel.evals.extract.runner import EvalReport, run_eval
+from docfunnel.evals.gate import Status
 
 from helpers import DATASET
 

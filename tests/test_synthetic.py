@@ -1,9 +1,9 @@
 import json
 
-from docfunnel.evals.dataset import load_dataset
-from docfunnel.schema import ReceiptExtraction
-from docfunnel.synthetic import generate, ocr_noise
-from docfunnel.validation import check_business_rules
+from docfunnel.datasets.receipts import generate, ocr_noise
+from docfunnel.evals.extract.dataset import load_dataset
+from docfunnel.extract.schema import ReceiptExtraction
+from docfunnel.extract.validation import check_business_rules
 
 from helpers import DATASET
 

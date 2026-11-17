@@ -13,10 +13,7 @@ pytest.importorskip("pypdfium2")
 pytest.importorskip("numpy")
 
 from docfunnel.cli import app
-from docfunnel.evals.metrics import char_error_rate, normalize_whitespace
-from docfunnel.parse import ParseOptions, parse_file
-from docfunnel.schema import ReceiptExtraction
-from docfunnel.synthetic_pdf import (
+from docfunnel.datasets.pdfs import (
     DocTruth,
     generate_specs,
     generate_truths,
@@ -25,7 +22,10 @@ from docfunnel.synthetic_pdf import (
     render_pdf,
     write_pdf_dataset,
 )
-from docfunnel.validation import check_business_rules
+from docfunnel.evals.text import char_error_rate, normalize_whitespace
+from docfunnel.extract.schema import ReceiptExtraction
+from docfunnel.extract.validation import check_business_rules
+from docfunnel.parse import ParseOptions, parse_file
 
 
 @pytest.fixture(scope="module")

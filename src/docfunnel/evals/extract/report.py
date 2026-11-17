@@ -4,19 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from docfunnel.evals.runner import EvalReport
-
-
-def fmt_pct(value: float | None) -> str:
-    return "n/a" if value is None else f"{value * 100:.1f}%"
-
-
-def fmt_usd(value: float | None) -> str:
-    return "unknown" if value is None else f"${value:.6f}"
-
-
-def fmt_ms(value: float | None) -> str:
-    return "n/a" if value is None else f"{value:.1f} ms"
+from docfunnel.evals.extract.runner import EvalReport
+from docfunnel.evals.formatting import fmt_ms, fmt_pct, fmt_usd
 
 
 def summary_rows(report: EvalReport) -> list[tuple[str, str]]:

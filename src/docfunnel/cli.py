@@ -11,11 +11,11 @@ from typing import Annotated
 import typer
 
 from docfunnel.config import Settings, build_extractor, parse_target
-from docfunnel.evals.compare import Thresholds, compare_reports, render_comparison
-from docfunnel.evals.dataset import DEFAULT_DATASET, file_sha256, load_dataset
-from docfunnel.evals.report import load_report, summary_rows, write_report
-from docfunnel.evals.runner import run_eval
-from docfunnel.extractor import ModelTarget
+from docfunnel.evals.extract.compare import Thresholds, compare_reports, render_comparison
+from docfunnel.evals.extract.dataset import DEFAULT_DATASET, file_sha256, load_dataset
+from docfunnel.evals.extract.report import load_report, summary_rows, write_report
+from docfunnel.evals.extract.runner import run_eval
+from docfunnel.extract.extractor import ModelTarget
 from docfunnel.loaders import UnsupportedDocumentError, load_document
 from docfunnel.providers.base import ProviderNotConfiguredError
 from docfunnel.providers.replay import RecordingProvider
@@ -258,7 +258,7 @@ def generate_dataset(
     seed: Annotated[int, typer.Option(help="Random seed")] = 7,
 ) -> None:
     """(Re)generate the synthetic labelled dataset deterministically."""
-    from docfunnel.synthetic import write_dataset
+    from docfunnel.datasets.receipts import write_dataset
 
     count = write_dataset(out, n=n, seed=seed)
     typer.echo(f"Wrote {count} documents to {out}")
@@ -274,7 +274,7 @@ def generate_pdfs(
 ) -> None:
     """Generate multi-page invoice/contract PDFs (digital, scanned, mixed) with ground truth."""
     try:
-        from docfunnel.synthetic_pdf import write_pdf_dataset
+        from docfunnel.datasets.pdfs import write_pdf_dataset
     except ImportError as exc:  # pragma: no cover - only without the extra
         raise _fail("generate-pdfs requires the 'synthetic' extra") from exc
     truths = write_pdf_dataset(out, n=n, seed=seed)
@@ -301,7 +301,7 @@ def eval_parse(
     run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
 ) -> None:
     """Evaluate the parse stage: OCR routing, CER/WER, field recall and throughput."""
-    from docfunnel.evals.parse_eval import (
+    from docfunnel.evals.parse import (
         ParseEvalConfig,
         run_parse_eval,
         summary_rows,
@@ -344,7 +344,7 @@ def compare_parse(
     out: Annotated[Path | None, typer.Option(help="Also write the comparison as Markdown")] = None,
 ) -> None:
     """Compare two parse eval runs; exit 1 on a quality regression."""
-    from docfunnel.evals.parse_eval import (
+    from docfunnel.evals.parse import (
         ParseThresholds,
         compare_parse_reports,
         load_parse_report,

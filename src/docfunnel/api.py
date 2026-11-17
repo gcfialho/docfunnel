@@ -15,9 +15,9 @@ from pydantic import BaseModel, Field, model_validator
 
 from docfunnel import __version__
 from docfunnel.config import Settings
-from docfunnel.extractor import MAX_DOCUMENT_CHARS, Extractor
+from docfunnel.extract.extractor import MAX_DOCUMENT_CHARS, Extractor
+from docfunnel.extract.schema import ExtractionResult
 from docfunnel.loaders import UnsupportedDocumentError, load_document
-from docfunnel.schema import ExtractionResult
 from docfunnel.service import get_extractor, get_settings
 
 app = FastAPI(

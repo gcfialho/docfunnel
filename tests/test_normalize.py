@@ -3,7 +3,7 @@ from decimal import Decimal
 
 import pytest
 
-from docfunnel.normalize import (
+from docfunnel.extract.normalize import (
     amounts_close,
     normalize_currency,
     normalize_identifier,

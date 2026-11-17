@@ -20,10 +20,10 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
-from docfunnel.extractor import Extractor, ModelTarget, RetryPolicy
-from docfunnel.pricing import PriceTable
+from docfunnel.extract.extractor import Extractor, ModelTarget, RetryPolicy
+from docfunnel.extract.pricing import PriceTable
+from docfunnel.extract.validation import ReviewPolicy
 from docfunnel.providers import DEFAULT_MODELS, get_provider
-from docfunnel.validation import ReviewPolicy
 
 
 def parse_target(spec: str) -> tuple[str, str]:

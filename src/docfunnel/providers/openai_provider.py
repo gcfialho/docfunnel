@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-from docfunnel.prompts import OUTPUT_SCHEMA_NAME
+from docfunnel.extract.prompts import OUTPUT_SCHEMA_NAME
 from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,
