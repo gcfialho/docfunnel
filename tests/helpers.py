@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
@@ -74,3 +75,17 @@ class MakeExtractor(Protocol):
         max_attempts: int = ...,
         backoff_base_s: float = ...,
     ) -> tuple[Extractor, list[float]]: ...
+
+
+@dataclass
+class DocServer:
+    """Handle on the ``doc_server`` fixture: its base URL and the routes it serves."""
+
+    base: str
+    routes: dict[str, tuple[int, dict[str, str], bytes]]
+
+    def serve(
+        self, path: str, body: bytes, *, status: int = 200, headers: dict[str, str] | None = None
+    ) -> str:
+        self.routes[path] = (status, headers or {}, body)
+        return self.base + path

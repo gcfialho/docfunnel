@@ -23,7 +23,8 @@ from docfunnel.evals.extract.report import load_report, summary_rows, write_repo
 from docfunnel.evals.extract.runner import run_eval
 from docfunnel.evals.parse.compare import ParseThresholds
 from docfunnel.extract.extractor import ModelTarget
-from docfunnel.loaders import UnsupportedDocumentError, load_document
+from docfunnel.library import extract_document
+from docfunnel.loaders import UnsupportedDocumentError
 from docfunnel.providers.base import ProviderNotConfiguredError
 from docfunnel.providers.replay import RecordingProvider
 
@@ -119,7 +120,7 @@ OcrEngineOpt = Annotated[
 
 @app.command(rich_help_panel=PIPELINE)
 def parse(
-    source: Annotated[Path, typer.Argument(help="File (pdf/image/txt)")],
+    source: Annotated[str, typer.Argument(help="File path or http(s) URL (pdf/image/txt)")],
     ocr_engine: OcrEngineOpt = "auto",
     dpi: Annotated[int, typer.Option(help="Render resolution for OCR")] = 200,
     force_ocr: Annotated[
@@ -130,14 +131,16 @@ def parse(
     ] = "summary",
 ) -> None:
     """Parse one document into pages and blocks (no LLM call)."""
-    from docfunnel.parse import ParseOptions, parse_file, to_markdown
+    from docfunnel.library import parse_document
+    from docfunnel.parse import ParseOptions, to_markdown
     from docfunnel.parse.ocr import OcrUnavailableError
 
     if output not in {"summary", "text", "json", "markdown"}:
         raise _fail("--format must be summary, text, json or markdown")
     try:
         options = ParseOptions(ocr_engine=ocr_engine, dpi=dpi, force_ocr=force_ocr)
-        document = parse_file(source, options)
+        fetch = Settings.from_env().fetch_policy(confine_to_input_dir=False)
+        document = parse_document(source, options=options, fetch=fetch)
     except (OSError, UnsupportedDocumentError, OcrUnavailableError, ValueError) as exc:
         raise _fail(str(exc)) from exc
     if output == "json":
@@ -161,7 +164,9 @@ def parse(
 
 @app.command(rich_help_panel=PIPELINE)
 def extract(
-    source: Annotated[str, typer.Argument(help="File (txt/pdf/image) or '-' for stdin")],
+    source: Annotated[
+        str, typer.Argument(help="File path, http(s) URL (txt/pdf/image) or '-' for stdin")
+    ],
     provider: ProviderOpt = None,
     model: ModelOpt = None,
     fallback: FallbackOpt = None,
@@ -173,9 +178,13 @@ def extract(
 ) -> None:
     """Extract one document and print the result as JSON."""
     try:
-        text = sys.stdin.read() if source == "-" else load_document(Path(source))
-        extractor = build_extractor(_settings(provider, model, fallback, cassette))
-        result = extractor.extract(text)
+        settings = _settings(provider, model, fallback, cassette)
+        extractor = build_extractor(settings)
+        if source == "-":
+            result = extract_document(text=sys.stdin.read(), extractor=extractor)
+        else:
+            fetch = settings.fetch_policy(confine_to_input_dir=False)
+            result = extract_document(source, extractor=extractor, fetch=fetch)
     except (OSError, UnsupportedDocumentError, ProviderNotConfiguredError, ValueError) as exc:
         raise _fail(str(exc)) from exc
     exclude = None if include_calls else {"calls"}
