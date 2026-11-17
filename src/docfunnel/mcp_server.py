@@ -23,11 +23,15 @@ The tool logic lives in plain functions so it can be tested without the SDK inst
 
 from __future__ import annotations
 
+import functools
+from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Literal
 
 from docfunnel.library import extract_document as _extract
 from docfunnel.library import parse_document as _parse
 from docfunnel.parse.markdown import to_markdown
+from docfunnel.parse.ocr import OcrUnavailableError
+from docfunnel.providers.base import ProviderNotConfiguredError
 from docfunnel.service import get_extractor, get_settings
 
 if TYPE_CHECKING:
@@ -99,22 +103,49 @@ def extract_document(source: str | None = None, text: str | None = None) -> dict
     return result.model_dump(mode="json", exclude={"calls"})
 
 
+# Failures the caller can act on: a bad source, a blocked URL, a missing page, a missing
+# extra or API key. Their message reaches the model; anything else is reported as a crash.
+ANTICIPATED = (ValueError, OSError, ImportError, OcrUnavailableError, ProviderNotConfiguredError)
+
+
+def _reporting(
+    fn: Callable[..., dict[str, Any]], tool_error: type[Exception]
+) -> Callable[..., dict[str, Any]]:
+    """Re-raise anticipated failures as the SDK's ToolError, so the model reads the reason."""
+
+    @functools.wraps(fn)
+    def wrapper(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        try:
+            return fn(*args, **kwargs)
+        except ANTICIPATED as exc:
+            raise tool_error(str(exc)) from exc
+
+    return wrapper
+
+
 def build_server() -> MCPServer:
     try:
         from mcp.server.mcpserver import MCPServer  # mcp >= 2
+        from mcp.server.mcpserver.exceptions import ToolError
 
         server = MCPServer("docfunnel")
     except ImportError:  # pragma: no cover - mcp 1.x
         try:
             # Checked against the locked mcp 2.x, where this module is an import-time stub.
             from mcp.server.fastmcp import FastMCP  # type: ignore[attr-defined]
+            from mcp.server.fastmcp.exceptions import (  # type: ignore[import-not-found, no-redef]
+                ToolError,
+            )
         except ImportError as exc:
             raise RuntimeError(
                 "the MCP server requires the 'mcp' extra: uv sync --extra mcp"
             ) from exc
         server = FastMCP("docfunnel")  # same constructor and .tool()/.run() API in 1.x
-    server.tool(name="parse_document", description=PARSE_DESCRIPTION)(parse_document)
-    server.tool(name="extract_document", description=EXTRACT_DESCRIPTION)(extract_document)
+    for name, fn, description in (
+        ("parse_document", parse_document, PARSE_DESCRIPTION),
+        ("extract_document", extract_document, EXTRACT_DESCRIPTION),
+    ):
+        server.tool(name=name, description=description)(_reporting(fn, ToolError))
     return server
 
 

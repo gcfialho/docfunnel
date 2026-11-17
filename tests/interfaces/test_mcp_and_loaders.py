@@ -125,3 +125,19 @@ def test_pdf_loader(tmp_path: Path) -> None:
         writer.write(handle)
     with pytest.raises(UnsupportedDocumentError, match="no text found"):
         load_document(path)
+
+
+def test_anticipated_tool_failures_reach_the_model(mcp_settings: Settings) -> None:
+    pytest.importorskip("mcp")
+    from mcp.server.mcpserver.exceptions import ToolError, UnexpectedToolError
+
+    server = mcp_server.build_server()
+    source = str(EXAMPLES / "invoice_multipage.pdf")
+
+    async def call() -> object:
+        return await server.call_tool("parse_document", {"source": source, "pages": [99]})
+
+    # A ToolError's text goes to the model; an UnexpectedToolError's text is withheld.
+    with pytest.raises(ToolError, match=r"pages \[99\] do not exist") as info:
+        asyncio.run(call())
+    assert not isinstance(info.value, UnexpectedToolError)
