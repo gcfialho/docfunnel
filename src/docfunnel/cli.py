@@ -440,6 +440,9 @@ def eval_e2e(
         float, typer.Option(help="Spending cap per provider; later calls are skipped")
     ] = 4.0,
     limit: Annotated[int | None, typer.Option(help="Only the first N documents")] = None,
+    sample: Annotated[
+        int | None, typer.Option(help="A seeded random sample of N documents (seed 0)")
+    ] = None,
     where: Annotated[
         list[str] | None,
         typer.Option(help="Only documents with this tag, e.g. scan=has_scanned_pages, size=large"),
@@ -469,6 +472,7 @@ def eval_e2e(
         limit=limit,
         where=dict(w.split("=", 1) for w in where or []),
         compact_output=compact_output,
+        sample=sample,
         workers=workers,
         run_name=run_name,
     )

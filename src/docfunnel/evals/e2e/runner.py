@@ -21,6 +21,7 @@ skipped and reported as such, never run.
 from __future__ import annotations
 
 import datetime as dt
+import random
 import threading
 from collections.abc import Callable, Sequence
 from concurrent.futures import ThreadPoolExecutor
@@ -98,6 +99,9 @@ class E2EConfig:
     parse_options: ParseOptions = field(default_factory=lambda: ParseOptions(ocr_engine="auto"))
     run_name: str | None = None
     hybrid_dpi: int = 150
+    sample: int | None = None
+    """A seeded random sample of this many documents (after ``where``), for cheap runs."""
+    sample_seed: int = 0
     where: dict[str, str] = field(default_factory=dict)
     """Only documents whose tags match, e.g. ``{"scan": "has_scanned_pages"}``."""
 
@@ -174,7 +178,11 @@ def run_e2e(
         d
         for d in load_e2e_set(config.dataset)
         if all(d.tags.get(k) == v for k, v in config.where.items())
-    ][: config.limit]
+    ]
+    if config.sample is not None and config.sample < len(docs):
+        picked = set(random.Random(config.sample_seed).sample([d.id for d in docs], config.sample))
+        docs = [d for d in docs if d.id in picked]
+    docs = docs[: config.limit]
     routes = sorted(config.routes, key=ROUTES.index)  # docfunnel before hybrid, for reuse
     parsed: dict[str, ParsedDocument] = {}
     if {"docfunnel", "hybrid"} & set(routes):
