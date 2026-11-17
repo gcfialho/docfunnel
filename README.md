@@ -63,7 +63,30 @@ export OPENAI_API_KEY=...
 uv run docfunnel extract examples/invoice_br.txt --provider openai --fallback anthropic:claude-haiku-5-5
 ```
 
-Also available as an HTTP API (`docfunnel serve`), an MCP server (`docfunnel mcp`) and a Docker image. See the [usage guide](docs/usage.md).
+Also available as an HTTP API (`docfunnel serve`) and a Docker image. See the [usage guide](docs/usage.md).
+
+### From Python
+
+```python
+import docfunnel
+
+doc = docfunnel.parse_document("https://example.com/contract.pdf")  # path, URL or bytes
+print(doc.pages[0].route, doc.text[:200])
+
+result = docfunnel.extract_document("examples/receipt_us.txt")
+print(result.document.total, result.needs_review)
+```
+
+### From an agent
+
+`docfunnel mcp` is an MCP server with two tools that take a local path or an http(s) URL: `parse_document` (Markdown per page, no LLM call) and `extract_document` (receipt and invoice fields). Downloads are size-capped and private addresses are blocked.
+
+```bash
+claude mcp add --transport stdio docfunnel \
+  -- uv run --directory /path/to/docfunnel --extra mcp --extra cpu docfunnel mcp
+```
+
+Setup for the Claude Agent SDK, the OpenAI Agents SDK, Gemini CLI and LiteLLM: [Using docfunnel from an agent](docs/agents.md).
 
 ## How it works
 
@@ -142,6 +165,8 @@ src/docfunnel/
 ├── providers/    # OpenAI, Anthropic, Gemini, fake, replay; per-model capability table
 ├── evals/        # parse-stage and LLM-step evals, shared regression-gate primitives
 ├── datasets/     # seeded synthetic receipts (text) and invoices/contracts (PDF)
+├── library.py  # parse_document / extract_document: path, URL or bytes in
+├── sources.py  # local paths, safe downloads, file-type detection
 └── cli.py · api.py · mcp_server.py · config.py · loaders.py
 tests/            # mirrors src/: parse, extract, providers, evals, datasets, interfaces
 docs/             # architecture, usage, providers, evaluation reports, roadmap
@@ -155,7 +180,8 @@ examples/         # sample documents for the quickstart
 | Guide | What it covers |
 | --- | --- |
 | [Architecture](docs/architecture.md) | Pipeline diagram, package map, design choices |
-| [Usage](docs/usage.md) | CLI commands, HTTP API, Docker, MCP, configuration |
+| [Usage](docs/usage.md) | CLI commands, Python API, HTTP API, Docker, MCP, configuration |
+| [Agents](docs/agents.md) | MCP tools and setup for Claude Code, the Claude Agent SDK, OpenAI Agents SDK, Gemini CLI, LiteLLM |
 | [Providers](docs/providers.md) | Default models, what each adapter sends, pricing, adding a provider |
 | [Evaluation: parse stage](docs/evaluation/parse-stage.md) | Dataset, metrics, results across engines and platforms, the gate |
 | [Evaluation: LLM step](docs/evaluation/llm-step.md) | Dataset, metrics, fake-provider results, reproducing with a real model |

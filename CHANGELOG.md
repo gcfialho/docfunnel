@@ -17,6 +17,11 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Added
 
+- **Python API:** `docfunnel.parse_document` and `docfunnel.extract_document` (plus async variants) take a local path, an http(s) URL or bytes.
+- **Safe downloads** (`docfunnel.sources`): http(s) only, size cap, timeout, every host and redirect checked against private addresses, optional host allowlist and local directory confinement; the file type comes from the path, the `Content-Type` or the first bytes.
+- **MCP:** a `parse_document` tool (Markdown per page, page selection, size cap), and `extract_document` now takes a `source`. Configured with `DOCFUNNEL_INPUT_DIR`, `DOCFUNNEL_ALLOW_URLS`, `DOCFUNNEL_ALLOW_PRIVATE_URLS` and `DOCFUNNEL_MAX_DOWNLOAD_MB`.
+- `docfunnel parse` and `docfunnel extract` accept URLs.
+- `docs/agents.md`: setup for Claude Code, the Claude Agent SDK, the OpenAI Agents SDK, Gemini CLI and LiteLLM.
 - `Makefile` with `install`, `check`, `eval`, `gate`, `eval-parse`, `gate-parse`, `baselines`, `docker` and other targets.
 - `CONTRIBUTING.md`, this changelog, `.pre-commit-config.yaml`, `.editorconfig`, Dependabot for GitHub Actions and uv, issue and pull request templates.
 - Cross-platform parse results, including the x86_64 GitHub runner, in `docs/evaluation/parse-stage.md`.
