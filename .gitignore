@@ -16,6 +16,7 @@ htmlcov/
 # Local runs (committed baselines live in reports/baseline/)
 reports/*
 !reports/baseline/
+!reports/e2e/
 cassettes/
 
 # Secrets
@@ -28,3 +29,4 @@ cassettes/
 
 # Generated PDF dataset (docfunnel generate-pdfs); regenerate instead of committing
 data/synthetic/pdf/
+data/synthetic/e2e/
