@@ -13,7 +13,7 @@ from docfunnel.providers.base import (
     ProviderError,
     ProviderNotConfiguredError,
 )
-from docfunnel.providers.capabilities import openai_model
+from docfunnel.providers.capabilities import base_model, openai_model
 
 if TYPE_CHECKING:
     from openai.types.chat import ChatCompletionMessageParam
@@ -53,7 +53,7 @@ class OpenAIProvider:
         """The Chat Completions arguments for ``request``, shaped by the model's profile."""
         model = openai_model(request.model)
         kwargs: CompletionCreateParamsNonStreaming = {
-            "model": request.model,
+            "model": base_model(request.model),
             "messages": [_message_param(m) for m in request.messages],
             # Covers reasoning tokens too; max_tokens is deprecated and rejected by them.
             "max_completion_tokens": max(request.max_output_tokens, model.min_output_tokens),

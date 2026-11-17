@@ -99,5 +99,40 @@ def test_both_routes_budget_and_report(e2e_dir: Path, tmp_path: Path) -> None:
     assert load_e2e_report(json_path).meta == report.meta
     markdown = md_path.read_text()
     assert "| `cheap-model` | docfunnel | 3 |" in markdown
-    assert "### Native against docfunnel" in markdown
+    assert "### Against the docfunnel route" in markdown
     assert "skipped calls (budget reached): 2" in markdown
+
+
+def test_hybrid_sends_images_of_scanned_pages_and_reuses_digital_results(
+    e2e_dir: Path,
+) -> None:
+    docs = load_e2e_set(e2e_dir)
+    scripted = ScriptedProvider([_answer(float(d.label.total or 0)) for d in docs] * 2)
+
+    def make(provider: str, model: str, config: E2EConfig) -> Extractor:
+        prices = PriceTable.from_mapping({model: {"input": 0.0, "output": 0.0}})
+        return Extractor(
+            [ModelTarget(scripted, model)], retry=RetryPolicy(max_attempts=1), prices=prices
+        )
+
+    config = E2EConfig(
+        dataset=e2e_dir,
+        targets=[("scripted", "m")],
+        routes=("hybrid", "docfunnel"),  # run in docfunnel-first order regardless
+        workers=1,
+    )
+    report = run_e2e(config, make_extractor=make)
+
+    hybrid = [r for r in report.rows if r.route == "hybrid"]
+    reused = [r for r in hybrid if r.reused]
+    image_requests = [r for r in scripted.requests if r.attachments]
+    # A document is reused when the parse stage sent none of its pages to OCR, which can
+    # differ from the scanned label (a digital page on a letterhead image goes to OCR).
+    assert image_requests
+    assert len(reused) + len(image_requests) == len(hybrid) == len(docs)
+    assert all(d.scanned_pages == 0 for d in docs if d.id in {r.doc_id for r in reused})
+    for request in image_requests:
+        assert all(a.media_type == "image/jpeg" for a in request.attachments)
+        assert all(a.data.startswith(b"\xff\xd8") for a in request.attachments)
+        assert "is a scan: read it from attached image 1" in request.messages[1].content
+    assert report.meta.routes == ["docfunnel", "hybrid"]

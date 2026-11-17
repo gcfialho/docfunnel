@@ -41,29 +41,29 @@ _HEADER = [
 
 
 def _comparison(report: E2EReport, slice_: str) -> list[str]:
-    """Native against docfunnel, per model: what the parse stage saves or costs."""
+    """Every other route against the docfunnel route, per model (per-document averages)."""
     lines = [
-        "| Model | Input tokens (native / docfunnel) | Cost (native / docfunnel) "
-        "| Field accuracy (docfunnel - native) | Exact match (docfunnel - native) |",
-        "| --- | ---: | ---: | ---: | ---: |",
+        "| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) "
+        "| Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |",
+        "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
     by_key = {(g.model, g.route): g.metrics for g in report.groups if g.slice == slice_}
-    for model in dict.fromkeys(g.model for g in report.groups):
-        native, ours = by_key.get((model, "native")), by_key.get((model, "docfunnel"))
-        if native is None or ours is None:
+    for model, route in by_key:
+        other, ours = by_key[(model, route)], by_key.get((model, "docfunnel"))
+        if route == "docfunnel" or ours is None or not ours.input_tokens:
             continue
-        tokens = native.input_tokens / ours.input_tokens if ours.input_tokens else None
+        tokens = (other.input_tokens / other.documents) / (ours.input_tokens / ours.documents)
         cost = (
-            native.cost_per_doc_usd / ours.cost_per_doc_usd
-            if native.cost_per_doc_usd and ours.cost_per_doc_usd
+            other.cost_per_doc_usd / ours.cost_per_doc_usd
+            if other.cost_per_doc_usd and ours.cost_per_doc_usd
             else None
         )
-        accuracy = (ours.field_accuracy - native.field_accuracy) * 100
-        exact = (ours.exact_match_rate - native.exact_match_rate) * 100
-        token_ratio = "n/a" if tokens is None else f"{tokens:.2f}x"
+        accuracy = (other.field_accuracy - ours.field_accuracy) * 100
+        exact = (other.exact_match_rate - ours.exact_match_rate) * 100
         cost_ratio = "n/a" if cost is None else f"{cost:.2f}x"
         lines.append(
-            f"| `{model}` | {token_ratio} | {cost_ratio} | {accuracy:+.1f} pp | {exact:+.1f} pp |"
+            f"| `{model}` | {route} | {tokens:.2f}x | {cost_ratio} "
+            f"| {accuracy:+.1f} pp | {exact:+.1f} pp |"
         )
     return lines
 
@@ -94,7 +94,7 @@ def render_e2e_markdown(report: E2EReport) -> str:
         *_HEADER,
         *[_group_row(report, g) for g in report.groups if g.slice == "all"],
         "",
-        "### Native against docfunnel",
+        "### Against the docfunnel route",
         "",
         *_comparison(report, "all"),
     ]

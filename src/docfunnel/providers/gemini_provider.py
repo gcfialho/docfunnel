@@ -11,7 +11,7 @@ from docfunnel.providers.base import (
     ProviderError,
     ProviderNotConfiguredError,
 )
-from docfunnel.providers.capabilities import gemini_model
+from docfunnel.providers.capabilities import base_model, gemini_model
 
 if TYPE_CHECKING:
     from google.genai import types as genai_types
@@ -78,7 +78,9 @@ class GeminiProvider:
             contents[0].parts = [*files, *(contents[0].parts or [])]
         try:
             response = self._client.models.generate_content(
-                model=request.model, contents=contents, config=self.build_config(request)
+                model=base_model(request.model),
+                contents=contents,
+                config=self.build_config(request),
             )
         except self._errors.APIError as exc:
             code = getattr(exc, "code", None) or 0

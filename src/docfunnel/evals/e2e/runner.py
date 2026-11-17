@@ -7,8 +7,12 @@ For every model and every document:
   and its CPU time is reported next to the model's latency.
 * **native**: the PDF itself goes to the model as a file, the way an application
   without a parse stage would send it.
+* **hybrid**: the text of the pages the parse stage read from the text layer, plus an
+  image of each page it routed to OCR, so the model reads the scans itself. On a
+  document with no scanned page it is the docfunnel route; that result is reused
+  rather than paid for twice.
 
-Both routes use the same prompt, output schema, repair turn and scoring
+All routes use the same prompt, output schema, repair turn and scoring
 (:func:`docfunnel.evals.extract.runner.score_document`). Spending is capped per
 provider: once a provider's recorded cost reaches its budget, its remaining calls are
 skipped and reported as such, never run.
@@ -32,10 +36,12 @@ from docfunnel.evals.extract.dataset import LabeledDocument
 from docfunnel.evals.extract.runner import DocumentScore, Metrics, aggregate, score_document
 from docfunnel.extract.extractor import Extractor
 from docfunnel.extract.prompts import PROMPT_VERSION
+from docfunnel.parse.model import ParsedDocument
 from docfunnel.parse.pipeline import PagePool, ParseOptions
 from docfunnel.providers.base import Attachment
 
-ROUTES = ("docfunnel", "native")
+ROUTES = ("docfunnel", "native", "hybrid")
+DEFAULT_ROUTES = ("docfunnel", "native")
 
 
 class E2ERow(BaseModel):
@@ -45,6 +51,8 @@ class E2ERow(BaseModel):
     skipped: bool = False
     score: DocumentScore | None = None
     parse_cpu_ms: float = 0.0
+    reused: bool = False
+    """Hybrid route on a document without scanned pages: the docfunnel result, not a call."""
 
 
 class E2EGroup(BaseModel):
@@ -79,7 +87,7 @@ class E2EReport(BaseModel):
 class E2EConfig:
     dataset: Path
     targets: list[tuple[str, str]]
-    routes: tuple[str, ...] = ROUTES
+    routes: tuple[str, ...] = DEFAULT_ROUTES
     budget_usd: dict[str, float] = field(default_factory=dict)
     default_budget_usd: float = 4.0
     max_attempts: int = 2
@@ -88,6 +96,7 @@ class E2EConfig:
     limit: int | None = None
     parse_options: ParseOptions = field(default_factory=lambda: ParseOptions(ocr_engine="auto"))
     run_name: str | None = None
+    hybrid_dpi: int = 150
 
 
 class _Budget:
@@ -112,14 +121,44 @@ class _Budget:
 
 def _parse_all(
     docs: Sequence[E2EDoc], directory: Path, options: ParseOptions
-) -> dict[str, tuple[str, float]]:
-    """``{doc_id: (text, parse CPU ms)}``: the parse stage, once per document."""
+) -> dict[str, ParsedDocument]:
+    """The parse stage, once per document."""
     with PagePool(options) as pool:
         parsed = pool.parse([directory / d.file for d in docs], [d.id for d in docs])
-    return {
-        doc.doc_id: (doc.text, sum(p.timings_ms.get("total", 0.0) for p in doc.pages))
-        for doc in parsed
-    }
+    return {doc.doc_id: doc for doc in parsed}
+
+
+def _cpu_ms(document: ParsedDocument) -> float:
+    return sum(page.timings_ms.get("total", 0.0) for page in document.pages)
+
+
+def _page_jpeg(path: Path, index: int, dpi: int) -> bytes:
+    import io
+
+    import pypdfium2 as pdfium
+
+    pdf = pdfium.PdfDocument(str(path))
+    try:
+        image = pdf[index].render(scale=dpi / 72, grayscale=True).to_pil()
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG", quality=85)
+        return buffer.getvalue()
+    finally:
+        pdf.close()
+
+
+def hybrid_inputs(document: ParsedDocument, pdf: Path, dpi: int) -> tuple[str, list[Attachment]]:
+    """Text of the text-layer pages, and a JPEG of each page the parse stage sent to OCR."""
+    parts: list[str] = []
+    images: list[Attachment] = []
+    for page in document.pages:
+        if page.source == "ocr":
+            images.append(Attachment(_page_jpeg(pdf, page.number - 1, dpi), "image/jpeg"))
+            note = f"[Page {page.number} is a scan: read it from attached image {len(images)}.]"
+            parts.append(note)
+        else:
+            parts.append(page.text)
+    return "\n\n".join(parts), images
 
 
 def run_e2e(
@@ -129,9 +168,11 @@ def run_e2e(
     on_row: Callable[[E2ERow], None] | None = None,
 ) -> E2EReport:
     docs = load_e2e_set(config.dataset)[: config.limit]
-    texts: dict[str, tuple[str, float]] = {}
-    if "docfunnel" in config.routes:
-        texts = _parse_all(docs, config.dataset, config.parse_options)
+    routes = sorted(config.routes, key=ROUTES.index)  # docfunnel before hybrid, for reuse
+    parsed: dict[str, ParsedDocument] = {}
+    if {"docfunnel", "hybrid"} & set(routes):
+        parsed = _parse_all(docs, config.dataset, config.parse_options)
+    text_scores: dict[tuple[str, str], DocumentScore] = {}
     budget = _Budget(config.budget_usd, config.default_budget_usd)
     factory = make_extractor or _default_extractor
     rows: list[E2ERow] = []
@@ -143,14 +184,27 @@ def run_e2e(
             row.skipped = True
         else:
             labeled = LabeledDocument(id=doc.id, text="", label=doc.label, tags=doc.tags)
+            pdf = config.dataset / doc.file
+            result = None
             if route == "docfunnel":
-                text, row.parse_cpu_ms = texts[doc.id]
-                result = extractor.extract(text)
-            else:
-                data = (config.dataset / doc.file).read_bytes()
+                row.parse_cpu_ms = _cpu_ms(parsed[doc.id])
+                result = extractor.extract(parsed[doc.id].text)
+            elif route == "native":
+                data = pdf.read_bytes()
                 result = extractor.extract(attachments=[Attachment(data, "application/pdf")])
-            budget.add(provider, result.usage.cost_usd)
-            row.score = score_document(labeled, result)
+            else:
+                row.parse_cpu_ms = _cpu_ms(parsed[doc.id])
+                text, images = hybrid_inputs(parsed[doc.id], pdf, config.hybrid_dpi)
+                if not images and (model, doc.id) in text_scores:
+                    row.score, row.reused = text_scores[(model, doc.id)], True
+                else:
+                    result = extractor.extract(text, attachments=images)
+            if result is not None:
+                budget.add(provider, result.usage.cost_usd)
+                row.score = score_document(labeled, result)
+                if route == "docfunnel":
+                    with lock:
+                        text_scores[(model, doc.id)] = row.score
         with lock:
             rows.append(row)
         if on_row is not None:
@@ -158,7 +212,7 @@ def run_e2e(
 
     for provider, model in config.targets:
         extractor = factory(provider, model, config)
-        for route in config.routes:
+        for route in routes:
             with ThreadPoolExecutor(max_workers=config.workers) as pool:
                 for future in [
                     pool.submit(run_one, extractor, provider, model, route, doc) for doc in docs
@@ -177,7 +231,7 @@ def run_e2e(
         documents=len(docs),
         pages=sum(d.pages for d in docs),
         targets=[f"{p}:{m}" for p, m in config.targets],
-        routes=list(config.routes),
+        routes=routes,
         budget_usd={p: budget.limit(p) for p, _ in config.targets},
         spent_usd={p: round(v, 6) for p, v in budget.spent.items()},
         skipped_calls=sum(r.skipped for r in rows),

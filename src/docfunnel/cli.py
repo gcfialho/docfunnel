@@ -434,7 +434,7 @@ def eval_e2e(
         "reports/e2e-latest"
     ),
     route: Annotated[
-        list[str] | None, typer.Option("--route", help="docfunnel | native (repeatable)")
+        list[str] | None, typer.Option("--route", help="docfunnel | native | hybrid (repeatable)")
     ] = None,
     budget_usd: Annotated[
         float, typer.Option(help="Spending cap per provider; later calls are skipped")
@@ -443,12 +443,17 @@ def eval_e2e(
     workers: Annotated[int, typer.Option(help="Concurrent documents per model")] = 4,
     run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
 ) -> None:
-    """Compare the docfunnel route (CPU parse, then text) with native PDF input, per model."""
-    from docfunnel.evals.e2e import ROUTES, E2EConfig, run_e2e, write_e2e_report
+    """Compare the docfunnel route (CPU parse, then text) with native PDF input, per model.
 
-    routes = tuple(route or ROUTES)
+    Targets accept variant options for ablations, e.g.
+    ``gemini:gemini-3.8-flash+thinking_level=medium`` or
+    ``anthropic:claude-haiku-5-5+effort=medium``.
+    """
+    from docfunnel.evals.e2e import DEFAULT_ROUTES, ROUTES, E2EConfig, run_e2e, write_e2e_report
+
+    routes = tuple(route or DEFAULT_ROUTES)
     if unknown := set(routes) - set(ROUTES):
-        raise _fail(f"unknown route(s) {sorted(unknown)}; use docfunnel or native")
+        raise _fail(f"unknown route(s) {sorted(unknown)}; use docfunnel, native or hybrid")
     config = E2EConfig(
         dataset=data,
         targets=[parse_target(t) for t in target],

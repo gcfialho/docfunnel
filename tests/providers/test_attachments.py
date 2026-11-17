@@ -91,3 +91,32 @@ def test_replay_keys_depend_on_the_attached_bytes() -> None:
     assert request_key(request(PDF)) != request_key(text_only)
     other = Attachment(b"%PDF-1.7 other", "application/pdf")
     assert request_key(request(PDF)) != request_key(request(other))
+
+
+def test_model_variants_change_the_profile_not_the_model_sent() -> None:
+    from docfunnel.extract.pricing import PriceTable
+    from docfunnel.providers.capabilities import anthropic_model, base_model, gemini_model
+
+    variant = "gemini-3.8-flash+thinking_level=medium+structured_outputs=false"
+    profile = gemini_model(variant)
+    assert profile.thinking_level == "medium"
+    assert profile.structured_outputs is False
+    assert profile.min_output_tokens == gemini_model("gemini-3.8-flash").min_output_tokens
+    assert anthropic_model("claude-haiku-5-5+effort=none").effort is None
+    assert base_model(variant) == "gemini-3.8-flash"
+    prices = PriceTable.load()
+    assert prices.cost(variant, 10**6, 0) == prices.cost("gemini-3.8-flash", 10**6, 0)
+    with pytest.raises(ValueError, match="key=value with key in"):
+        gemini_model("gemini-3.8-flash+temperature=0")
+
+    pytest.importorskip("anthropic")
+    from docfunnel.providers.anthropic_provider import AnthropicProvider
+
+    params = AnthropicProvider.build_params(
+        CompletionRequest(
+            model="claude-haiku-5-5+effort=medium",
+            messages=(Message("system", "S"), Message("user", "U")),
+        )
+    )
+    assert params["model"] == "claude-haiku-5-5"
+    assert params["output_config"]["effort"] == "medium"

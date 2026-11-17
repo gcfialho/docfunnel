@@ -14,7 +14,7 @@ from docfunnel.providers.base import (
     ProviderError,
     ProviderNotConfiguredError,
 )
-from docfunnel.providers.capabilities import anthropic_model
+from docfunnel.providers.capabilities import anthropic_model, base_model
 
 if TYPE_CHECKING:
     from anthropic.types import (
@@ -97,7 +97,7 @@ class AnthropicProvider:
         """
         model = anthropic_model(request.model)
         kwargs: MessageCreateParamsNonStreaming = {
-            "model": request.model,
+            "model": base_model(request.model),
             # Thinking, where the model runs it, is counted against max_tokens.
             "max_tokens": max(request.max_output_tokens, model.min_output_tokens),
             "system": request.system,

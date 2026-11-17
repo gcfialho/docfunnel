@@ -7,9 +7,17 @@ accuracy? See :mod:`docfunnel.evals.e2e.runner`.
 
 from docfunnel.evals.e2e.dataset import E2EDoc, build_e2e_set, load_e2e_set
 from docfunnel.evals.e2e.report import load_e2e_report, render_e2e_markdown, write_e2e_report
-from docfunnel.evals.e2e.runner import ROUTES, E2EConfig, E2EReport, E2ERow, run_e2e
+from docfunnel.evals.e2e.runner import (
+    DEFAULT_ROUTES,
+    ROUTES,
+    E2EConfig,
+    E2EReport,
+    E2ERow,
+    run_e2e,
+)
 
 __all__ = [
+    "DEFAULT_ROUTES",
     "ROUTES",
     "E2EConfig",
     "E2EDoc",
