@@ -134,5 +134,5 @@ def test_hybrid_sends_images_of_scanned_pages_and_reuses_digital_results(
     for request in image_requests:
         assert all(a.media_type == "image/jpeg" for a in request.attachments)
         assert all(a.data.startswith(b"\xff\xd8") for a in request.attachments)
-        assert "is a scan: read it from attached image 1" in request.messages[1].content
+        assert "[[attachment:1]]" in request.messages[1].content
     assert report.meta.routes == ["docfunnel", "hybrid"]

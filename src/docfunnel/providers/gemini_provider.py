@@ -10,6 +10,7 @@ from docfunnel.providers.base import (
     CompletionResponse,
     ProviderError,
     ProviderNotConfiguredError,
+    interleave,
 )
 from docfunnel.providers.capabilities import base_model, gemini_model
 
@@ -71,11 +72,16 @@ class GeminiProvider:
             for m in request.conversation
         ]
         if request.attachments and contents:
-            files = [
-                types.Part.from_bytes(data=a.data, mime_type=a.media_type)
-                for a in request.attachments
+            first = request.conversation[0].content
+            contents[0].parts = [
+                types.Part(text=part)
+                if isinstance(part, str)
+                else types.Part.from_bytes(
+                    data=request.attachments[part].data,
+                    mime_type=request.attachments[part].media_type,
+                )
+                for part in interleave(first, len(request.attachments))
             ]
-            contents[0].parts = [*files, *(contents[0].parts or [])]
         try:
             response = self._client.models.generate_content(
                 model=base_model(request.model),

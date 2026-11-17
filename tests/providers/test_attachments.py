@@ -120,3 +120,26 @@ def test_model_variants_change_the_profile_not_the_model_sent() -> None:
     )
     assert params["model"] == "claude-haiku-5-5"
     assert params["output_config"]["effort"] == "medium"
+
+
+def test_interleave_places_files_at_their_markers() -> None:
+    from docfunnel.providers.base import interleave
+
+    assert interleave("p1\n[[attachment:2]]\np3", 2) == [0, "p1\n", 1, "\np3"]
+    assert interleave("no markers", 1) == [0, "no markers"]
+    assert interleave("[[attachment:9]] stays", 1) == [0, "[[attachment:9]] stays"]
+
+
+def test_anthropic_interleaves_images_between_pages() -> None:
+    pytest.importorskip("anthropic")
+    from docfunnel.providers.anthropic_provider import AnthropicProvider
+
+    req = CompletionRequest(
+        model="m",
+        messages=(Message("system", "S"), Message("user", "page 1\n[[attachment:1]]\npage 3")),
+        attachments=(PNG,),
+    )
+    content = next(iter(AnthropicProvider.build_params(req)["messages"]))["content"]
+    assert isinstance(content, list)
+    assert [block["type"] for block in content] == ["text", "image", "text"]
+    assert content[0] == {"type": "text", "text": "page 1\n"}

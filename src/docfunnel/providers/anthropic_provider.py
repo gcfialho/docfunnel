@@ -13,6 +13,7 @@ from docfunnel.providers.base import (
     Message,
     ProviderError,
     ProviderNotConfiguredError,
+    interleave,
 )
 from docfunnel.providers.capabilities import anthropic_model, base_model
 
@@ -64,8 +65,12 @@ def _attachment_block(attachment: Attachment) -> ContentBlockParam:
 def _messages(request: CompletionRequest) -> list[MessageParam]:
     messages = [_message_param(m) for m in request.conversation]
     if request.attachments and messages:
-        blocks = [_attachment_block(a) for a in request.attachments]
-        blocks.append({"type": "text", "text": request.conversation[0].content})
+        blocks: list[ContentBlockParam] = [
+            {"type": "text", "text": part}
+            if isinstance(part, str)
+            else _attachment_block(request.attachments[part])
+            for part in interleave(request.conversation[0].content, len(request.attachments))
+        ]
         messages[0] = {"role": "user", "content": blocks}
     return messages
 

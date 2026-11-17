@@ -161,8 +161,8 @@ def hybrid_inputs(document: ParsedDocument, pdf: Path, dpi: int) -> tuple[str, l
     for page in document.pages:
         if page.source == "ocr":
             images.append(Attachment(_page_jpeg(pdf, page.number - 1, dpi), "image/jpeg"))
-            note = f"[Page {page.number} is a scan: read it from attached image {len(images)}.]"
-            parts.append(note)
+            # The adapters put the image here, between the pages of text around it.
+            parts.append(f"[Page {page.number}, scanned:]\n[[attachment:{len(images)}]]")
         else:
             parts.append(page.text)
     return "\n\n".join(parts), images

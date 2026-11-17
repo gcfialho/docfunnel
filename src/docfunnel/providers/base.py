@@ -7,6 +7,7 @@ repair, fallback and accounting live in :mod:`docfunnel.extract.extractor`, not 
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Literal, Protocol, runtime_checkable
@@ -28,6 +29,31 @@ class Attachment:
     media_type: str  # "application/pdf", "image/png", "image/jpeg", ...
 
 
+ATTACHMENT_MARKER = re.compile(r"\[\[attachment:(\d+)\]\]")
+
+
+def interleave(text: str, count: int) -> list[str | int]:
+    """Split ``text`` on attachment markers: strings, and 0-based attachment indexes.
+
+    Attachments without a marker come first, in order; a marker for a missing file
+    stays as text.
+    """
+    parts: list[str | int] = []
+    used: set[int] = set()
+    position = 0
+    for match in ATTACHMENT_MARKER.finditer(text):
+        index = int(match.group(1)) - 1
+        if not 0 <= index < count:
+            continue
+        parts.append(text[position : match.start()])
+        parts.append(index)
+        used.add(index)
+        position = match.end()
+    parts.append(text[position:])
+    leading: list[str | int] = [i for i in range(count) if i not in used]
+    return [*leading, *(p for p in parts if p != "")]
+
+
 @dataclass(frozen=True, slots=True)
 class CompletionRequest:
     model: str
@@ -39,8 +65,10 @@ class CompletionRequest:
     """JSON Schema for native structured output; adapters use it only where the model's
     capability profile allows (see :mod:`docfunnel.providers.capabilities`)."""
     attachments: tuple[Attachment, ...] = ()
-    """Files placed before the text of the first user message. Supported by the Gemini
-    and Anthropic adapters; others raise a non-retryable :class:`ProviderError`."""
+    """Files sent with the first user message. Each ``[[attachment:N]]`` marker (1-based) in
+    that message is replaced by file N at that point, so files can sit between pages of
+    text; files without a marker go before the text. Supported by the Gemini and
+    Anthropic adapters; others raise a non-retryable :class:`ProviderError`."""
 
     @property
     def system(self) -> str:
