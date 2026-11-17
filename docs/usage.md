@@ -23,8 +23,8 @@ uv sync --extra cpu         # parse stage only: pypdfium2 + RapidOCR
 
 | Group | Command | What it does |
 | --- | --- | --- |
-| Pipeline | `parse FILE` | Pages and blocks, no LLM call. `--format summary\|text\|json\|markdown`, `--ocr-engine`, `--dpi`, `--force-ocr` |
-| | `extract FILE\|-` | Validated JSON, review decision and per-call accounting. `--fail-on-review` exits with code 3 |
+| Pipeline | `parse SOURCE` | Pages and blocks, no LLM call. `--format summary\|text\|json\|markdown`, `--ocr-engine`, `--dpi`, `--force-ocr` |
+| | `extract SOURCE\|-` | Validated JSON, review decision and per-call accounting. `--fail-on-review` exits with code 3 |
 | Evaluate & gate | `eval-parse` | Parse-stage eval on the synthetic PDF set -> `reports/parse-latest/` |
 | | `compare-parse BASE CAND` | Parse regression gate; exit 1 on a quality regression |
 | | `eval` | LLM-step eval on the labelled receipts -> `reports/latest/` |
@@ -59,6 +59,58 @@ uv run docfunnel extract examples/invoice_br.txt \
 ```
 
 PDFs and images go through the parse stage first. See [Providers, models and pricing](providers.md) for models, prices and what each adapter sends.
+
+`SOURCE` is a local path or an http(s) URL; downloads follow the rules under [Configuration](#configuration).
+
+## Python API
+
+```python
+import docfunnel
+
+doc = docfunnel.parse_document("examples/invoice_mixed_scan.pdf")  # no LLM call
+for page in doc.pages:
+    print(page.number, page.route, len(page.text))
+
+result = docfunnel.extract_document("https://example.com/receipt.pdf")
+if result.needs_review:
+    print(result.review_reasons)
+else:
+    print(result.document.total, result.document.currency)
+```
+
+| Function | What it does |
+| --- | --- |
+| `parse_document(source, *, options=None, fetch=None, doc_id=None)` | PDF, image or text file to a `ParsedDocument`: pages, blocks, character spans, boxes and the route each page took |
+| `extract_document(source=None, *, text=None, extractor=None, settings=None, parse_options=None, fetch=None)` | Receipt or invoice to an `ExtractionResult`: validated fields, issues, `needs_review` with reasons, per-call tokens and cost |
+| `aparse_document`, `aextract_document` | The same, run in a worker thread for async code |
+
+`source` is a local path, an http(s) URL or the document's bytes. Bad model output never raises: it ends up in the result with `needs_review=True`. Errors in the input do raise: `SourceError` (not found, not allowed, too large, unknown type) and `ValueError`.
+
+The model comes from `extractor`, else from `settings`, else from the `DOCFUNNEL_*` environment variables. To reuse one configured extractor across calls:
+
+```python
+from docfunnel.config import Settings, build_extractor
+
+extractor = build_extractor(
+    Settings(provider="openai", fallbacks=(("anthropic", "claude-haiku-5-5"),))
+)
+results = [docfunnel.extract_document(path, extractor=extractor) for path in paths]
+```
+
+`fetch` takes a `docfunnel.FetchPolicy` that sets what a source may point at:
+
+| Field | Default | Meaning |
+| --- | --- | --- |
+| `allow_local_files` | `True` | Accept local paths |
+| `base_dir` | `None` | When set, local paths must stay inside it |
+| `allow_urls` | `True` | Download http(s) URLs |
+| `allow_private_hosts` | `False` | Allow URLs that resolve to private, loopback, link-local or reserved addresses (checked on every redirect) |
+| `allowed_hosts` | `None` | When set, only these host names |
+| `max_bytes` | 50 MB | Download size limit |
+| `timeout_s` | 30 | Download timeout |
+| `max_redirects` | 5 | Redirects to follow |
+
+For pages and blocks without the source handling, use `docfunnel.parse.parse_file` and `docfunnel.parse.PagePool` (many files across worker processes). For the extraction loop on its own, use `docfunnel.extract.Extractor`.
 
 ## HTTP API
 
@@ -97,7 +149,7 @@ Stdio transport, for example in an MCP client config:
 }
 ```
 
-It exposes one tool, `extract_document`, which takes raw text and returns the extraction result (validated fields, issues, review decision and usage totals, without the per-call records).
+It exposes `parse_document` (Markdown per page, no LLM call) and `extract_document` (receipt and invoice fields), both taking a local path or an http(s) URL. Setup for Claude Code, the Claude Agent SDK, the OpenAI Agents SDK, Gemini CLI and LiteLLM is in [Using docfunnel from an agent](agents.md).
 
 ## Configuration
 
@@ -113,5 +165,8 @@ The CLI, the API and the MCP server read the same environment variables (see [`.
 | `DOCFUNNEL_REVIEW_MIN_CONFIDENCE` | fields below this confidence go to review | `0.7` |
 | `DOCFUNNEL_PRICING_FILE` | JSON price table overriding the bundled one | bundled |
 | `DOCFUNNEL_CASSETTE` | cassette file for the `replay` provider | none |
-| `DOCFUNNEL_INPUT_DIR` | directory `POST /extract` may read files from | disabled |
+| `DOCFUNNEL_INPUT_DIR` | directory `POST /extract` and the MCP tools may read files from | API: disabled; MCP: any supported file |
+| `DOCFUNNEL_ALLOW_URLS` | let the CLI and the MCP tools download http(s) URLs | `1` |
+| `DOCFUNNEL_ALLOW_PRIVATE_URLS` | allow URLs on private, loopback and link-local hosts | `0` |
+| `DOCFUNNEL_MAX_DOWNLOAD_MB` | download size limit | `50` |
 | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` | provider keys | none |

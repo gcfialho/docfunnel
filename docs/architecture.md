@@ -116,6 +116,8 @@ src/docfunnel/
 │   ├── pdfs.py            #   multi-page invoices and contracts rendered to PDF (parse stage)
 │   └── scan.py            #   deterministic scan simulation (rotation, blur, noise, JPEG)
 ├── config.py              # env-driven Settings, extractor factory
+├── library.py             # parse_document / extract_document: the public entry points
+├── sources.py             # path, URL or bytes -> local file; download limits, host checks
 ├── loaders.py             # file -> text for the extractor, through the parse stage
 ├── service.py             # process-wide extractor shared by the API and the MCP server
 ├── cli.py                 # `docfunnel` command line
