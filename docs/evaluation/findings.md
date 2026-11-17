@@ -2,7 +2,43 @@
 
 A lab notebook: what each run with a real model showed, what it cost, and what changed in the code because of it. Newest entries first. Raw reports are in [`reports/e2e/`](../../reports/e2e/).
 
-Spend so far (cap: US$ 5 per provider key): Gemini ~US$ 3.81 by our price table, after which the key's prepaid credit ran out; Anthropic ~US$ 0.66.
+Spend so far (cap: US$ 5 per provider key): Gemini ~US$ 3.81 by our price table, after which the key's prepaid credit ran out; Anthropic ~US$ 2.03.
+
+## Summary after the first day (2026-11-17)
+
+On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs:
+
+| Setup | Exact match (all 39) | Cost per 1k docs |
+| --- | ---: | ---: |
+| Gemini 3.1 Flash-Lite, hybrid route | ~97% | ~$7.3 |
+| Gemini 3.5 Flash-Lite, native PDF | 97% | $11.9 |
+| Claude Haiku 5.5, native PDF (effort low) | 82% | $4.3 |
+| Claude Haiku 5.5, hybrid (effort low) | 82% | $3.6 |
+| Claude Haiku 5.5, hybrid (effort medium), 12-doc sample | 100% (12/12) | $4.4 |
+| Claude Sonnet 5.5, 12-doc sample | 75% (9/12) | $52 |
+
+- **What helps:** the parse stage on digital pages (exact text, fewer Claude tokens); the hybrid route with images in place (scans read by the model, the rest as text); Haiku at effort `medium`; the `line_items_missing` rule, which caught every empty item list.
+- **What does not:** CPU OCR text for scans (every docfunnel-route miss is on a scanned page); sending text to Gemini to save money (its PDF input is already cheap); compact keys; a bigger model (Gemini 3.8 Flash no better, Sonnet 5.5 worse on long invoices).
+- **What costs money:** the answer. Output is 72 to 92% of the cost, and it is the line items' values.
+- **What is not settled:** run-to-run variance is ~10 pp on 29 documents; the documents are synthetic; the Gemini bill may differ from our price table.
+
+## 2026-11-17: reference models on a 12-invoice sample
+
+**Setup.** `--sample 12` (seed 0: 9 small, 3 large; 10 with scanned pages), native and hybrid routes: Claude Sonnet 5.5 (effort `low`) and Claude Haiku 5.5 at effort `medium` (`claude-haiku-5-5+effort=medium`), compared with earlier runs on the same 12 documents. Cost: Anthropic US$ 1.37. Report: [`reports/e2e-reference/`](../../reports/e2e-reference/report.md).
+
+| Model | Route | Exact match | Line items F1 | Output tok/doc | Cost per 1k docs |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Haiku 5.5, effort low | native | 75.0% | 79.8% | 5,927 | $4.19 |
+| Haiku 5.5, effort low | hybrid | 91.7% | 98.2% | 6,154 | $4.07 |
+| Haiku 5.5, effort medium | native | 91.7% | 92.6% | 6,505 | $4.48 |
+| Haiku 5.5, effort medium | **hybrid** | **100.0%** | **100.0%** | 6,807 | **$4.39** |
+| Sonnet 5.5, effort low | native | 75.0% | 78.9% | 2,907 | $53.67 |
+| Sonnet 5.5, effort low | hybrid | 75.0% | 85.1% | 3,182 | $51.63 |
+| Gemini 3.5 Flash-Lite | native | 100.0% | 100.0% | 5,106 | $13.73 |
+| Gemini 3.1 Flash-Lite | hybrid | 100.0% | 100.0% | 4,401 | $7.80 |
+
+1. **Effort `medium` pays for itself on Haiku 5.5:** +17 pp exact match on native input, +8 pp on hybrid, for 7 to 8% more cost. Haiku 5.5 at medium on the hybrid route was the cheapest setup with every document right.
+2. **Sonnet 5.5 skips long item lists.** On every invoice with 54 or more items (3 per route) it returned all header fields right and an empty `line_items`, in ~215 output tokens; costing 12x Haiku, it scored lower. The `line_items_missing` rule added earlier today sent all 6 to review; without it they would have been auto-accepted.
 
 ## 2026-11-17: compact line items; the Gemini key runs out of credit
 
