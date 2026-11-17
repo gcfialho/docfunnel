@@ -2,26 +2,80 @@
 
 docfunnel is a pipeline of stages. Each stage has a typed output, its own evaluation and its own regression gate in CI.
 
+Solid arrows are the normal path; dotted arrows are the fallback chain. Transient errors (429, 5xx, timeouts) are retried with backoff on the same model before the chain moves on. Each stage is scored on its own: see [Evaluation: parse stage](evaluation/parse-stage.md) and [Evaluation: LLM step](evaluation/llm-step.md).
+
 ```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    fontSize: 14px
+    primaryColor: "#ffffff"
+    primaryBorderColor: "#94a3b8"
+    primaryTextColor: "#0f172a"
+    lineColor: "#64748b"
+    clusterBkg: "#f8fafc"
+    clusterBorder: "#cbd5e1"
+    titleColor: "#0f172a"
+    edgeLabelBackground: "#ffffff"
+  flowchart:
+    curve: basis
+    nodeSpacing: 40
+    rankSpacing: 50
+    padding: 12
+---
 flowchart LR
-    A["File<br/>pdf · image · txt"] --> B["Split into pages<br/>(page pool: one task per page)"]
-    B --> C{"Page has a usable<br/>text layer?"}
-    C -->|yes| D["pypdfium2<br/>text + line boxes"]
-    C -->|"no text · garbled ·<br/>scan with stray text"| E["Render page<br/>CPU OCR: RapidOCR | Tesseract"]
-    D --> F["ParsedDocument<br/>pages · blocks · spans · source"]
-    E --> F
-    F --> P["Prompt<br/>JSON Schema + extraction rules"]
-    P --> M{{"LLM provider<br/>OpenAI · Anthropic · Gemini · fake · replay"}}
-    M --> J["Parse JSON<br/>(strip fences / prose)"]
-    J -->|"invalid JSON or<br/>schema error"| R["Repair prompt<br/>+ backoff"]
-    R --> M
-    M -.->|"attempts exhausted /<br/>non-retryable error"| N["Next model in<br/>fallback chain"]
-    N --> J
-    J -->|valid| G["Pydantic schema<br/>+ business rules"]
-    G --> H{"needs_review?"}
-    H -->|no| K["Auto-accept"]
-    H -->|yes| L["Human review<br/>(with reasons)"]
-    M -.->|"tokens · cost · latency"| Q[("CallRecord")]
+    IN[/"Input file<br/>PDF · image · text"/]
+
+    subgraph S1["Stage 1 · Parse (CPU, no LLM)"]
+        POOL["Page pool<br/>one task per page"]
+        ROUTE{"Route<br/>page"}
+        TEXT["Text layer<br/>pypdfium2<br/>text and line boxes"]
+        OCR["CPU OCR<br/>RapidOCR · Tesseract<br/>deskewed rows"]
+        DOC[("ParsedDocument<br/>pages · blocks<br/>spans · boxes")]
+        POOL --> ROUTE
+        ROUTE -->|text_layer| TEXT
+        ROUTE -->|"ocr: no_text · garbled<br/>· scan_with_stray_text"| OCR
+        TEXT --> DOC
+        OCR --> DOC
+    end
+
+    subgraph S2["Stage 2 · LLM extraction"]
+        PROMPT["Prompt<br/>JSON Schema<br/>and rules"]
+        LLM{{"Model target<br/>OpenAI · Anthropic · Gemini<br/>logs tokens · cost · latency"}}
+        SCHEMA{"Valid<br/>schema?"}
+        REPAIR["Repair prompt<br/>with the errors"]
+        NEXT["Next model in<br/>fallback chain"]
+        RULES{"Business<br/>rules?"}
+        PROMPT --> LLM --> SCHEMA
+        SCHEMA -->|no| REPAIR
+        REPAIR --> LLM
+        LLM -.->|"attempts<br/>exhausted"| NEXT
+        NEXT -.-> LLM
+        SCHEMA -->|yes| RULES
+    end
+
+    IN --> POOL
+    DOC --> PROMPT
+    RULES -->|pass| ACCEPT(["Auto-accept"])
+    RULES -->|fail| REVIEW(["Human review<br/>with reasons"])
+
+    classDef io fill:#f1f5f9,stroke:#475569,stroke-width:1.5px,color:#0f172a
+    classDef parse fill:#eff6ff,stroke:#3b82f6,stroke-width:1.5px,color:#0f172a
+    classDef llm fill:#f5f3ff,stroke:#7c3aed,stroke-width:1.5px,color:#0f172a
+    classDef decision fill:#ffffff,stroke:#334155,stroke-width:1.5px,color:#0f172a
+    classDef data fill:#ecfeff,stroke:#0891b2,stroke-width:1.5px,color:#0f172a
+    classDef ok fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef warn fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    style S1 fill:#f8fafc,stroke:#93c5fd,stroke-width:1.5px,color:#1e3a8a
+    style S2 fill:#f8fafc,stroke:#c4b5fd,stroke-width:1.5px,color:#4c1d95
+    class IN io
+    class POOL,TEXT,OCR parse
+    class PROMPT,LLM,REPAIR,NEXT llm
+    class ROUTE,SCHEMA,RULES decision
+    class DOC data
+    class ACCEPT ok
+    class REVIEW warn
 ```
 
 ## Package layout
@@ -73,7 +127,7 @@ Dependencies point one way: `parse` knows nothing about LLMs; `extract` knows no
 
 ## Design choices
 
-- **Decide OCR per page, from signals PDFium already has.** A page goes to OCR when it has fewer than 40 alphanumeric characters, when more than 5% of its text is broken-encoding markers, or when images cover more than half of it and it has fewer than 200 characters (a scan with a digital stamp). The thresholds come from the design notes and similar libraries, and are measured rather than trusted: the parse eval reports routing precision and recall on pages labelled scanned or digital. `--force-ocr` covers PDFs with an old, bad invisible OCR layer.
+- **Decide OCR per page, from signals PDFium already has.** A page goes to OCR when it has fewer than 40 alphanumeric characters, when more than 5% of its text is broken-encoding markers, or when images cover more than half of it and it has fewer than 200 characters (a scan with a digital stamp). The thresholds are measured rather than trusted: the parse eval reports routing precision and recall on pages labelled scanned or digital. `--force-ocr` covers PDFs with an old, bad invisible OCR layer.
 - **Processes, not threads, and one thread per process.** PDFium is not thread-safe. OpenCV, BLAS and ONNX Runtime each default to "all cores", which oversubscribes the CPU when there are N workers, so each worker is limited to one thread. On an Apple M4 Pro, 12 processes with 1 thread each parsed the set 3x faster than 1 process with 12 threads.
 - **The unit of work is `(file, page)`.** One long document does not hold up the other workers. The OCR model loads once per worker, and a failure or timeout on one page is recorded on that page without failing the document.
 - **Reading order for OCR is rebuilt in code.** OCR engines return one box per table cell, and on a skewed scan the boxes of one row drift apart vertically. Box centres are deskewed with the median baseline angle before grouping them into rows, so `Description  Qty  Unit  Amount` stays on one line.
@@ -82,4 +136,4 @@ Dependencies point one way: `parse` knows nothing about LLMs; `extract` knows no
 - **Every field is nullable.** The prompt tells the model to return `null` for anything not printed. Without that option, the schema would push the model to invent values. Allowing null also makes hallucination measurable: a value returned where the label is null counts as a hallucinated field.
 - **Normalization is shared.** `docfunnel.extract.normalize` is the single definition of when two values are equal. Schema coercion, business rules and eval metrics all use it, so `"1.234,50"` and `1234.5` are treated the same everywhere.
 - **SDK-level retries are disabled.** The extractor controls the retry policy, so every attempt shows up in the accounting.
-- **Request parameters come from a capability table, not the model name.** See [providers.md](providers.md).
+- **Request parameters come from a capability table, not the model name.** See [Providers, models and pricing](providers.md).

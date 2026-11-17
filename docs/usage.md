@@ -2,7 +2,7 @@
 
 Everything below works offline with the deterministic `fake` provider unless a real provider is named. Run `docfunnel --help` or `docfunnel <command> --help` for every option.
 
-## Install
+## Installation
 
 ```bash
 uv sync --all-extras        # everything: OCR engines, provider SDKs, MCP, PDF generator
@@ -58,7 +58,7 @@ uv run docfunnel extract examples/invoice_br.txt \
   --fallback anthropic:claude-haiku-5-5
 ```
 
-PDFs and images go through the parse stage first. See [providers.md](providers.md) for models, prices and what each adapter sends.
+PDFs and images go through the parse stage first. See [Providers, models and pricing](providers.md) for models, prices and what each adapter sends.
 
 ## HTTP API
 

@@ -1,6 +1,6 @@
 # Limitations and roadmap
 
-Phase 1 (this version) is the parse stage and its evaluation, feeding the LLM extraction step that already handles schema validation, repair, fallback, human-review routing and cost tracking.
+Phase 1 (this version) is the parse stage and its evaluation, feeding the LLM step, which already handles schema validation, repair, fallback, human-review routing and cost tracking.
 
 ## Known limitations
 
@@ -9,7 +9,7 @@ Phase 1 (this version) is the parse stage and its evaluation, feeding the LLM ex
 - **No `garbled` test pages.** The rule for broken text layers (fonts without a Unicode map) exists and is unit-tested, but the generator does not produce such PDFs yet.
 - **Lines, not layout.** Blocks are text lines. Paragraphs, tables and multi-column reading order need a layout model (Docling as an optional extra, planned).
 - **Tesseract runs with the `eng` model only**, which costs it accuracy on German and Portuguese text; `ParseOptions(tesseract_lang="eng+deu+por")` is available when those models are installed.
-- **The LLM step is still evaluated only with the fake provider.** No real-model numbers are published, and no request has been sent to the OpenAI, Anthropic or Gemini APIs yet. The adapters follow the providers' current documentation and the installed SDKs (see [providers.md](providers.md)), but the first real call per provider is still the real test.
+- **The LLM step is still evaluated only with the fake provider.** No real-model numbers are published, and no request has been sent to the OpenAI, Anthropic or Gemini APIs yet. The adapters follow the providers' current documentation and the installed SDKs (see [Providers, models and pricing](providers.md)), but the first real call per provider is still the real test.
 - **The bundled receipt dataset is read from the working directory.** `docfunnel eval` defaults to `data/synthetic/receipts.jsonl`, so run it from the repository root (or pass `--dataset`).
 
 ## Next phases

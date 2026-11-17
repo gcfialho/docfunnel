@@ -12,6 +12,8 @@ All notable changes to this project are documented here. The format follows [Kee
 - `docfunnel.__version__` is read from the installed package metadata, so `pyproject.toml` is the only place the version is set.
 - Tests mirror the package layout (`tests/parse`, `tests/extract`, `tests/providers`, `tests/evals`, `tests/datasets`, `tests/interfaces`).
 - README shortened to an overview; details moved to `docs/` (architecture, usage, providers, both evaluations, roadmap).
+- Pipeline diagrams redrawn: one subgraph per stage, one node shape per role, and colours that read on light and dark backgrounds. Schema errors loop back to the model; business-rule failures go to review.
+- Error messages for a missing extra, API key, cassette or Tesseract binary now include the command or flag that fixes them.
 
 ### Added
 

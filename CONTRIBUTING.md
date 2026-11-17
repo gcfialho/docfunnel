@@ -27,7 +27,7 @@ The package is split by pipeline stage; see [docs/architecture.md](docs/architec
 
 Shared fixtures live in `tests/conftest.py`; shared helpers (`ScriptedProvider`, paths) in `tests/helpers.py`.
 
-## Rules of the road
+## Conventions
 
 - **Tests never touch the network.** Real providers are tested against stubbed SDK clients and a mock HTTP transport; end-to-end runs use the `fake` provider. CI has no API keys.
 - **Types are strict.** `mypy --strict` covers `src/` and `tests/`. Optional dependencies without stubs are listed in `[tool.mypy.overrides]`.

@@ -63,26 +63,75 @@ export OPENAI_API_KEY=...
 uv run docfunnel extract examples/invoice_br.txt --provider openai --fallback anthropic:claude-haiku-5-5
 ```
 
-Also available as an HTTP API (`docfunnel serve`), an MCP server (`docfunnel mcp`) and a Docker image. See [docs/usage.md](docs/usage.md).
+Also available as an HTTP API (`docfunnel serve`), an MCP server (`docfunnel mcp`) and a Docker image. See the [usage guide](docs/usage.md).
 
 ## How it works
 
 ```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    fontSize: 14px
+    primaryColor: "#ffffff"
+    primaryBorderColor: "#94a3b8"
+    primaryTextColor: "#0f172a"
+    lineColor: "#64748b"
+    clusterBkg: "#f8fafc"
+    clusterBorder: "#cbd5e1"
+    titleColor: "#0f172a"
+    edgeLabelBackground: "#ffffff"
+  flowchart:
+    curve: basis
+    nodeSpacing: 40
+    rankSpacing: 50
+    padding: 12
+---
 flowchart LR
-    A["File<br/>pdf · image · txt"] --> C{"Per page:<br/>usable text layer?"}
-    C -->|yes| D["pypdfium2<br/>text + line boxes"]
-    C -->|no| E["CPU OCR<br/>RapidOCR | Tesseract"]
-    D --> F["ParsedDocument<br/>pages · blocks · spans"]
-    E --> F
-    F --> M{{"LLM<br/>structured output"}}
-    M -->|"invalid → repair / retry / fallback"| M
-    M --> G["Schema + business rules"]
-    G --> H{"needs_review?"}
-    H -->|no| K["Auto-accept"]
-    H -->|yes| L["Human review<br/>(with reasons)"]
+    IN[/"PDF · image · text"/]
+
+    subgraph S1["Stage 1 · Parse (CPU, no LLM)"]
+        ROUTE{"Usable<br/>text layer?"}
+        TEXT["Text layer<br/>pypdfium2"]
+        OCR["CPU OCR<br/>RapidOCR · Tesseract"]
+        DOC[("ParsedDocument<br/>pages · blocks · spans")]
+        ROUTE -->|yes| TEXT --> DOC
+        ROUTE -->|no| OCR --> DOC
+    end
+
+    subgraph S2["Stage 2 · LLM extraction"]
+        LLM{{"LLM<br/>structured output"}}
+        SCHEMA{"Valid<br/>schema?"}
+        RULES{"Business<br/>rules?"}
+        LLM --> SCHEMA
+        SCHEMA -->|"no · repair, retry,<br/>fallback"| LLM
+        SCHEMA -->|yes| RULES
+    end
+
+    IN --> ROUTE
+    DOC --> LLM
+    RULES -->|pass| ACCEPT(["Auto-accept"])
+    RULES -->|fail| REVIEW(["Human review<br/>with reasons"])
+
+    classDef io fill:#f1f5f9,stroke:#475569,stroke-width:1.5px,color:#0f172a
+    classDef parse fill:#eff6ff,stroke:#3b82f6,stroke-width:1.5px,color:#0f172a
+    classDef llm fill:#f5f3ff,stroke:#7c3aed,stroke-width:1.5px,color:#0f172a
+    classDef decision fill:#ffffff,stroke:#334155,stroke-width:1.5px,color:#0f172a
+    classDef data fill:#ecfeff,stroke:#0891b2,stroke-width:1.5px,color:#0f172a
+    classDef ok fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef warn fill:#fff7ed,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    style S1 fill:#f8fafc,stroke:#93c5fd,stroke-width:1.5px,color:#1e3a8a
+    style S2 fill:#f8fafc,stroke:#c4b5fd,stroke-width:1.5px,color:#4c1d95
+    class IN io
+    class TEXT,OCR parse
+    class LLM llm
+    class ROUTE,SCHEMA,RULES decision
+    class DOC data
+    class ACCEPT ok
+    class REVIEW warn
 ```
 
-The detailed diagram, the package map and the reasoning behind each design choice are in [docs/architecture.md](docs/architecture.md).
+The detailed diagram, the package map and the reasoning behind each design choice are in the [architecture guide](docs/architecture.md).
 
 ## Repository layout
 
@@ -103,7 +152,7 @@ examples/         # sample documents for the quickstart
 
 ## Documentation
 
-| | |
+| Guide | What it covers |
 | --- | --- |
 | [Architecture](docs/architecture.md) | Pipeline diagram, package map, design choices |
 | [Usage](docs/usage.md) | CLI commands, HTTP API, Docker, MCP, configuration |
@@ -118,14 +167,14 @@ examples/         # sample documents for the quickstart
 
 ```bash
 make install   # uv sync --all-extras
-make check     # ruff + mypy --strict + 267 tests (~10 s, no network or API keys, 96% coverage)
+make check     # ruff, mypy --strict and the test suite (no network or API keys)
 ```
 
 CI runs lint, types and tests, both eval gates, and a Docker build with smoke tests. No job needs an API key or a GPU. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Roadmap
 
-Phase 1 (this version) is the parse stage and its evaluation, feeding the LLM extraction step. Next: **classification and retrieval** (cascade classifier, layout-aware chunking, hybrid search, CORD v2 and olmOCR-bench subsets), then **QA with verified citations** (evidence inside the schema, checked in code, with a quality-vs-cost Pareto across models), and optionally a **GPU benchmark** to find which pages justify a GPU route. Details and current limitations: [docs/roadmap.md](docs/roadmap.md).
+Phase 1 (this version) is the parse stage and its evaluation, feeding the LLM step. Next: **classification and retrieval** (cascade classifier, layout-aware chunking, hybrid search, CORD v2 and olmOCR-bench subsets), then **QA with verified citations** (evidence inside the schema, checked in code, with a quality-vs-cost Pareto across models), and optionally a **GPU benchmark** to find which pages justify a GPU route. Details and current limitations are in the [roadmap](docs/roadmap.md).
 
 ## Author
 

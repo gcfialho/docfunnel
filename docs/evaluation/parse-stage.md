@@ -73,6 +73,6 @@ OCR output is not bit-identical across CPUs, so the gate has tolerances (1 pp sc
 | Linux arm64 container (`python:3.12-slim`), 4 workers | same | 1.7% / 4.5% | 95.1% | n/a |
 | GitHub Actions `ubuntu-latest`: Intel Xeon 8370C, x86_64, 4 workers ([CI run, 2026-11-03](https://github.com/gcfialho/docfunnel/actions/runs/41730496056)) | same | 1.8% / 4.3% | 95.1% | 8.5x |
 
-## The gate
+## Regression gate
 
 `docfunnel compare-parse` gates quality only: routing accuracy, precision and recall may not drop; digital CER may rise by at most 0.1 pp and scanned CER by 1 pp; field recall may drop by at most 2 pp. Absolute throughput is reported but not gated, because shared CI runners are too noisy for timings. The one timing check is relative and runs within the same job: pypdfium2 must stay at least 3x faster than pypdf on the same pages. Engines missing from the candidate run (Tesseract in CI) are reported as skipped.

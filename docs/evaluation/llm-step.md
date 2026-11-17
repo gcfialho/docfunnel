@@ -1,6 +1,6 @@
 # Evaluation: LLM step
 
-How well does the extraction step turn document text into the right fields, at what cost, and does it know when to ask a human? Code: [`src/docfunnel/evals/extract/`](../../src/docfunnel/evals/extract/). Baseline reports: [`reports/baseline/`](../../reports/baseline/).
+How well does the LLM step turn document text into the right fields, at what cost, and does it know when to ask a human? Code: [`src/docfunnel/evals/extract/`](../../src/docfunnel/evals/extract/). Baseline reports: [`reports/baseline/`](../../reports/baseline/).
 
 ```bash
 uv run docfunnel eval --fallback fake:fake-pro                    # -> reports/latest/report.{json,md}
@@ -18,7 +18,7 @@ uv run docfunnel compare reports/baseline/fake-mini+fallback/report.json reports
 | Variants | clean (45), OCR noise such as `T0TAL` or `1O,5O` (8), misprinted totals that *should* be reviewed (7) |
 | Hard cases | absent optional fields (tax ID, number, tax, payment), a "Bill to" customer next to the vendor, thousands separators |
 
-## The contract
+## Output contract
 
 A Pydantic model (`ReceiptExtraction`) covers vendor, tax ID, document number, date, currency, subtotal, tax, total, payment method and line items, plus a confidence score for each field. Money is stored as `Decimal`, and inputs like `"1.234,50 €"`, `"R$ 15.120,00"` and `"15/03/2024"` are normalized.
 
@@ -66,7 +66,7 @@ What the run shows about the system (not about any model):
 - **Business rules catch what confidence can't.** All 7 misprinted receipts are flagged (`total_mismatch` or `line_items_total_mismatch`) even though the extraction itself was correct.
 - **Review recall is about 70%, and the misses are the useful finding.** They are *confident* hallucinations (for example, an invented `tax` of 1.00 with confidence 0.85 on a minimal ticket that prints only a total) and quietly missed optional fields. Self-reported confidence doesn't catch these. Measuring hallucination against labels, and keeping rules that cross-check fields, is how you find them.
 
-## The gate
+## Regression gate
 
 `docfunnel compare` exits non-zero when quality drops or cost rises beyond configurable thresholds (defaults: field accuracy -1 pp, exact match -2 pp, schema compliance -0 pp, hallucination +1 pp, review recall -5 pp, cost per document +20% relative; p95 latency off unless set). Example, comparing the no-fallback run against the baseline (exit code 1):
 
@@ -96,4 +96,4 @@ uv run docfunnel compare reports/openai-gpt-6-luna/report.json reports/candidate
   --max-cost-increase 0.10 --max-p95-latency-increase 0.25
 ```
 
-Cost is computed from the price table described in [providers.md](../providers.md#pricing).
+Cost is computed from the price table described under [Pricing](../providers.md#pricing).
