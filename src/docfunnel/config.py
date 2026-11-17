@@ -5,6 +5,8 @@
 ``DOCFUNNEL_MODEL``                    model name (defaults per provider)
 ``DOCFUNNEL_FALLBACK``                 comma-separated ``provider:model`` chain
 ``DOCFUNNEL_MAX_ATTEMPTS``             attempts per model (default 3)
+``DOCFUNNEL_MAX_OUTPUT_TOKENS``        output token limit per call (default 2048; raised to
+                                       each model's floor; long invoices need ~16000)
 ``DOCFUNNEL_BACKOFF_BASE_S``           base backoff in seconds (default 0.5)
 ``DOCFUNNEL_REVIEW_MIN_CONFIDENCE``    review threshold for field confidence (0.7)
 ``DOCFUNNEL_PRICING_FILE``             JSON price table overriding the bundled one
@@ -53,6 +55,7 @@ class Settings:
     model: str | None = None
     fallbacks: tuple[tuple[str, str], ...] = field(default_factory=tuple)
     max_attempts: int = 3
+    max_output_tokens: int = 2048
     backoff_base_s: float = 0.5
     review_min_confidence: float = 0.7
     pricing_file: Path | None = None
@@ -76,6 +79,7 @@ class Settings:
             model=env.get("DOCFUNNEL_MODEL") or None,
             fallbacks=tuple(parse_target(s) for s in fallback_spec.split(",") if s.strip()),
             max_attempts=int(env.get("DOCFUNNEL_MAX_ATTEMPTS", "3")),
+            max_output_tokens=int(env.get("DOCFUNNEL_MAX_OUTPUT_TOKENS", "2048")),
             backoff_base_s=float(env.get("DOCFUNNEL_BACKOFF_BASE_S", "0.5")),
             review_min_confidence=float(env.get("DOCFUNNEL_REVIEW_MIN_CONFIDENCE", "0.7")),
             pricing_file=path("DOCFUNNEL_PRICING_FILE"),
@@ -149,4 +153,5 @@ def build_extractor(settings: Settings) -> Extractor:
         ),
         review=ReviewPolicy(min_confidence=settings.review_min_confidence),
         prices=PriceTable.load(settings.pricing_file),
+        max_output_tokens=settings.max_output_tokens,
     )
