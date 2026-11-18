@@ -60,6 +60,21 @@ uv run docfunnel extract examples/invoice_br.txt \
 
 PDFs and images go through the parse stage first. See [Providers, models and pricing](providers.md) for models, prices and what each adapter sends.
 
+#### What the model is sent: `--route`
+
+| Route | The model gets | Use it when |
+| --- | --- | --- |
+| `text` (default) | the parsed text: text layer, OCR text on scanned pages | documents are digital, or the model cannot read images |
+| `hybrid-ocr` | the text of digital pages; for each scanned page, its image in place, then its OCR text | documents have scans: the most accurate route in [our runs](evaluation/findings.md) |
+| `hybrid` | the same, without the OCR text | comparison only; small models misread images alone |
+| `native` | the PDF or image file itself | the provider reads files well and cheaply (Gemini, OpenAI); not Ollama |
+
+On a fully digital PDF the three parsed routes send the same text. Page images need a model that takes images (every provider here except `fake` reads them; `replay` matches them by hash).
+
+```bash
+uv run docfunnel extract examples/invoice_mixed_scan.pdf --provider openai --route hybrid-ocr
+```
+
 `SOURCE` is a local path or an http(s) URL; downloads follow the rules under [Configuration](#configuration).
 
 ## Python API
@@ -81,7 +96,7 @@ else:
 | Function | What it does |
 | --- | --- |
 | `parse_document(source, *, options=None, fetch=None, doc_id=None)` | PDF, image or text file to a `ParsedDocument`: pages, blocks, character spans, boxes and the route each page took |
-| `extract_document(source=None, *, text=None, extractor=None, settings=None, parse_options=None, fetch=None)` | Receipt or invoice to an `ExtractionResult`: validated fields, issues, `needs_review` with reasons, per-call tokens and cost |
+| `extract_document(source=None, *, text=None, extractor=None, settings=None, parse_options=None, fetch=None, route=None)` | Receipt or invoice to an `ExtractionResult`: validated fields, issues, `needs_review` with reasons, per-call tokens and cost. `route` is one of the [routes above](#what-the-model-is-sent---route) |
 | `aparse_document`, `aextract_document` | The same, run in a worker thread for async code |
 
 `source` is a local path, an http(s) URL or the document's bytes. Bad model output never raises: it ends up in the result with `needs_review=True`. Errors in the input do raise: `SourceError` (not found, not allowed, too large, unknown type) and `ValueError`.
@@ -157,10 +172,13 @@ The CLI, the API and the MCP server read the same environment variables (see [`.
 
 | Variable | Meaning | Default |
 | --- | --- | --- |
-| `DOCFUNNEL_PROVIDER` | `fake`, `openai`, `anthropic`, `gemini` or `replay` | `fake` |
+| `DOCFUNNEL_PROVIDER` | `fake`, `openai`, `anthropic`, `gemini`, `ollama` or `replay` | `fake` |
 | `DOCFUNNEL_MODEL` | model name | the provider's default |
 | `DOCFUNNEL_FALLBACK` | comma-separated `provider:model` chain | none |
+| `DOCFUNNEL_ROUTE` | what the model is sent for a PDF or image: `text`, `hybrid`, `hybrid-ocr` or `native` | `text` |
 | `DOCFUNNEL_MAX_ATTEMPTS` | attempts per model | `3` |
+| `DOCFUNNEL_MAX_OUTPUT_TOKENS` | output token limit per call, raised to each model's floor (long invoices need ~16,000) | `2048` |
+| `DOCFUNNEL_COMPACT_OUTPUT` | one-letter line-item keys in the model's answer | `0` |
 | `DOCFUNNEL_BACKOFF_BASE_S` | base backoff in seconds | `0.5` |
 | `DOCFUNNEL_REVIEW_MIN_CONFIDENCE` | fields below this confidence go to review | `0.7` |
 | `DOCFUNNEL_PRICING_FILE` | JSON price table overriding the bundled one | bundled |
@@ -170,3 +188,4 @@ The CLI, the API and the MCP server read the same environment variables (see [`.
 | `DOCFUNNEL_ALLOW_PRIVATE_URLS` | allow URLs on private, loopback and link-local hosts | `0` |
 | `DOCFUNNEL_MAX_DOWNLOAD_MB` | download size limit | `50` |
 | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` | provider keys | none |
+| `OLLAMA_HOST` | Ollama server for the `ollama` provider | `http://localhost:11434` |
