@@ -16,7 +16,7 @@ htmlcov/
 # Local runs (committed baselines live in reports/baseline/)
 reports/*
 !reports/baseline/
-!reports/e2e*/
+!reports/e2e/
 cassettes/
 
 # Secrets

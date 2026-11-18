@@ -1,8 +1,9 @@
-"""End-to-end evaluation on PDFs: the docfunnel route against native PDF input.
+"""End-to-end evaluation on PDFs: what the model is sent, against accuracy and cost.
 
-Answers the question the project exists for: does parsing on the CPU first, then
-sending text to a small model, cost less than sending the PDF to the model, and at what
-accuracy? See :mod:`docfunnel.evals.e2e.runner`.
+Answers the question the project exists for: should a model get the parse stage's text,
+the PDF itself, or page images (with or without their OCR text), and what does each
+cost? See :mod:`docfunnel.evals.e2e.runner`; committed runs are indexed and charted by
+:mod:`docfunnel.evals.e2e.summary`.
 """
 
 from docfunnel.evals.e2e.dataset import E2EDoc, build_e2e_set, load_e2e_set

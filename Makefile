@@ -3,7 +3,7 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help install lint format typecheck test cov check \
-        pdfs eval eval-parse gate gate-parse baselines serve docker clean
+        pdfs eval eval-parse gate gate-parse baselines e2e-summary serve docker clean
 
 UV ?= uv
 
@@ -56,6 +56,9 @@ baselines: ## Rewrite the committed LLM-step baselines (parse baseline: see CONT
 		--out reports/baseline/fake-mini --run-name "fake-mini (no fallback)"
 	$(UV) run docfunnel eval --provider fake --model fake-mini --fallback fake:fake-pro \
 		--out reports/baseline/fake-mini+fallback --run-name "fake-mini + fake-pro fallback"
+
+e2e-summary: ## Regenerate reports/e2e/README.md and the accuracy-vs-cost chart
+	$(UV) run docfunnel e2e-summary reports/e2e
 
 # ---- run --------------------------------------------------------------------------
 

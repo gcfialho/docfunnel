@@ -1,6 +1,6 @@
 # Findings from real-model runs
 
-A lab notebook: what each run with a real model showed, what it cost, and what changed in the code because of it. Newest entries first. Raw reports are in [`reports/e2e/`](../../reports/e2e/).
+A lab notebook: what each run with a real model showed, what it cost, and what changed in the code because of it. Newest entries first. Raw reports are in [`reports/e2e/`](../../reports/e2e/README.md); the conclusions are in the [real-model benchmark](real-models.md).
 
 Spend so far (cap: US$ 5 per provider key): Gemini ~US$ 3.81 by our price table, after which the key's prepaid credit ran out; Anthropic ~US$ 2.03 (the key was later revoked); OpenAI ~US$ 0.65.
 
@@ -26,7 +26,7 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 ## 2026-11-17: a local model (Gemma 4 12B on Ollama)
 
-**Setup.** New `ollama` provider (Ollama's OpenAI-compatible endpoint, JSON Schema constraint, thinking off). Gemma 4 12B (`gemma4:12b-mlx`, 4-bit MLX build, vision) on an Apple M4 Pro with 24 GB, two requests at a time, 32K context. The 12-invoice sample used for the reference models; docfunnel, hybrid and hybrid-ocr routes. Ollama does not take PDF files, so there is no native route. No API cost. Report: [`reports/e2e-local/`](../../reports/e2e-local/report.md).
+**Setup.** New `ollama` provider (Ollama's OpenAI-compatible endpoint, JSON Schema constraint, thinking off). Gemma 4 12B (`gemma4:12b-mlx`, 4-bit MLX build, vision) on an Apple M4 Pro with 24 GB, two requests at a time, 32K context. The 12-invoice sample used for the reference models; docfunnel, hybrid and hybrid-ocr routes. Ollama does not take PDF files, so there is no native route. No API cost. Report: [`reports/e2e/09-local-gemma/`](../../reports/e2e/09-local-gemma/report.md).
 
 | `gemma4:12b-mlx` (12 invoices) | Field accuracy | Exact match | Line items F1 | Sent to review | LLM p50 |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -41,7 +41,7 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 ## 2026-11-17: GPT-6 Luna, and the hybrid route with OCR text
 
-**Setup.** The OpenAI adapter now sends PDFs (`file` part) and page images (`image_url`, `detail: "high"`). GPT-6 Luna at reasoning effort `none` (default) and `low`, on all 39 invoices and the docfunnel, native and hybrid routes. Then a fourth route, `hybrid-ocr`: the hybrid input plus each scanned page's OCR text after its image. Then `hybrid-ocr` again on the 29 invoices with scans, to check it was not luck. Cost: OpenAI US$ 0.65 in total. Reports: [`reports/e2e-openai/`](../../reports/e2e-openai/report.md), [`reports/e2e-openai-hybrid-ocr/`](../../reports/e2e-openai-hybrid-ocr/report.md), [`reports/e2e-hybrid-ocr/`](../../reports/e2e-hybrid-ocr/report.md).
+**Setup.** The OpenAI adapter now sends PDFs (`file` part) and page images (`image_url`, `detail: "high"`). GPT-6 Luna at reasoning effort `none` (default) and `low`, on all 39 invoices and the docfunnel, native and hybrid routes. Then a fourth route, `hybrid-ocr`: the hybrid input plus each scanned page's OCR text after its image. Then `hybrid-ocr` again on the 29 invoices with scans, to check it was not luck. Cost: OpenAI US$ 0.65 in total. Reports: [`reports/e2e/06-gpt-6-luna/`](../../reports/e2e/06-gpt-6-luna/report.md), [`reports/e2e/07-gpt-6-luna-hybrid-ocr/`](../../reports/e2e/07-gpt-6-luna-hybrid-ocr/report.md), [`reports/e2e/08-hybrid-ocr-repeat/`](../../reports/e2e/08-hybrid-ocr-repeat/report.md).
 
 | `gpt-6-luna` (all 39) | Field accuracy | Exact match | Line items F1 | Input tok/doc | Cost per 1k docs |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -52,7 +52,7 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 | hybrid-ocr, repeat (29 with scans) | 100.0% | 96.6% | 97.2% | 9,999 | $2.10 |
 | native, effort `low` | 99.1% | 87.2% | 97.6% | 5,232 | $1.92 |
 
-1. **Text and image fail in different places, and together they do not.** On the docfunnel route GPT-6 Luna got every header field right and every miss (10 to 11 documents) was in the line items of a scanned page: RapidOCR text loses the table. On the native and hybrid routes the items were right, but it misread or skipped identifiers on scanned pages: 3 to 8 errors per run, mostly the vendor tax ID, then the document number and the date. With both the image and its OCR text, it got 39 of 39 documents right, and 28 of 29 on the repeat. This is the best result of the benchmark, on the cheapest model tested, for 15% more than native input.
+1. **Text and image fail in different places, and together they do not.** On the docfunnel route GPT-6 Luna got every header field right and every miss (10 to 11 documents) was in the line items of a scanned page: RapidOCR text loses the table. On the native and hybrid routes the items were right, but it misread or skipped identifiers on scanned pages: 3 to 8 errors per run, mostly the vendor tax ID, then the document number and the date. With both the image and its OCR text, it got 39 of 39 documents right, and 28 of 29 on the repeat. This is the best result of the benchmark, on the cheapest model tested, for 26% more than native input ($2.15 against $1.71 per 1k).
 2. **The misread identifiers are a GPT-6 Luna trait.** Gemini 3.5 Flash-Lite, 3.1 Flash-Lite and Claude Haiku 5.5 did not misread them on the native or hybrid routes. Haiku's hybrid misses were line items, which the OCR text may also fix: not tested, as neither the Anthropic nor the Gemini key works any more.
 3. **OpenAI reads a PDF cheaply too.** Native input is 1.33x the docfunnel input and costs 2% more; like Gemini, unlike Claude. The hypothesis that GPT would behave like Claude was wrong.
 4. **Reasoning effort `low` did not pay off:** +3 pp of exact match on native input (within the noise), +12% cost.
@@ -60,7 +60,7 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 ## 2026-11-17: reference models on a 12-invoice sample
 
-**Setup.** `--sample 12` (seed 0: 9 small, 3 large; 10 with scanned pages), native and hybrid routes: Claude Sonnet 5.5 (effort `low`) and Claude Haiku 5.5 at effort `medium` (`claude-haiku-5-5+effort=medium`), compared with earlier runs on the same 12 documents. Cost: Anthropic US$ 1.37. Report: [`reports/e2e-reference/`](../../reports/e2e-reference/report.md).
+**Setup.** `--sample 12` (seed 0: 9 small, 3 large; 10 with scanned pages), native and hybrid routes: Claude Sonnet 5.5 (effort `low`) and Claude Haiku 5.5 at effort `medium` (`claude-haiku-5-5+effort=medium`), compared with earlier runs on the same 12 documents. Cost: Anthropic US$ 1.37. Report: [`reports/e2e/05-reference-models/`](../../reports/e2e/05-reference-models/report.md).
 
 | Model | Route | Exact match | Line items F1 | Output tok/doc | Cost per 1k docs |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -78,7 +78,7 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 ## 2026-11-17: compact line items; the Gemini key runs out of credit
 
-**Setup.** Hybrid route on all 39 invoices with `--compact-output` (one-letter line-item keys), Gemini 3.1 Flash-Lite and Claude Haiku 5.5, compared with the standard answer format on the same documents (hybrid on the 29 with scans, docfunnel on the 10 digital ones). Cost: Anthropic US$ 0.14. Report: [`reports/e2e-compact/`](../../reports/e2e-compact/report.md).
+**Setup.** Hybrid route on all 39 invoices with `--compact-output` (one-letter line-item keys), Gemini 3.1 Flash-Lite and Claude Haiku 5.5, compared with the standard answer format on the same documents (hybrid on the 29 with scans, docfunnel on the 10 digital ones). Cost: Anthropic US$ 0.14. Report: [`reports/e2e/04-compact-output/`](../../reports/e2e/04-compact-output/report.md).
 
 | `claude-haiku-5-5` | Exact match | Line items F1 | Output tok/doc | Cost per 1k docs |
 | --- | ---: | ---: | ---: | ---: |
@@ -91,7 +91,7 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 ## 2026-11-17: hybrid route, images in place
 
-**Setup.** Same 29 invoices with scanned pages and the same three models; each scanned page's image now sits between the text of the pages around it. Cost: Gemini US$ 0.53, Anthropic US$ 0.10. Report: [`reports/e2e-hybrid/`](../../reports/e2e-hybrid/report.md).
+**Setup.** Same 29 invoices with scanned pages and the same three models; each scanned page's image now sits between the text of the pages around it. Cost: Gemini US$ 0.53, Anthropic US$ 0.10. Report: [`reports/e2e/03-hybrid/`](../../reports/e2e/03-hybrid/report.md).
 
 | Model | Route | Exact match | Line items F1 | Cost per 1k docs |
 | --- | --- | ---: | ---: | ---: |
@@ -112,7 +112,7 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 ## 2026-11-17: hybrid route, first attempt (images before the text)
 
-**Setup.** `--route hybrid --where scan=has_scanned_pages`: the 29 invoices with scanned pages; Gemini 3.5 / 3.1 Flash-Lite and Claude Haiku 5.5. Every page the parse stage routed to OCR was sent as a 150 dpi JPEG, all images before the text, with a note in the text where each scanned page was ("read it from attached image 2"). Cost: Gemini US$ 0.44, Anthropic US$ 0.10. Report: [`reports/e2e-hybrid-v1-images-first/`](../../reports/e2e-hybrid-v1-images-first/report.md).
+**Setup.** `--route hybrid --where scan=has_scanned_pages`: the 29 invoices with scanned pages; Gemini 3.5 / 3.1 Flash-Lite and Claude Haiku 5.5. Every page the parse stage routed to OCR was sent as a 150 dpi JPEG, all images before the text, with a note in the text where each scanned page was ("read it from attached image 2"). Cost: Gemini US$ 0.44, Anthropic US$ 0.10. Report: [`reports/e2e/02-hybrid-images-first/`](../../reports/e2e/02-hybrid-images-first/report.md).
 
 | Model | docfunnel exact match | native | hybrid v1 | hybrid v1 cost / native cost |
 | --- | ---: | ---: | ---: | ---: |
@@ -129,7 +129,7 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 ## 2026-11-17: full run, 4 models x 2 routes x 39 invoices
 
-**Setup.** `docfunnel eval-e2e` on 39 invoices, 174 pages: 29 small (1 to 4 pages, 17 to 170 line items) and 10 large (an invoice with contracts annexed, 8 to 10 pages); 10 fully digital, 29 with at least one scanned page. Models: Gemini 3.5 Flash-Lite (thinking `minimal`), 3.8 Flash (`low`), 3.1 Flash-Lite (default), Claude Haiku 5.5 (effort `low`). Output limit 16,384 tokens, 2 attempts. Cost: Gemini US$ 2.67, Anthropic US$ 0.29; no call skipped. Report: [`reports/e2e/report.md`](../../reports/e2e/report.md).
+**Setup.** `docfunnel eval-e2e` on 39 invoices, 174 pages: 29 small (1 to 4 pages, 17 to 170 line items) and 10 large (an invoice with contracts annexed, 8 to 10 pages); 10 fully digital, 29 with at least one scanned page. Models: Gemini 3.5 Flash-Lite (thinking `minimal`), 3.8 Flash (`low`), 3.1 Flash-Lite (default), Claude Haiku 5.5 (effort `low`). Output limit 16,384 tokens, 2 attempts. Cost: Gemini US$ 2.67, Anthropic US$ 0.29; no call skipped. Report: [`reports/e2e/01-small-models/`](../../reports/e2e/01-small-models/report.md).
 
 | Model | Route | Field accuracy | Exact match | Line items F1 | Cost per 1k docs | LLM p50 |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |

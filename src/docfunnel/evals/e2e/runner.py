@@ -1,4 +1,4 @@
-"""Run the end-to-end comparison: the docfunnel route against native PDF input.
+"""Run the end-to-end comparison: every route, per model, on the same documents.
 
 For every model and every document:
 
@@ -11,6 +11,7 @@ For every model and every document:
   image of each page it routed to OCR, so the model reads the scans itself. On a
   document with no scanned page it is the docfunnel route; that result is reused
   rather than paid for twice.
+* **hybrid-ocr**: ``hybrid``, plus each scanned page's OCR text after its image.
 
 All routes use the same prompt, output schema, repair turn and scoring
 (:func:`docfunnel.evals.extract.runner.score_document`). Spending is capped per
