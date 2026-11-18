@@ -14,7 +14,7 @@
    "gemini:gemini-3.1-flash-lite"
   ],
   "routes": [
-   "docfunnel",
+   "text",
    "native"
   ],
   "budget_usd": {
@@ -25,12 +25,13 @@
    "gemini": 2.667741,
    "anthropic": 0.292678
   },
-  "skipped_calls": 0
+  "skipped_calls": 0,
+  "unavailable": {}
  },
  "groups": [
   {
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "all",
    "metrics": {
     "documents": 39,
@@ -52,13 +53,14 @@
     "cost_per_doc_usd": 0.012459971794871795,
     "input_tokens": 164688,
     "output_tokens": 174613,
+    "reasoning_tokens": null,
     "latency_p50_ms": 7326.349,
     "latency_p95_ms": 16282.6773
    }
   },
   {
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=large",
    "metrics": {
     "documents": 10,
@@ -80,13 +82,14 @@
     "cost_per_doc_usd": 0.00850347,
     "input_tokens": 62099,
     "output_tokens": 26562,
+    "reasoning_tokens": null,
     "latency_p50_ms": 5448.218999999999,
     "latency_p95_ms": 8052.956900000001
    }
   },
   {
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=has_scanned_pages",
    "metrics": {
     "documents": 29,
@@ -108,13 +111,14 @@
     "cost_per_doc_usd": 0.011678503448275862,
     "input_tokens": 128047,
     "output_tokens": 120105,
+    "reasoning_tokens": null,
     "latency_p50_ms": 7049.248,
     "latency_p95_ms": 15936.7078
    }
   },
   {
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=small",
    "metrics": {
     "documents": 29,
@@ -136,13 +140,14 @@
     "cost_per_doc_usd": 0.013824282758620689,
     "input_tokens": 102589,
     "output_tokens": 148051,
+    "reasoning_tokens": null,
     "latency_p50_ms": 8902.301,
     "latency_p95_ms": 16408.6088
    }
   },
   {
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=digital",
    "metrics": {
     "documents": 10,
@@ -164,6 +169,7 @@
     "cost_per_doc_usd": 0.014726230000000002,
     "input_tokens": 36641,
     "output_tokens": 54508,
+    "reasoning_tokens": null,
     "latency_p50_ms": 10847.972000000002,
     "latency_p95_ms": 17019.96095
    }
@@ -192,6 +198,7 @@
     "cost_per_doc_usd": 0.011859325641025641,
     "input_tokens": 123879,
     "output_tokens": 170140,
+    "reasoning_tokens": null,
     "latency_p50_ms": 8483.32,
     "latency_p95_ms": 17562.1522
    }
@@ -220,6 +227,7 @@
     "cost_per_doc_usd": 0.007580430000000001,
     "input_tokens": 58506,
     "output_tokens": 23301,
+    "reasoning_tokens": null,
     "latency_p50_ms": 6633.0265,
     "latency_p95_ms": 8353.405050000001
    }
@@ -248,6 +256,7 @@
     "cost_per_doc_usd": 0.010934748275862069,
     "input_tokens": 100909,
     "output_tokens": 114734,
+    "reasoning_tokens": null,
     "latency_p50_ms": 7708.711,
     "latency_p95_ms": 16766.8722
    }
@@ -276,6 +285,7 @@
     "cost_per_doc_usd": 0.013334806896551723,
     "input_tokens": 65373,
     "output_tokens": 146839,
+    "reasoning_tokens": null,
     "latency_p50_ms": 10467.559,
     "latency_p95_ms": 17576.2782
    }
@@ -304,13 +314,14 @@
     "cost_per_doc_usd": 0.0145406,
     "input_tokens": 22970,
     "output_tokens": 55406,
+    "reasoning_tokens": null,
     "latency_p50_ms": 11512.0645,
     "latency_p95_ms": 17574.8656
    }
   },
   {
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "all",
    "metrics": {
     "documents": 39,
@@ -332,13 +343,14 @@
     "cost_per_doc_usd": 0.01519803846153846,
     "input_tokens": 164688,
     "output_tokens": 125122,
+    "reasoning_tokens": null,
     "latency_p50_ms": 17133.522,
     "latency_p95_ms": 36377.5367
    }
   },
   {
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=large",
    "metrics": {
     "documents": 10,
@@ -360,13 +372,14 @@
     "cost_per_doc_usd": 0.01234905,
     "input_tokens": 62099,
     "output_tokens": 20511,
+    "reasoning_tokens": null,
     "latency_p50_ms": 14292.371500000001,
     "latency_p95_ms": 23791.40400000001
    }
   },
   {
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=has_scanned_pages",
    "metrics": {
     "documents": 29,
@@ -388,13 +401,14 @@
     "cost_per_doc_usd": 0.014519663793103448,
     "input_tokens": 128047,
     "output_tokens": 86676,
+    "reasoning_tokens": null,
     "latency_p50_ms": 16946.841,
     "latency_p95_ms": 33177.9628
    }
   },
   {
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=small",
    "metrics": {
     "documents": 29,
@@ -416,13 +430,14 @@
     "cost_per_doc_usd": 0.01618044827586207,
     "input_tokens": 102589,
     "output_tokens": 104611,
+    "reasoning_tokens": null,
     "latency_p50_ms": 19730.702,
     "latency_p95_ms": 36675.0802
    }
   },
   {
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=digital",
    "metrics": {
     "documents": 10,
@@ -444,6 +459,7 @@
     "cost_per_doc_usd": 0.017165325000000002,
     "input_tokens": 36641,
     "output_tokens": 38446,
+    "reasoning_tokens": null,
     "latency_p50_ms": 21430.847,
     "latency_p95_ms": 36936.81375
    }
@@ -472,6 +488,7 @@
     "cost_per_doc_usd": 0.014396807692307693,
     "input_tokens": 123879,
     "output_tokens": 124951,
+    "reasoning_tokens": null,
     "latency_p50_ms": 19758.924,
     "latency_p95_ms": 35969.717599999996
    }
@@ -500,6 +517,7 @@
     "cost_per_doc_usd": 0.01209195,
     "input_tokens": 58506,
     "output_tokens": 20544,
+    "reasoning_tokens": null,
     "latency_p50_ms": 18528.002,
     "latency_p95_ms": 23879.385850000002
    }
@@ -528,6 +546,7 @@
     "cost_per_doc_usd": 0.013795577586206897,
     "input_tokens": 100909,
     "output_tokens": 86504,
+    "reasoning_tokens": null,
     "latency_p50_ms": 19718.125,
     "latency_p95_ms": 34795.7254
    }
@@ -556,6 +575,7 @@
     "cost_per_doc_usd": 0.015191586206896552,
     "input_tokens": 65373,
     "output_tokens": 104407,
+    "reasoning_tokens": null,
     "latency_p50_ms": 21094.165,
     "latency_p95_ms": 36129.1706
    }
@@ -584,13 +604,14 @@
     "cost_per_doc_usd": 0.016140375000000002,
     "input_tokens": 22970,
     "output_tokens": 38447,
+    "reasoning_tokens": null,
     "latency_p50_ms": 24131.4035,
     "latency_p95_ms": 35243.349200000004
    }
   },
   {
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "all",
    "metrics": {
     "documents": 39,
@@ -612,13 +633,14 @@
     "cost_per_doc_usd": 0.0032143769230769227,
     "input_tokens": 255087,
     "output_tokens": 199704,
+    "reasoning_tokens": null,
     "latency_p50_ms": 16020.57,
     "latency_p95_ms": 29155.389900000006
    }
   },
   {
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=large",
    "metrics": {
     "documents": 10,
@@ -640,13 +662,14 @@
     "cost_per_doc_usd": 0.00276324,
     "input_tokens": 102844,
     "output_tokens": 34696,
+    "reasoning_tokens": null,
     "latency_p50_ms": 11038.593499999999,
     "latency_p95_ms": 18014.8674
    }
   },
   {
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=has_scanned_pages",
    "metrics": {
     "documents": 29,
@@ -668,13 +691,14 @@
     "cost_per_doc_usd": 0.003084396551724138,
     "input_tokens": 201535,
     "output_tokens": 138588,
+    "reasoning_tokens": null,
     "latency_p50_ms": 15730.835,
     "latency_p95_ms": 27183.1002
    }
   },
   {
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=small",
    "metrics": {
     "documents": 29,
@@ -696,13 +720,14 @@
     "cost_per_doc_usd": 0.003369941379310345,
     "input_tokens": 152243,
     "output_tokens": 165008,
+    "reasoning_tokens": null,
     "latency_p50_ms": 17630.058,
     "latency_p95_ms": 30371.339400000004
    }
   },
   {
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=digital",
    "metrics": {
     "documents": 10,
@@ -724,6 +749,7 @@
     "cost_per_doc_usd": 0.00359132,
     "input_tokens": 53552,
     "output_tokens": 61116,
+    "reasoning_tokens": null,
     "latency_p50_ms": 18360.767,
     "latency_p95_ms": 31649.0586
    }
@@ -752,6 +778,7 @@
     "cost_per_doc_usd": 0.0042901820512820515,
     "input_tokens": 472706,
     "output_tokens": 240093,
+    "reasoning_tokens": null,
     "latency_p50_ms": 17643.416,
     "latency_p95_ms": 35086.2941
    }
@@ -780,6 +807,7 @@
     "cost_per_doc_usd": 0.00450562,
     "input_tokens": 226557,
     "output_tokens": 44801,
+    "reasoning_tokens": null,
     "latency_p50_ms": 16250.366,
     "latency_p95_ms": 23481.125700000004
    }
@@ -808,6 +836,7 @@
     "cost_per_doc_usd": 0.00412418275862069,
     "input_tokens": 375728,
     "output_tokens": 164057,
+    "reasoning_tokens": null,
     "latency_p50_ms": 16908.786,
     "latency_p95_ms": 31088.9084
    }
@@ -836,6 +865,7 @@
     "cost_per_doc_usd": 0.004215893103448276,
     "input_tokens": 246149,
     "output_tokens": 195292,
+    "reasoning_tokens": null,
     "latency_p50_ms": 18729.516,
     "latency_p95_ms": 35528.9796
    }
@@ -864,13 +894,14 @@
     "cost_per_doc_usd": 0.00477158,
     "input_tokens": 96978,
     "output_tokens": 76036,
+    "reasoning_tokens": null,
     "latency_p50_ms": 25347.0795,
     "latency_p95_ms": 35484.71105
    }
   },
   {
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "all",
    "metrics": {
     "documents": 39,
@@ -892,13 +923,14 @@
     "cost_per_doc_usd": 0.00739076923076923,
     "input_tokens": 164688,
     "output_tokens": 164712,
+    "reasoning_tokens": null,
     "latency_p50_ms": 8023.84,
     "latency_p95_ms": 17177.7093
    }
   },
   {
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=large",
    "metrics": {
     "documents": 10,
@@ -920,13 +952,14 @@
     "cost_per_doc_usd": 0.006081425,
     "input_tokens": 62099,
     "output_tokens": 30193,
+    "reasoning_tokens": null,
     "latency_p50_ms": 7320.8715,
     "latency_p95_ms": 8308.783800000001
    }
   },
   {
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=has_scanned_pages",
    "metrics": {
     "documents": 29,
@@ -948,13 +981,14 @@
     "cost_per_doc_usd": 0.007081870689655173,
     "input_tokens": 128047,
     "output_tokens": 115575,
+    "reasoning_tokens": null,
     "latency_p50_ms": 7729.784,
     "latency_p95_ms": 16416.2326
    }
   },
   {
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=small",
    "metrics": {
     "documents": 29,
@@ -976,13 +1010,14 @@
     "cost_per_doc_usd": 0.00784226724137931,
     "input_tokens": 102589,
     "output_tokens": 134519,
+    "reasoning_tokens": null,
     "latency_p50_ms": 8723.082,
     "latency_p95_ms": 17627.3708
    }
   },
   {
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=digital",
    "metrics": {
     "documents": 10,
@@ -1004,6 +1039,7 @@
     "cost_per_doc_usd": 0.008286575000000001,
     "input_tokens": 36641,
     "output_tokens": 49137,
+    "reasoning_tokens": null,
     "latency_p50_ms": 9730.674,
     "latency_p95_ms": 17608.37885
    }
@@ -1032,6 +1068,7 @@
     "cost_per_doc_usd": 0.007098711538461539,
     "input_tokens": 123879,
     "output_tokens": 163920,
+    "reasoning_tokens": null,
     "latency_p50_ms": 9275.285,
     "latency_p95_ms": 16019.495400000002
    }
@@ -1060,6 +1097,7 @@
     "cost_per_doc_usd": 0.00619935,
     "input_tokens": 58506,
     "output_tokens": 31578,
+    "reasoning_tokens": null,
     "latency_p50_ms": 8554.9365,
     "latency_p95_ms": 10882.62915
    }
@@ -1088,6 +1126,7 @@
     "cost_per_doc_usd": 0.006762163793103448,
     "input_tokens": 100909,
     "output_tokens": 113917,
+    "reasoning_tokens": null,
     "latency_p50_ms": 8948.658,
     "latency_p95_ms": 14853.9282
    }
@@ -1116,6 +1155,7 @@
     "cost_per_doc_usd": 0.007408836206896551,
     "input_tokens": 65373,
     "output_tokens": 132342,
+    "reasoning_tokens": null,
     "latency_p50_ms": 10115.235,
     "latency_p95_ms": 16247.137400000001
    }
@@ -1144,6 +1184,7 @@
     "cost_per_doc_usd": 0.0080747,
     "input_tokens": 22970,
     "output_tokens": 50003,
+    "reasoning_tokens": null,
     "latency_p50_ms": 10535.393,
     "latency_p95_ms": 16224.3732
    }
@@ -1153,8 +1194,9 @@
   {
    "doc_id": "large-00",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -1187,15 +1229,18 @@
     "latency_ms": 5276.922,
     "cost_usd": 0.0083488,
     "input_tokens": 5921,
-    "output_tokens": 2629
+    "output_tokens": 2629,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 29821.096999999998
+   "parse_cpu_ms": 29821.096999999998,
+   "reused": false
   },
   {
    "doc_id": "large-01",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -1228,15 +1273,18 @@
     "latency_ms": 6476.541,
     "cost_usd": 0.0099132,
     "input_tokens": 5694,
-    "output_tokens": 3282
+    "output_tokens": 3282,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6199.044
+   "parse_cpu_ms": 6199.044,
+   "reused": false
   },
   {
    "doc_id": "large-02",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -1271,15 +1319,18 @@
     "latency_ms": 5664.866,
     "cost_usd": 0.0087944,
     "input_tokens": 6548,
-    "output_tokens": 2732
+    "output_tokens": 2732,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34609.739
+   "parse_cpu_ms": 34609.739,
+   "reused": false
   },
   {
    "doc_id": "large-03",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -1312,15 +1363,18 @@
     "latency_ms": 8609.804,
     "cost_usd": 0.0139066,
     "input_tokens": 7097,
-    "output_tokens": 4711
+    "output_tokens": 4711,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 48053.28
+   "parse_cpu_ms": 48053.28,
+   "reused": false
   },
   {
    "doc_id": "large-04",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -1353,15 +1407,18 @@
     "latency_ms": 4352.948,
     "cost_usd": 0.0069932,
     "input_tokens": 6019,
-    "output_tokens": 2075
+    "output_tokens": 2075,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 29029.452
+   "parse_cpu_ms": 29029.452,
+   "reused": false
   },
   {
    "doc_id": "large-05",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -1394,15 +1451,18 @@
     "latency_ms": 4918.72,
     "cost_usd": 0.0079063,
     "input_tokens": 6471,
-    "output_tokens": 2386
+    "output_tokens": 2386,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 41659.61
+   "parse_cpu_ms": 41659.61,
+   "reused": false
   },
   {
    "doc_id": "large-06",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -1435,15 +1495,18 @@
     "latency_ms": 2683.362,
     "cost_usd": 0.0043329,
     "input_tokens": 6043,
-    "output_tokens": 1008
+    "output_tokens": 1008,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 51954.126
+   "parse_cpu_ms": 51954.126,
+   "reused": false
   },
   {
    "doc_id": "large-07",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -1476,15 +1539,18 @@
     "latency_ms": 5619.516,
     "cost_usd": 0.0085251,
     "input_tokens": 6267,
-    "output_tokens": 2658
+    "output_tokens": 2658,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 25063.245
+   "parse_cpu_ms": 25063.245,
+   "reused": false
   },
   {
    "doc_id": "large-08",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -1517,15 +1583,18 @@
     "latency_ms": 7372.366,
     "cost_usd": 0.0117572,
     "input_tokens": 6574,
-    "output_tokens": 3914
+    "output_tokens": 3914,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 35431.313
+   "parse_cpu_ms": 35431.313,
+   "reused": false
   },
   {
    "doc_id": "large-09",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -1558,15 +1627,18 @@
     "latency_ms": 2808.688,
     "cost_usd": 0.004557,
     "input_tokens": 5465,
-    "output_tokens": 1167
+    "output_tokens": 1167,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 27301.951
+   "parse_cpu_ms": 27301.951,
+   "reused": false
   },
   {
    "doc_id": "pdf-001",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -1599,15 +1671,18 @@
     "latency_ms": 11542.566,
     "cost_usd": 0.017189,
     "input_tokens": 4680,
-    "output_tokens": 6314
+    "output_tokens": 6314,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 18592.329
+   "parse_cpu_ms": 18592.329,
+   "reused": false
   },
   {
    "doc_id": "pdf-004",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-004",
     "tags": {
@@ -1640,15 +1715,18 @@
     "latency_ms": 10703.056,
     "cost_usd": 0.0148164,
     "input_tokens": 3363,
-    "output_tokens": 5523
+    "output_tokens": 5523,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 7775.362
+   "parse_cpu_ms": 7775.362,
+   "reused": false
   },
   {
    "doc_id": "pdf-005",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -1681,15 +1759,18 @@
     "latency_ms": 7130.569,
     "cost_usd": 0.0080952,
     "input_tokens": 2234,
-    "output_tokens": 2970
+    "output_tokens": 2970,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 16066.413
+   "parse_cpu_ms": 16066.413,
+   "reused": false
   },
   {
    "doc_id": "pdf-006",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -1722,15 +1803,18 @@
     "latency_ms": 11218.403,
     "cost_usd": 0.0161892,
     "input_tokens": 5064,
-    "output_tokens": 5868
+    "output_tokens": 5868,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 62554.434
+   "parse_cpu_ms": 62554.434,
+   "reused": false
   },
   {
    "doc_id": "pdf-007",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -1763,15 +1847,18 @@
     "latency_ms": 15534.693,
     "cost_usd": 0.0218922,
     "input_tokens": 4924,
-    "output_tokens": 8166
+    "output_tokens": 8166,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6480.724
+   "parse_cpu_ms": 6480.724,
+   "reused": false
   },
   {
    "doc_id": "pdf-008",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -1804,15 +1891,18 @@
     "latency_ms": 4869.109,
     "cost_usd": 0.0070232,
     "input_tokens": 2344,
-    "output_tokens": 2528
+    "output_tokens": 2528,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 9302.268
+   "parse_cpu_ms": 9302.268,
+   "reused": false
   },
   {
    "doc_id": "pdf-010",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -1845,15 +1935,18 @@
     "latency_ms": 5175.733,
     "cost_usd": 0.0075974,
     "input_tokens": 2608,
-    "output_tokens": 2726
+    "output_tokens": 2726,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12069.167
+   "parse_cpu_ms": 12069.167,
+   "reused": false
   },
   {
    "doc_id": "pdf-011",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -1886,15 +1979,18 @@
     "latency_ms": 9272.843,
     "cost_usd": 0.0135802,
     "input_tokens": 3334,
-    "output_tokens": 5032
+    "output_tokens": 5032,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34781.907
+   "parse_cpu_ms": 34781.907,
+   "reused": false
   },
   {
    "doc_id": "pdf-016",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-016",
     "tags": {
@@ -1927,15 +2023,18 @@
     "latency_ms": 11522.56,
     "cost_usd": 0.0170173,
     "input_tokens": 4516,
-    "output_tokens": 6265
+    "output_tokens": 6265,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 13.853
+   "parse_cpu_ms": 13.853,
+   "reused": false
   },
   {
    "doc_id": "pdf-018",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -1968,15 +2067,18 @@
     "latency_ms": 16159.885,
     "cost_usd": 0.0259226,
     "input_tokens": 5417,
-    "output_tokens": 9719
+    "output_tokens": 9719,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 50559.924
+   "parse_cpu_ms": 50559.924,
+   "reused": false
   },
   {
    "doc_id": "pdf-019",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -2009,15 +2111,18 @@
     "latency_ms": 8817.491,
     "cost_usd": 0.0130841,
     "input_tokens": 3022,
-    "output_tokens": 4871
+    "output_tokens": 4871,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 30642.143
+   "parse_cpu_ms": 30642.143,
+   "reused": false
   },
   {
    "doc_id": "pdf-020",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-020",
     "tags": {
@@ -2050,15 +2155,18 @@
     "latency_ms": 17643.8,
     "cost_usd": 0.0271977,
     "input_tokens": 5609,
-    "output_tokens": 10206
+    "output_tokens": 10206,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 25.088
+   "parse_cpu_ms": 25.088,
+   "reused": false
   },
   {
    "doc_id": "pdf-021",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-021",
     "tags": {
@@ -2091,15 +2199,18 @@
     "latency_ms": 4522.679,
     "cost_usd": 0.0058617,
     "input_tokens": 1839,
-    "output_tokens": 2124
+    "output_tokens": 2124,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 3.066
+   "parse_cpu_ms": 3.066,
+   "reused": false
   },
   {
    "doc_id": "pdf-023",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -2132,15 +2243,18 @@
     "latency_ms": 9706.124,
     "cost_usd": 0.0149244,
     "input_tokens": 4273,
-    "output_tokens": 5457
+    "output_tokens": 5457,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 4769.249
+   "parse_cpu_ms": 4769.249,
+   "reused": false
   },
   {
    "doc_id": "pdf-027",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -2173,15 +2287,18 @@
     "latency_ms": 8902.301,
     "cost_usd": 0.0134004,
     "input_tokens": 3318,
-    "output_tokens": 4962
+    "output_tokens": 4962,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34902.629
+   "parse_cpu_ms": 34902.629,
+   "reused": false
   },
   {
    "doc_id": "pdf-028",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -2214,15 +2331,18 @@
     "latency_ms": 7049.248,
     "cost_usd": 0.0106433,
     "input_tokens": 2761,
-    "output_tokens": 3926
+    "output_tokens": 3926,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 28467.420000000002
+   "parse_cpu_ms": 28467.420000000002,
+   "reused": false
   },
   {
    "doc_id": "pdf-029",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -2255,15 +2375,18 @@
     "latency_ms": 2895.654,
     "cost_usd": 0.003157,
     "input_tokens": 1590,
-    "output_tokens": 1072
+    "output_tokens": 1072,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 10098.024
+   "parse_cpu_ms": 10098.024,
+   "reused": false
   },
   {
    "doc_id": "pdf-030",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -2296,15 +2419,18 @@
     "latency_ms": 6274.825,
     "cost_usd": 0.0090596,
     "input_tokens": 2957,
-    "output_tokens": 3269
+    "output_tokens": 3269,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12779.554
+   "parse_cpu_ms": 12779.554,
+   "reused": false
   },
   {
    "doc_id": "pdf-034",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -2337,15 +2463,18 @@
     "latency_ms": 7622.697,
     "cost_usd": 0.0106899,
     "input_tokens": 2833,
-    "output_tokens": 3936
+    "output_tokens": 3936,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12069.262999999999
+   "parse_cpu_ms": 12069.262999999999,
+   "reused": false
   },
   {
    "doc_id": "pdf-037",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-037",
     "tags": {
@@ -2378,15 +2507,18 @@
     "latency_ms": 12862.351,
     "cost_usd": 0.0202112,
     "input_tokens": 5229,
-    "output_tokens": 7457
+    "output_tokens": 7457,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12.933
+   "parse_cpu_ms": 12.933,
+   "reused": false
   },
   {
    "doc_id": "pdf-039",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-039",
     "tags": {
@@ -2419,15 +2551,18 @@
     "latency_ms": 4153.91,
     "cost_usd": 0.0053272,
     "input_tokens": 1724,
-    "output_tokens": 1924
+    "output_tokens": 1924,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 8.165
+   "parse_cpu_ms": 8.165,
+   "reused": false
   },
   {
    "doc_id": "pdf-040",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-040",
     "tags": {
@@ -2460,15 +2595,18 @@
     "latency_ms": 10992.888,
     "cost_usd": 0.0169726,
     "input_tokens": 3792,
-    "output_tokens": 6334
+    "output_tokens": 6334,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 10.544
+   "parse_cpu_ms": 10.544,
+   "reused": false
   },
   {
    "doc_id": "pdf-042",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-042",
     "tags": {
@@ -2501,15 +2639,18 @@
     "latency_ms": 3519.918,
     "cost_usd": 0.0042011,
     "input_tokens": 1612,
-    "output_tokens": 1487
+    "output_tokens": 1487,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6.481
+   "parse_cpu_ms": 6.481,
+   "reused": false
   },
   {
    "doc_id": "pdf-043",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-043",
     "tags": {
@@ -2542,15 +2683,18 @@
     "latency_ms": 7326.349,
     "cost_usd": 0.0107401,
     "input_tokens": 3767,
-    "output_tokens": 3844
+    "output_tokens": 3844,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 9.927
+   "parse_cpu_ms": 9.927,
+   "reused": false
   },
   {
    "doc_id": "pdf-044",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -2583,15 +2727,18 @@
     "latency_ms": 15601.942,
     "cost_usd": 0.024332,
     "input_tokens": 5065,
-    "output_tokens": 9125
+    "output_tokens": 9125,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 50801.063
+   "parse_cpu_ms": 50801.063,
+   "reused": false
   },
   {
    "doc_id": "pdf-045",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -2624,15 +2771,18 @@
     "latency_ms": 16509.354,
     "cost_usd": 0.0252091,
     "input_tokens": 5297,
-    "output_tokens": 9448
+    "output_tokens": 9448,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 14838.865
+   "parse_cpu_ms": 14838.865,
+   "reused": false
   },
   {
    "doc_id": "pdf-047",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -2665,15 +2815,18 @@
     "latency_ms": 6428.468,
     "cost_usd": 0.0087917,
     "input_tokens": 2789,
-    "output_tokens": 3182
+    "output_tokens": 3182,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12343.907000000001
+   "parse_cpu_ms": 12343.907000000001,
+   "reused": false
   },
   {
    "doc_id": "pdf-048",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -2706,15 +2859,18 @@
     "latency_ms": 2604.118,
     "cost_usd": 0.0028614,
     "input_tokens": 1438,
-    "output_tokens": 972
+    "output_tokens": 972,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 8512.513
+   "parse_cpu_ms": 8512.513,
+   "reused": false
   },
   {
    "doc_id": "pdf-049",
    "model": "gemini-3.5-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-049",
     "tags": {
@@ -2747,15 +2903,18 @@
     "latency_ms": 16257.491,
     "cost_usd": 0.024917,
     "input_tokens": 5190,
-    "output_tokens": 9344
+    "output_tokens": 9344,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 22.836
+   "parse_cpu_ms": 22.836,
+   "reused": false
   },
   {
    "doc_id": "large-00",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -2788,15 +2947,18 @@
     "latency_ms": 6130.645,
     "cost_usd": 0.0064303,
     "input_tokens": 6101,
-    "output_tokens": 1840
+    "output_tokens": 1840,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-01",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -2829,15 +2991,18 @@
     "latency_ms": 6547.758,
     "cost_usd": 0.0080015,
     "input_tokens": 5605,
-    "output_tokens": 2528
+    "output_tokens": 2528,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-02",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -2870,15 +3035,18 @@
     "latency_ms": 7708.711,
     "cost_usd": 0.0076711,
     "input_tokens": 6137,
-    "output_tokens": 2332
+    "output_tokens": 2332,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-03",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -2911,15 +3079,18 @@
     "latency_ms": 8880.882,
     "cost_usd": 0.0108886,
     "input_tokens": 6137,
-    "output_tokens": 3619
+    "output_tokens": 3619,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-04",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -2952,15 +3123,18 @@
     "latency_ms": 5588.524,
     "cost_usd": 0.0057243,
     "input_tokens": 5581,
-    "output_tokens": 1620
+    "output_tokens": 1620,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-05",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -2993,15 +3167,18 @@
     "latency_ms": 6718.295,
     "cost_usd": 0.0081403,
     "input_tokens": 6101,
-    "output_tokens": 2524
+    "output_tokens": 2524,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-06",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -3034,15 +3211,18 @@
     "latency_ms": 5638.548,
     "cost_usd": 0.0059117,
     "input_tokens": 6089,
-    "output_tokens": 1634
+    "output_tokens": 1634,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-07",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -3075,15 +3255,18 @@
     "latency_ms": 7185.524,
     "cost_usd": 0.0085718,
     "input_tokens": 5581,
-    "output_tokens": 2759
+    "output_tokens": 2759,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-08",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -3116,15 +3299,18 @@
     "latency_ms": 7284.998,
     "cost_usd": 0.0093539,
     "input_tokens": 6113,
-    "output_tokens": 3008
+    "output_tokens": 3008,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-09",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -3157,15 +3343,18 @@
     "latency_ms": 4431.538,
     "cost_usd": 0.0051108,
     "input_tokens": 5061,
-    "output_tokens": 1437
+    "output_tokens": 1437,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-001",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -3198,15 +3387,18 @@
     "latency_ms": 10321.128,
     "cost_usd": 0.0129564,
     "input_tokens": 2413,
-    "output_tokens": 4893
+    "output_tokens": 4893,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-004",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-004",
     "tags": {
@@ -3239,15 +3431,18 @@
     "latency_ms": 7672.843,
     "cost_usd": 0.0109739,
     "input_tokens": 2413,
-    "output_tokens": 4100
+    "output_tokens": 4100,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-005",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -3280,15 +3475,18 @@
     "latency_ms": 4681.977,
     "cost_usd": 0.0049393,
     "input_tokens": 1881,
-    "output_tokens": 1750
+    "output_tokens": 1750,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-006",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -3321,15 +3519,18 @@
     "latency_ms": 16551.303,
     "cost_usd": 0.0219235,
     "input_tokens": 2945,
-    "output_tokens": 8416
+    "output_tokens": 8416,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-007",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -3362,15 +3563,18 @@
     "latency_ms": 15491.01,
     "cost_usd": 0.0212985,
     "input_tokens": 2945,
-    "output_tokens": 8166
+    "output_tokens": 8166,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-008",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -3403,15 +3607,18 @@
     "latency_ms": 7176.321,
     "cost_usd": 0.0084993,
     "input_tokens": 1881,
-    "output_tokens": 3174
+    "output_tokens": 3174,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-010",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -3444,15 +3651,18 @@
     "latency_ms": 6595.324,
     "cost_usd": 0.0074243,
     "input_tokens": 1881,
-    "output_tokens": 2744
+    "output_tokens": 2744,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-011",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -3485,15 +3695,18 @@
     "latency_ms": 11289.997,
     "cost_usd": 0.0136389,
     "input_tokens": 2413,
-    "output_tokens": 5166
+    "output_tokens": 5166,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-016",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-016",
     "tags": {
@@ -3526,15 +3739,18 @@
     "latency_ms": 15213.163,
     "cost_usd": 0.0208566,
     "input_tokens": 2897,
-    "output_tokens": 7995
+    "output_tokens": 7995,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-018",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -3567,15 +3783,18 @@
     "latency_ms": 13603.126,
     "cost_usd": 0.0164816,
     "input_tokens": 2897,
-    "output_tokens": 6245
+    "output_tokens": 6245,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-019",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -3608,15 +3827,18 @@
     "latency_ms": 10467.559,
     "cost_usd": 0.0127418,
     "input_tokens": 1881,
-    "output_tokens": 4871
+    "output_tokens": 4871,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-020",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-020",
     "tags": {
@@ -3649,15 +3871,18 @@
     "latency_ms": 17587.579,
     "cost_usd": 0.0255585,
     "input_tokens": 2945,
-    "output_tokens": 9870
+    "output_tokens": 9870,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-021",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-021",
     "tags": {
@@ -3690,15 +3915,18 @@
     "latency_ms": 4628.707,
     "cost_usd": 0.0055922,
     "input_tokens": 1349,
-    "output_tokens": 2075
+    "output_tokens": 2075,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-023",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -3731,15 +3959,18 @@
     "latency_ms": 11554.602,
     "cost_usd": 0.0145116,
     "input_tokens": 2897,
-    "output_tokens": 5457
+    "output_tokens": 5457,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-027",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -3772,15 +4003,18 @@
     "latency_ms": 11313.68,
     "cost_usd": 0.0135506,
     "input_tokens": 2377,
-    "output_tokens": 5135
+    "output_tokens": 5135,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-028",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -3813,15 +4047,18 @@
     "latency_ms": 9256.905,
     "cost_usd": 0.0106643,
     "input_tokens": 1881,
-    "output_tokens": 4040
+    "output_tokens": 4040,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-029",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -3854,15 +4091,18 @@
     "latency_ms": 4602.943,
     "cost_usd": 0.0045386,
     "input_tokens": 1337,
-    "output_tokens": 1655
+    "output_tokens": 1655,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-030",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -3895,15 +4135,18 @@
     "latency_ms": 5939.603,
     "cost_usd": 0.0071421,
     "input_tokens": 1857,
-    "output_tokens": 2634
+    "output_tokens": 2634,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-034",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -3936,15 +4179,18 @@
     "latency_ms": 8483.32,
     "cost_usd": 0.0103871,
     "input_tokens": 1857,
-    "output_tokens": 3932
+    "output_tokens": 3932,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-037",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-037",
     "tags": {
@@ -3977,15 +4223,18 @@
     "latency_ms": 17559.327,
     "cost_usd": 0.024951,
     "input_tokens": 2945,
-    "output_tokens": 9627
+    "output_tokens": 9627,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-039",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-039",
     "tags": {
@@ -4018,15 +4267,18 @@
     "latency_ms": 4021.674,
     "cost_usd": 0.0050661,
     "input_tokens": 1337,
-    "output_tokens": 1866
+    "output_tokens": 1866,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-040",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-040",
     "tags": {
@@ -4059,15 +4311,18 @@
     "latency_ms": 12228.904,
     "cost_usd": 0.0168589,
     "input_tokens": 2413,
-    "output_tokens": 6454
+    "output_tokens": 6454,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-042",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-042",
     "tags": {
@@ -4100,15 +4355,18 @@
     "latency_ms": 3547.36,
     "cost_usd": 0.0040272,
     "input_tokens": 1349,
-    "output_tokens": 1449
+    "output_tokens": 1449,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-043",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-043",
     "tags": {
@@ -4141,15 +4399,18 @@
     "latency_ms": 12082.076,
     "cost_usd": 0.0168181,
     "input_tokens": 2377,
-    "output_tokens": 6442
+    "output_tokens": 6442,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-044",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -4182,15 +4443,18 @@
     "latency_ms": 20269.234,
     "cost_usd": 0.0229066,
     "input_tokens": 2897,
-    "output_tokens": 8815
+    "output_tokens": 8815,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-045",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -4223,15 +4487,18 @@
     "latency_ms": 16910.585,
     "cost_usd": 0.0231135,
     "input_tokens": 2945,
-    "output_tokens": 8892
+    "output_tokens": 8892,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-047",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -4264,15 +4531,18 @@
     "latency_ms": 9132.313,
     "cost_usd": 0.0111093,
     "input_tokens": 1881,
-    "output_tokens": 4218
+    "output_tokens": 4218,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-048",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -4305,15 +4575,18 @@
     "latency_ms": 3686.579,
     "cost_usd": 0.0034761,
     "input_tokens": 1337,
-    "output_tokens": 1230
+    "output_tokens": 1230,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-049",
    "model": "gemini-3.5-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-049",
     "tags": {
@@ -4346,15 +4619,18 @@
     "latency_ms": 10942.053,
     "cost_usd": 0.0147035,
     "input_tokens": 2945,
-    "output_tokens": 5528
+    "output_tokens": 5528,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-00",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -4387,15 +4663,18 @@
     "latency_ms": 13952.968,
     "cost_usd": 0.01133325,
     "input_tokens": 5921,
-    "output_tokens": 1838
+    "output_tokens": 1838,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 29821.096999999998
+   "parse_cpu_ms": 29821.096999999998,
+   "reused": false
   },
   {
    "doc_id": "large-01",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -4428,15 +4707,18 @@
     "latency_ms": 12681.378,
     "cost_usd": 0.011988,
     "input_tokens": 5694,
-    "output_tokens": 2058
+    "output_tokens": 2058,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6199.044
+   "parse_cpu_ms": 6199.044,
+   "reused": false
   },
   {
    "doc_id": "large-02",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -4471,15 +4753,18 @@
     "latency_ms": 14631.775,
     "cost_usd": 0.013266,
     "input_tokens": 6548,
-    "output_tokens": 2228
+    "output_tokens": 2228,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34609.739
+   "parse_cpu_ms": 34609.739,
+   "reused": false
   },
   {
    "doc_id": "large-03",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -4512,15 +4797,18 @@
     "latency_ms": 16946.841,
     "cost_usd": 0.01645275,
     "input_tokens": 7097,
-    "output_tokens": 2968
+    "output_tokens": 2968,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 48053.28
+   "parse_cpu_ms": 48053.28,
+   "reused": false
   },
   {
    "doc_id": "large-04",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -4553,15 +4841,18 @@
     "latency_ms": 9059.137,
     "cost_usd": 0.00951675,
     "input_tokens": 6019,
-    "output_tokens": 1334
+    "output_tokens": 1334,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 29029.452
+   "parse_cpu_ms": 29029.452,
+   "reused": false
   },
   {
    "doc_id": "large-05",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -4594,15 +4885,18 @@
     "latency_ms": 16915.83,
     "cost_usd": 0.01431825,
     "input_tokens": 6471,
-    "output_tokens": 2524
+    "output_tokens": 2524,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 41659.61
+   "parse_cpu_ms": 41659.61,
+   "reused": false
   },
   {
    "doc_id": "large-06",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -4635,15 +4929,18 @@
     "latency_ms": 8958.073,
     "cost_usd": 0.00844725,
     "input_tokens": 6043,
-    "output_tokens": 1044
+    "output_tokens": 1044,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 51954.126
+   "parse_cpu_ms": 51954.126,
+   "reused": false
   },
   {
    "doc_id": "large-07",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -4676,15 +4973,18 @@
     "latency_ms": 29238.762,
     "cost_usd": 0.014904,
     "input_tokens": 6267,
-    "output_tokens": 2721
+    "output_tokens": 2721,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 25063.245
+   "parse_cpu_ms": 25063.245,
+   "reused": false
   },
   {
    "doc_id": "large-08",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -4717,15 +5017,18 @@
     "latency_ms": 17133.522,
     "cost_usd": 0.014568,
     "input_tokens": 6574,
-    "output_tokens": 2570
+    "output_tokens": 2570,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 35431.313
+   "parse_cpu_ms": 35431.313,
+   "reused": false
   },
   {
    "doc_id": "large-09",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -4758,15 +5061,18 @@
     "latency_ms": 8453.964,
     "cost_usd": 0.00869625,
     "input_tokens": 5465,
-    "output_tokens": 1226
+    "output_tokens": 1226,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 27301.951
+   "parse_cpu_ms": 27301.951,
+   "reused": false
   },
   {
    "doc_id": "pdf-001",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -4799,15 +5105,18 @@
     "latency_ms": 29949.964,
     "cost_usd": 0.02287875,
     "input_tokens": 4680,
-    "output_tokens": 5165
+    "output_tokens": 5165,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 18592.329
+   "parse_cpu_ms": 18592.329,
+   "reused": false
   },
   {
    "doc_id": "pdf-004",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-004",
     "tags": {
@@ -4840,15 +5149,18 @@
     "latency_ms": 19730.702,
     "cost_usd": 0.01556475,
     "input_tokens": 3363,
-    "output_tokens": 3478
+    "output_tokens": 3478,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 7775.362
+   "parse_cpu_ms": 7775.362,
+   "reused": false
   },
   {
    "doc_id": "pdf-005",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -4881,15 +5193,18 @@
     "latency_ms": 12211.903,
     "cost_usd": 0.0084105,
     "input_tokens": 2234,
-    "output_tokens": 1796
+    "output_tokens": 1796,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 16066.413
+   "parse_cpu_ms": 16066.413,
+   "reused": false
   },
   {
    "doc_id": "pdf-006",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -4922,15 +5237,18 @@
     "latency_ms": 32111.197,
     "cost_usd": 0.0240705,
     "input_tokens": 5064,
-    "output_tokens": 5406
+    "output_tokens": 5406,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 62554.434
+   "parse_cpu_ms": 62554.434,
+   "reused": false
   },
   {
    "doc_id": "pdf-007",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -4963,15 +5281,18 @@
     "latency_ms": 31867.644,
     "cost_usd": 0.02341425,
     "input_tokens": 4924,
-    "output_tokens": 5259
+    "output_tokens": 5259,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6480.724
+   "parse_cpu_ms": 6480.724,
+   "reused": false
   },
   {
    "doc_id": "pdf-008",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -5004,15 +5325,18 @@
     "latency_ms": 14256.101,
     "cost_usd": 0.0094755,
     "input_tokens": 2344,
-    "output_tokens": 2058
+    "output_tokens": 2058,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 9302.268
+   "parse_cpu_ms": 9302.268,
+   "reused": false
   },
   {
    "doc_id": "pdf-010",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -5045,15 +5369,18 @@
     "latency_ms": 15563.441,
     "cost_usd": 0.01032225,
     "input_tokens": 2608,
-    "output_tokens": 2231
+    "output_tokens": 2231,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12069.167
+   "parse_cpu_ms": 12069.167,
+   "reused": false
   },
   {
    "doc_id": "pdf-011",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -5086,15 +5413,18 @@
     "latency_ms": 18927.473,
     "cost_usd": 0.014718,
     "input_tokens": 3334,
-    "output_tokens": 3258
+    "output_tokens": 3258,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34781.907
+   "parse_cpu_ms": 34781.907,
+   "reused": false
   },
   {
    "doc_id": "pdf-016",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-016",
     "tags": {
@@ -5127,15 +5457,18 @@
     "latency_ms": 22700.984,
     "cost_usd": 0.02256825,
     "input_tokens": 4516,
-    "output_tokens": 5115
+    "output_tokens": 5115,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 13.853
+   "parse_cpu_ms": 13.853,
+   "reused": false
   },
   {
    "doc_id": "pdf-018",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -5170,15 +5503,18 @@
     "latency_ms": 36913.115,
     "cost_usd": 0.0274815,
     "input_tokens": 5417,
-    "output_tokens": 6245
+    "output_tokens": 6245,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 50559.924
+   "parse_cpu_ms": 50559.924,
+   "reused": false
   },
   {
    "doc_id": "pdf-019",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -5211,15 +5547,18 @@
     "latency_ms": 17173.495,
     "cost_usd": 0.0133965,
     "input_tokens": 3022,
-    "output_tokens": 2968
+    "output_tokens": 2968,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 30642.143
+   "parse_cpu_ms": 30642.143,
+   "reused": false
   },
   {
    "doc_id": "pdf-020",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-020",
     "tags": {
@@ -5252,15 +5591,18 @@
     "latency_ms": 36318.028,
     "cost_usd": 0.0279255,
     "input_tokens": 5609,
-    "output_tokens": 6325
+    "output_tokens": 6325,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 25.088
+   "parse_cpu_ms": 25.088,
+   "reused": false
   },
   {
    "doc_id": "pdf-021",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-021",
     "tags": {
@@ -5293,15 +5635,18 @@
     "latency_ms": 8590.729,
     "cost_usd": 0.00638175,
     "input_tokens": 1839,
-    "output_tokens": 1334
+    "output_tokens": 1334,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 3.066
+   "parse_cpu_ms": 3.066,
+   "reused": false
   },
   {
    "doc_id": "pdf-023",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -5334,15 +5679,18 @@
     "latency_ms": 27339.524,
     "cost_usd": 0.02069475,
     "input_tokens": 4273,
-    "output_tokens": 4664
+    "output_tokens": 4664,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 4769.249
+   "parse_cpu_ms": 4769.249,
+   "reused": false
   },
   {
    "doc_id": "pdf-027",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -5375,15 +5723,18 @@
     "latency_ms": 27493.801,
     "cost_usd": 0.01452975,
     "input_tokens": 3318,
-    "output_tokens": 3211
+    "output_tokens": 3211,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34902.629
+   "parse_cpu_ms": 34902.629,
+   "reused": false
   },
   {
    "doc_id": "pdf-028",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -5416,15 +5767,18 @@
     "latency_ms": 17007.823,
     "cost_usd": 0.01153575,
     "input_tokens": 2761,
-    "output_tokens": 2524
+    "output_tokens": 2524,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 28467.420000000002
+   "parse_cpu_ms": 28467.420000000002,
+   "reused": false
   },
   {
    "doc_id": "pdf-029",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -5457,15 +5811,18 @@
     "latency_ms": 7794.067,
     "cost_usd": 0.00508875,
     "input_tokens": 1590,
-    "output_tokens": 1039
+    "output_tokens": 1039,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 10098.024
+   "parse_cpu_ms": 10098.024,
+   "reused": false
   },
   {
    "doc_id": "pdf-030",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -5498,15 +5855,18 @@
     "latency_ms": 17845.012,
     "cost_usd": 0.01237275,
     "input_tokens": 2957,
-    "output_tokens": 2708
+    "output_tokens": 2708,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12779.554
+   "parse_cpu_ms": 12779.554,
+   "reused": false
   },
   {
    "doc_id": "pdf-034",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -5539,15 +5899,18 @@
     "latency_ms": 12493.317,
     "cost_usd": 0.0117285,
     "input_tokens": 2833,
-    "output_tokens": 2561
+    "output_tokens": 2561,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12069.262999999999
+   "parse_cpu_ms": 12069.262999999999,
+   "reused": false
   },
   {
    "doc_id": "pdf-037",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-037",
     "tags": {
@@ -5580,15 +5943,18 @@
     "latency_ms": 37443.093,
     "cost_usd": 0.026643,
     "input_tokens": 5229,
-    "output_tokens": 6059
+    "output_tokens": 6059,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12.933
+   "parse_cpu_ms": 12.933,
+   "reused": false
   },
   {
    "doc_id": "pdf-039",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-039",
     "tags": {
@@ -5621,15 +5987,18 @@
     "latency_ms": 14616.959,
     "cost_usd": 0.00588675,
     "input_tokens": 1724,
-    "output_tokens": 1225
+    "output_tokens": 1225,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 8.165
+   "parse_cpu_ms": 8.165,
+   "reused": false
   },
   {
    "doc_id": "pdf-040",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-040",
     "tags": {
@@ -5662,15 +6031,18 @@
     "latency_ms": 24991.286,
     "cost_usd": 0.0181365,
     "input_tokens": 3792,
-    "output_tokens": 4078
+    "output_tokens": 4078,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 10.544
+   "parse_cpu_ms": 10.544,
+   "reused": false
   },
   {
    "doc_id": "pdf-042",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-042",
     "tags": {
@@ -5703,15 +6075,18 @@
     "latency_ms": 7460.447,
     "cost_usd": 0.0046515,
     "input_tokens": 1612,
-    "output_tokens": 918
+    "output_tokens": 918,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6.481
+   "parse_cpu_ms": 6.481,
+   "reused": false
   },
   {
    "doc_id": "pdf-043",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-043",
     "tags": {
@@ -5744,15 +6119,18 @@
     "latency_ms": 20160.71,
     "cost_usd": 0.01805775,
     "input_tokens": 3767,
-    "output_tokens": 4062
+    "output_tokens": 4062,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 9.927
+   "parse_cpu_ms": 9.927,
+   "reused": false
   },
   {
    "doc_id": "pdf-044",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -5785,15 +6163,18 @@
     "latency_ms": 30034.833,
     "cost_usd": 0.025485,
     "input_tokens": 5065,
-    "output_tokens": 5783
+    "output_tokens": 5783,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 50801.063
+   "parse_cpu_ms": 50801.063,
+   "reused": false
   },
   {
    "doc_id": "pdf-045",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -5826,15 +6207,18 @@
     "latency_ms": 33889.14,
     "cost_usd": 0.026079,
     "input_tokens": 5297,
-    "output_tokens": 5895
+    "output_tokens": 5895,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 14838.865
+   "parse_cpu_ms": 14838.865,
+   "reused": false
   },
   {
    "doc_id": "pdf-047",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -5867,15 +6251,18 @@
     "latency_ms": 15181.373,
     "cost_usd": 0.01178175,
     "input_tokens": 2789,
-    "output_tokens": 2584
+    "output_tokens": 2584,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12343.907000000001
+   "parse_cpu_ms": 12343.907000000001,
+   "reused": false
   },
   {
    "doc_id": "pdf-048",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -5908,15 +6295,18 @@
     "latency_ms": 13805.833,
     "cost_usd": 0.004116,
     "input_tokens": 1438,
-    "output_tokens": 810
+    "output_tokens": 810,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 8512.513
+   "parse_cpu_ms": 8512.513,
+   "reused": false
   },
   {
    "doc_id": "pdf-049",
    "model": "gemini-3.8-flash",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-049",
     "tags": {
@@ -5949,15 +6339,18 @@
     "latency_ms": 29094.131,
     "cost_usd": 0.0258375,
     "input_tokens": 5190,
-    "output_tokens": 5852
+    "output_tokens": 5852,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 22.836
+   "parse_cpu_ms": 22.836,
+   "reused": false
   },
   {
    "doc_id": "large-00",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -5990,15 +6383,18 @@
     "latency_ms": 15620.214,
     "cost_usd": 0.01151325,
     "input_tokens": 6101,
-    "output_tokens": 1850
+    "output_tokens": 1850,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-01",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -6031,15 +6427,18 @@
     "latency_ms": 19010.788,
     "cost_usd": 0.01192125,
     "input_tokens": 5605,
-    "output_tokens": 2058
+    "output_tokens": 2058,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-02",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -6072,15 +6471,18 @@
     "latency_ms": 17839.607,
     "cost_usd": 0.01301775,
     "input_tokens": 6137,
-    "output_tokens": 2244
+    "output_tokens": 2244,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-03",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -6113,15 +6515,18 @@
     "latency_ms": 19758.924,
     "cost_usd": 0.01573275,
     "input_tokens": 6137,
-    "output_tokens": 2968
+    "output_tokens": 2968,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-04",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -6154,15 +6559,18 @@
     "latency_ms": 20182.777,
     "cost_usd": 0.00918825,
     "input_tokens": 5581,
-    "output_tokens": 1334
+    "output_tokens": 1334,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-05",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -6195,15 +6603,18 @@
     "latency_ms": 18222.417,
     "cost_usd": 0.0140445,
     "input_tokens": 6101,
-    "output_tokens": 2525
+    "output_tokens": 2525,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-06",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -6236,15 +6647,18 @@
     "latency_ms": 9221.461,
     "cost_usd": 0.008508,
     "input_tokens": 6089,
-    "output_tokens": 1051
+    "output_tokens": 1051,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-07",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -6277,15 +6691,18 @@
     "latency_ms": 26903.884,
     "cost_usd": 0.014352,
     "input_tokens": 5581,
-    "output_tokens": 2711
+    "output_tokens": 2711,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-08",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -6318,15 +6735,18 @@
     "latency_ms": 18833.587,
     "cost_usd": 0.01425225,
     "input_tokens": 6113,
-    "output_tokens": 2578
+    "output_tokens": 2578,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-09",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -6359,15 +6779,18 @@
     "latency_ms": 9398.652,
     "cost_usd": 0.0083895,
     "input_tokens": 5061,
-    "output_tokens": 1225
+    "output_tokens": 1225,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-001",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -6400,15 +6823,18 @@
     "latency_ms": 29820.939,
     "cost_usd": 0.02124225,
     "input_tokens": 2413,
-    "output_tokens": 5182
+    "output_tokens": 5182,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-004",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-004",
     "tags": {
@@ -6441,15 +6867,18 @@
     "latency_ms": 19324.231,
     "cost_usd": 0.01485225,
     "input_tokens": 2413,
-    "output_tokens": 3478
+    "output_tokens": 3478,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-005",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -6482,15 +6911,18 @@
     "latency_ms": 20308.404,
     "cost_usd": 0.00834825,
     "input_tokens": 1881,
-    "output_tokens": 1850
+    "output_tokens": 1850,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-006",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -6523,15 +6955,18 @@
     "latency_ms": 31934.358,
     "cost_usd": 0.02248125,
     "input_tokens": 2945,
-    "output_tokens": 5406
+    "output_tokens": 5406,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-007",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -6564,15 +6999,18 @@
     "latency_ms": 30657.319,
     "cost_usd": 0.02193,
     "input_tokens": 2945,
-    "output_tokens": 5259
+    "output_tokens": 5259,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-008",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -6605,15 +7043,18 @@
     "latency_ms": 13931.405,
     "cost_usd": 0.00912825,
     "input_tokens": 1881,
-    "output_tokens": 2058
+    "output_tokens": 2058,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-010",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -6646,15 +7087,18 @@
     "latency_ms": 11362.399,
     "cost_usd": 0.00978825,
     "input_tokens": 1881,
-    "output_tokens": 2234
+    "output_tokens": 2234,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-011",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -6687,15 +7131,18 @@
     "latency_ms": 23969.932,
     "cost_usd": 0.0139785,
     "input_tokens": 2413,
-    "output_tokens": 3245
+    "output_tokens": 3245,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-016",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-016",
     "tags": {
@@ -6730,15 +7177,18 @@
     "latency_ms": 29794.216,
     "cost_usd": 0.02135775,
     "input_tokens": 2897,
-    "output_tokens": 5116
+    "output_tokens": 5116,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-018",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -6771,15 +7221,18 @@
     "latency_ms": 40752.812,
     "cost_usd": 0.0255915,
     "input_tokens": 2897,
-    "output_tokens": 6245
+    "output_tokens": 6245,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-019",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -6812,15 +7265,18 @@
     "latency_ms": 18468.35,
     "cost_usd": 0.01254075,
     "input_tokens": 1881,
-    "output_tokens": 2968
+    "output_tokens": 2968,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-020",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-020",
     "tags": {
@@ -6853,15 +7309,18 @@
     "latency_ms": 36256.733,
     "cost_usd": 0.0259275,
     "input_tokens": 2945,
-    "output_tokens": 6325
+    "output_tokens": 6325,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-021",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-021",
     "tags": {
@@ -6894,15 +7353,18 @@
     "latency_ms": 9025.991,
     "cost_usd": 0.00601425,
     "input_tokens": 1349,
-    "output_tokens": 1334
+    "output_tokens": 1334,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-023",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -6935,15 +7397,18 @@
     "latency_ms": 28891.1,
     "cost_usd": 0.01966275,
     "input_tokens": 2897,
-    "output_tokens": 4664
+    "output_tokens": 4664,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-027",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -6976,15 +7441,18 @@
     "latency_ms": 19718.125,
     "cost_usd": 0.013824,
     "input_tokens": 2377,
-    "output_tokens": 3211
+    "output_tokens": 3211,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-028",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -7017,15 +7485,18 @@
     "latency_ms": 17950.885,
     "cost_usd": 0.01087575,
     "input_tokens": 1881,
-    "output_tokens": 2524
+    "output_tokens": 2524,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-029",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -7058,15 +7529,18 @@
     "latency_ms": 12200.724,
     "cost_usd": 0.004944,
     "input_tokens": 1337,
-    "output_tokens": 1051
+    "output_tokens": 1051,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-030",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -7099,15 +7573,18 @@
     "latency_ms": 21094.165,
     "cost_usd": 0.011559,
     "input_tokens": 1857,
-    "output_tokens": 2711
+    "output_tokens": 2711,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-034",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -7140,15 +7617,18 @@
     "latency_ms": 20009.906,
     "cost_usd": 0.01102275,
     "input_tokens": 1857,
-    "output_tokens": 2568
+    "output_tokens": 2568,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-037",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-037",
     "tags": {
@@ -7181,15 +7661,18 @@
     "latency_ms": 28201.563,
     "cost_usd": 0.02493,
     "input_tokens": 2945,
-    "output_tokens": 6059
+    "output_tokens": 6059,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-039",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-039",
     "tags": {
@@ -7222,15 +7705,18 @@
     "latency_ms": 8341.908,
     "cost_usd": 0.0055965,
     "input_tokens": 1337,
-    "output_tokens": 1225
+    "output_tokens": 1225,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-040",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-040",
     "tags": {
@@ -7263,15 +7749,18 @@
     "latency_ms": 24194.286,
     "cost_usd": 0.01710225,
     "input_tokens": 2413,
-    "output_tokens": 4078
+    "output_tokens": 4078,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-042",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-042",
     "tags": {
@@ -7304,15 +7793,18 @@
     "latency_ms": 7339.118,
     "cost_usd": 0.00445425,
     "input_tokens": 1349,
-    "output_tokens": 918
+    "output_tokens": 918,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-043",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-043",
     "tags": {
@@ -7345,15 +7837,18 @@
     "latency_ms": 24068.521,
     "cost_usd": 0.01701525,
     "input_tokens": 2377,
-    "output_tokens": 4062
+    "output_tokens": 4062,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-044",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -7386,15 +7881,18 @@
     "latency_ms": 33082.573,
     "cost_usd": 0.02384775,
     "input_tokens": 2897,
-    "output_tokens": 5780
+    "output_tokens": 5780,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-045",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -7427,15 +7925,18 @@
     "latency_ms": 35937.827,
     "cost_usd": 0.024315,
     "input_tokens": 2945,
-    "output_tokens": 5895
+    "output_tokens": 5895,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-047",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -7468,15 +7969,18 @@
     "latency_ms": 16313.898,
     "cost_usd": 0.010047,
     "input_tokens": 1881,
-    "output_tokens": 2303
+    "output_tokens": 2303,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-048",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -7509,15 +8013,18 @@
     "latency_ms": 7539.174,
     "cost_usd": 0.00402525,
     "input_tokens": 1337,
-    "output_tokens": 806
+    "output_tokens": 806,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-049",
    "model": "gemini-3.8-flash",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-049",
     "tags": {
@@ -7550,15 +8057,18 @@
     "latency_ms": 34004.769,
     "cost_usd": 0.02415375,
     "input_tokens": 2945,
-    "output_tokens": 5852
+    "output_tokens": 5852,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-00",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -7596,15 +8106,18 @@
     "latency_ms": 7990.368,
     "cost_usd": 0.001925,
     "input_tokens": 9945,
-    "output_tokens": 1861
+    "output_tokens": 1861,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 29821.096999999998
+   "parse_cpu_ms": 29821.096999999998,
+   "reused": false
   },
   {
    "doc_id": "large-01",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -7637,15 +8150,18 @@
     "latency_ms": 12976.557,
     "cost_usd": 0.0030488,
     "input_tokens": 9603,
-    "output_tokens": 4177
+    "output_tokens": 4177,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6199.044
+   "parse_cpu_ms": 6199.044,
+   "reused": false
   },
   {
    "doc_id": "large-02",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -7682,15 +8198,18 @@
     "latency_ms": 5466.335,
     "cost_usd": 0.0015908,
     "input_tokens": 10603,
-    "output_tokens": 1061
+    "output_tokens": 1061,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34609.739
+   "parse_cpu_ms": 34609.739,
+   "reused": false
   },
   {
    "doc_id": "large-03",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -7723,15 +8242,18 @@
     "latency_ms": 18187.707,
     "cost_usd": 0.0041198,
     "input_tokens": 11178,
-    "output_tokens": 6004
+    "output_tokens": 6004,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 48053.28
+   "parse_cpu_ms": 48053.28,
+   "reused": false
   },
   {
    "doc_id": "large-04",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -7764,15 +8286,18 @@
     "latency_ms": 9809.065,
     "cost_usd": 0.002394,
     "input_tokens": 10350,
-    "output_tokens": 2718
+    "output_tokens": 2718,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 29029.452
+   "parse_cpu_ms": 29029.452,
+   "reused": false
   },
   {
    "doc_id": "large-05",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -7805,15 +8330,18 @@
     "latency_ms": 14650.624,
     "cost_usd": 0.0034117,
     "input_tokens": 10547,
-    "output_tokens": 4714
+    "output_tokens": 4714,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 41659.61
+   "parse_cpu_ms": 41659.61,
+   "reused": false
   },
   {
    "doc_id": "large-06",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -7848,15 +8376,18 @@
     "latency_ms": 9937.503,
     "cost_usd": 0.0023757,
     "input_tokens": 10427,
-    "output_tokens": 2666
+    "output_tokens": 2666,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 51954.126
+   "parse_cpu_ms": 51954.126,
+   "reused": false
   },
   {
    "doc_id": "large-07",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -7893,15 +8424,18 @@
     "latency_ms": 12139.684,
     "cost_usd": 0.0026737,
     "input_tokens": 10127,
-    "output_tokens": 3322
+    "output_tokens": 3322,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 25063.245
+   "parse_cpu_ms": 25063.245,
+   "reused": false
   },
   {
    "doc_id": "large-08",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -7936,15 +8470,18 @@
     "latency_ms": 17803.619,
     "cost_usd": 0.0038297,
     "input_tokens": 10602,
-    "output_tokens": 5539
+    "output_tokens": 5539,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 35431.313
+   "parse_cpu_ms": 35431.313,
+   "reused": false
   },
   {
    "doc_id": "large-09",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -7977,15 +8514,18 @@
     "latency_ms": 9177.708,
     "cost_usd": 0.0022632,
     "input_tokens": 9462,
-    "output_tokens": 2634
+    "output_tokens": 2634,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 27301.951
+   "parse_cpu_ms": 27301.951,
+   "reused": false
   },
   {
    "doc_id": "pdf-001",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -8018,15 +8558,18 @@
     "latency_ms": 4892.856,
     "cost_usd": 0.0010386,
     "input_tokens": 6296,
-    "output_tokens": 818
+    "output_tokens": 818,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 18592.329
+   "parse_cpu_ms": 18592.329,
+   "reused": false
   },
   {
    "doc_id": "pdf-004",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-004",
     "tags": {
@@ -8059,15 +8602,18 @@
     "latency_ms": 20064.019,
     "cost_usd": 0.0038532,
     "input_tokens": 5137,
-    "output_tokens": 6679
+    "output_tokens": 6679,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 7775.362
+   "parse_cpu_ms": 7775.362,
+   "reused": false
   },
   {
    "doc_id": "pdf-005",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -8103,15 +8649,18 @@
     "latency_ms": 6437.23,
     "cost_usd": 0.001325,
     "input_tokens": 4035,
-    "output_tokens": 1843
+    "output_tokens": 1843,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 16066.413
+   "parse_cpu_ms": 16066.413,
+   "reused": false
   },
   {
    "doc_id": "pdf-006",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -8146,15 +8695,18 @@
     "latency_ms": 28097.101,
     "cost_usd": 0.0054485,
     "input_tokens": 6515,
-    "output_tokens": 9594
+    "output_tokens": 9594,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 62554.434
+   "parse_cpu_ms": 62554.434,
+   "reused": false
   },
   {
    "doc_id": "pdf-007",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -8189,15 +8741,18 @@
     "latency_ms": 25812.099,
     "cost_usd": 0.005083,
     "input_tokens": 6390,
-    "output_tokens": 8888
+    "output_tokens": 8888,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6480.724
+   "parse_cpu_ms": 6480.724,
+   "reused": false
   },
   {
    "doc_id": "pdf-008",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -8230,15 +8785,18 @@
     "latency_ms": 7559.467,
     "cost_usd": 0.0016044,
     "input_tokens": 4189,
-    "output_tokens": 2371
+    "output_tokens": 2371,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 9302.268
+   "parse_cpu_ms": 9302.268,
+   "reused": false
   },
   {
    "doc_id": "pdf-010",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -8277,15 +8835,18 @@
     "latency_ms": 15730.835,
     "cost_usd": 0.0028123,
     "input_tokens": 4488,
-    "output_tokens": 4727
+    "output_tokens": 4727,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12069.167
+   "parse_cpu_ms": 12069.167,
+   "reused": false
   },
   {
    "doc_id": "pdf-011",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -8320,15 +8881,18 @@
     "latency_ms": 21414.16,
     "cost_usd": 0.0039316,
     "input_tokens": 5091,
-    "output_tokens": 6845
+    "output_tokens": 6845,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34781.907
+   "parse_cpu_ms": 34781.907,
+   "reused": false
   },
   {
    "doc_id": "pdf-016",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-016",
     "tags": {
@@ -8361,15 +8925,18 @@
     "latency_ms": 16657.515,
     "cost_usd": 0.0035006,
     "input_tokens": 6151,
-    "output_tokens": 5771
+    "output_tokens": 5771,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 13.853
+   "parse_cpu_ms": 13.853,
+   "reused": false
   },
   {
    "doc_id": "pdf-018",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -8404,15 +8971,18 @@
     "latency_ms": 20182.135,
     "cost_usd": 0.0042216,
     "input_tokens": 7001,
-    "output_tokens": 7043
+    "output_tokens": 7043,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 50559.924
+   "parse_cpu_ms": 50559.924,
+   "reused": false
   },
   {
    "doc_id": "pdf-019",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -8445,15 +9015,18 @@
     "latency_ms": 16020.57,
     "cost_usd": 0.0031214,
     "input_tokens": 4744,
-    "output_tokens": 5294
+    "output_tokens": 5294,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 30642.143
+   "parse_cpu_ms": 30642.143,
+   "reused": false
   },
   {
    "doc_id": "pdf-020",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-020",
     "tags": {
@@ -8486,15 +9059,18 @@
     "latency_ms": 28092.027,
     "cost_usd": 0.0054482,
     "input_tokens": 6967,
-    "output_tokens": 9503
+    "output_tokens": 9503,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 25.088
+   "parse_cpu_ms": 25.088,
+   "reused": false
   },
   {
    "doc_id": "pdf-021",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-021",
     "tags": {
@@ -8527,15 +9103,18 @@
     "latency_ms": 7656.668,
     "cost_usd": 0.0014649,
     "input_tokens": 3679,
-    "output_tokens": 2194
+    "output_tokens": 2194,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 3.066
+   "parse_cpu_ms": 3.066,
+   "reused": false
   },
   {
    "doc_id": "pdf-023",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -8568,15 +9147,18 @@
     "latency_ms": 25055.319,
     "cost_usd": 0.0048858,
     "input_tokens": 5983,
-    "output_tokens": 8575
+    "output_tokens": 8575,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 4769.249
+   "parse_cpu_ms": 4769.249,
+   "reused": false
   },
   {
    "doc_id": "pdf-027",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -8609,15 +9191,18 @@
     "latency_ms": 17630.058,
     "cost_usd": 0.0034346,
     "input_tokens": 5166,
-    "output_tokens": 5836
+    "output_tokens": 5836,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34902.629
+   "parse_cpu_ms": 34902.629,
+   "reused": false
   },
   {
    "doc_id": "pdf-028",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -8650,15 +9235,18 @@
     "latency_ms": 14531.11,
     "cost_usd": 0.0028543,
     "input_tokens": 4603,
-    "output_tokens": 4788
+    "output_tokens": 4788,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 28467.420000000002
+   "parse_cpu_ms": 28467.420000000002,
+   "reused": false
   },
   {
    "doc_id": "pdf-029",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -8693,15 +9281,18 @@
     "latency_ms": 9556.646,
     "cost_usd": 0.0016234,
     "input_tokens": 3469,
-    "output_tokens": 2553
+    "output_tokens": 2553,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 10098.024
+   "parse_cpu_ms": 10098.024,
+   "reused": false
   },
   {
    "doc_id": "pdf-030",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -8737,15 +9328,18 @@
     "latency_ms": 18019.778,
     "cost_usd": 0.0032381,
     "input_tokens": 4776,
-    "output_tokens": 5521
+    "output_tokens": 5521,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12779.554
+   "parse_cpu_ms": 12779.554,
+   "reused": false
   },
   {
    "doc_id": "pdf-034",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -8780,15 +9374,18 @@
     "latency_ms": 17919.19,
     "cost_usd": 0.0032786,
     "input_tokens": 4711,
-    "output_tokens": 5615
+    "output_tokens": 5615,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12069.262999999999
+   "parse_cpu_ms": 12069.262999999999,
+   "reused": false
   },
   {
    "doc_id": "pdf-037",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-037",
     "tags": {
@@ -8821,15 +9418,18 @@
     "latency_ms": 31344.099,
     "cost_usd": 0.0061049,
     "input_tokens": 6779,
-    "output_tokens": 10854
+    "output_tokens": 10854,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12.933
+   "parse_cpu_ms": 12.933,
+   "reused": false
   },
   {
    "doc_id": "pdf-039",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-039",
     "tags": {
@@ -8862,15 +9462,18 @@
     "latency_ms": 5019.936,
     "cost_usd": 0.0010567,
     "input_tokens": 3602,
-    "output_tokens": 1393
+    "output_tokens": 1393,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 8.165
+   "parse_cpu_ms": 8.165,
+   "reused": false
   },
   {
    "doc_id": "pdf-040",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-040",
     "tags": {
@@ -8903,15 +9506,18 @@
     "latency_ms": 13654.161,
     "cost_usd": 0.0028813,
     "input_tokens": 5518,
-    "output_tokens": 4659
+    "output_tokens": 4659,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 10.544
+   "parse_cpu_ms": 10.544,
+   "reused": false
   },
   {
    "doc_id": "pdf-042",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-042",
     "tags": {
@@ -8944,15 +9550,18 @@
     "latency_ms": 5974.165,
     "cost_usd": 0.0011608,
     "input_tokens": 3573,
-    "output_tokens": 1607
+    "output_tokens": 1607,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6.481
+   "parse_cpu_ms": 6.481,
+   "reused": false
   },
   {
    "doc_id": "pdf-043",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-043",
     "tags": {
@@ -8985,15 +9594,18 @@
     "latency_ms": 21829.825,
     "cost_usd": 0.0043003,
     "input_tokens": 5498,
-    "output_tokens": 7501
+    "output_tokens": 7501,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 9.927
+   "parse_cpu_ms": 9.927,
+   "reused": false
   },
   {
    "doc_id": "pdf-044",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -9026,15 +9638,18 @@
     "latency_ms": 18557.263,
     "cost_usd": 0.0039165,
     "input_tokens": 6660,
-    "output_tokens": 6501
+    "output_tokens": 6501,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 50801.063
+   "parse_cpu_ms": 50801.063,
+   "reused": false
   },
   {
    "doc_id": "pdf-045",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -9067,15 +9682,18 @@
     "latency_ms": 28912.2,
     "cost_usd": 0.0056259,
     "input_tokens": 6579,
-    "output_tokens": 9936
+    "output_tokens": 9936,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 14838.865
+   "parse_cpu_ms": 14838.865,
+   "reused": false
   },
   {
    "doc_id": "pdf-047",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -9110,15 +9728,18 @@
     "latency_ms": 16285.01,
     "cost_usd": 0.0031134,
     "input_tokens": 4644,
-    "output_tokens": 5298
+    "output_tokens": 5298,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12343.907000000001
+   "parse_cpu_ms": 12343.907000000001,
+   "reused": false
   },
   {
    "doc_id": "pdf-048",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -9153,15 +9774,18 @@
     "latency_ms": 7179.398,
     "cost_usd": 0.0012581,
     "input_tokens": 3351,
-    "output_tokens": 1846
+    "output_tokens": 1846,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 8512.513
+   "parse_cpu_ms": 8512.513,
+   "reused": false
   },
   {
    "doc_id": "pdf-049",
    "model": "claude-haiku-5-5",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-049",
     "tags": {
@@ -9194,15 +9818,18 @@
     "latency_ms": 31898.571,
     "cost_usd": 0.0061423,
     "input_tokens": 6648,
-    "output_tokens": 10955
+    "output_tokens": 10955,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 22.836
+   "parse_cpu_ms": 22.836,
+   "reused": false
   },
   {
    "doc_id": "large-00",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -9237,15 +9864,18 @@
     "latency_ms": 16166.258,
     "cost_usd": 0.0044784,
     "input_tokens": 23109,
-    "output_tokens": 4335
+    "output_tokens": 4335,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-01",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -9280,15 +9910,18 @@
     "latency_ms": 16764.297,
     "cost_usd": 0.0047034,
     "input_tokens": 23424,
-    "output_tokens": 4722
+    "output_tokens": 4722,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-02",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -9321,15 +9954,18 @@
     "latency_ms": 16334.474,
     "cost_usd": 0.0047413,
     "input_tokens": 23998,
-    "output_tokens": 4683
+    "output_tokens": 4683,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-03",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -9362,15 +9998,18 @@
     "latency_ms": 21289.082,
     "cost_usd": 0.0056816,
     "input_tokens": 23471,
-    "output_tokens": 6669
+    "output_tokens": 6669,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-04",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -9403,15 +10042,18 @@
     "latency_ms": 10455.446,
     "cost_usd": 0.0035192,
     "input_tokens": 22232,
-    "output_tokens": 2592
+    "output_tokens": 2592,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-05",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -9444,15 +10086,18 @@
     "latency_ms": 16908.786,
     "cost_usd": 0.0048762,
     "input_tokens": 23267,
-    "output_tokens": 5099
+    "output_tokens": 5099,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-06",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -9485,15 +10130,18 @@
     "latency_ms": 9525.472,
     "cost_usd": 0.0034391,
     "input_tokens": 21896,
-    "output_tokens": 2499
+    "output_tokens": 2499,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-07",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -9528,15 +10176,18 @@
     "latency_ms": 25274.616,
     "cost_usd": 0.0058407,
     "input_tokens": 22367,
-    "output_tokens": 7208
+    "output_tokens": 7208,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-08",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -9569,15 +10220,18 @@
     "latency_ms": 14685.334,
     "cost_usd": 0.0044547,
     "input_tokens": 23032,
-    "output_tokens": 4303
+    "output_tokens": 4303,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-09",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -9610,15 +10264,18 @@
     "latency_ms": 9999.627,
     "cost_usd": 0.0033216,
     "input_tokens": 19761,
-    "output_tokens": 2691
+    "output_tokens": 2691,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-001",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -9651,15 +10308,18 @@
     "latency_ms": 30176.045,
     "cost_usd": 0.0060688,
     "input_tokens": 9828,
-    "output_tokens": 10172
+    "output_tokens": 10172,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-004",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-004",
     "tags": {
@@ -9694,15 +10354,18 @@
     "latency_ms": 26149.025,
     "cost_usd": 0.0052595,
     "input_tokens": 9800,
-    "output_tokens": 8559
+    "output_tokens": 8559,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-005",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -9735,15 +10398,18 @@
     "latency_ms": 11413.807,
     "cost_usd": 0.002385,
     "input_tokens": 6075,
-    "output_tokens": 3555
+    "output_tokens": 3555,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-006",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -9776,15 +10442,18 @@
     "latency_ms": 28780.262,
     "cost_usd": 0.0057795,
     "input_tokens": 9115,
-    "output_tokens": 9736
+    "output_tokens": 9736,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-007",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -9817,15 +10486,18 @@
     "latency_ms": 29934.76,
     "cost_usd": 0.0062985,
     "input_tokens": 12555,
-    "output_tokens": 10086
+    "output_tokens": 10086,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-008",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -9858,15 +10530,18 @@
     "latency_ms": 18125.559,
     "cost_usd": 0.0033991,
     "input_tokens": 7006,
-    "output_tokens": 5397
+    "output_tokens": 5397,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-010",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -9899,15 +10574,18 @@
     "latency_ms": 17643.416,
     "cost_usd": 0.0033608,
     "input_tokens": 7028,
-    "output_tokens": 5316
+    "output_tokens": 5316,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-011",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -9942,15 +10620,18 @@
     "latency_ms": 18443.461,
     "cost_usd": 0.0038755,
     "input_tokens": 7535,
-    "output_tokens": 6244
+    "output_tokens": 6244,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-016",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-016",
     "tags": {
@@ -9985,15 +10666,18 @@
     "latency_ms": 28882.381,
     "cost_usd": 0.0060359,
     "input_tokens": 12274,
-    "output_tokens": 9617
+    "output_tokens": 9617,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-018",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -10026,15 +10710,18 @@
     "latency_ms": 36034.428,
     "cost_usd": 0.0069623,
     "input_tokens": 9063,
-    "output_tokens": 12112
+    "output_tokens": 12112,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-019",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -10067,15 +10754,18 @@
     "latency_ms": 17571.786,
     "cost_usd": 0.003427,
     "input_tokens": 5955,
-    "output_tokens": 5663
+    "output_tokens": 5663,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-020",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-020",
     "tags": {
@@ -10110,15 +10800,18 @@
     "latency_ms": 34997.757,
     "cost_usd": 0.0071226,
     "input_tokens": 13196,
-    "output_tokens": 11606
+    "output_tokens": 11606,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-021",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-021",
     "tags": {
@@ -10151,15 +10844,18 @@
     "latency_ms": 8423.484,
     "cost_usd": 0.0017506,
     "input_tokens": 5271,
-    "output_tokens": 2447
+    "output_tokens": 2447,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-023",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -10194,15 +10890,18 @@
     "latency_ms": 27522.284,
     "cost_usd": 0.0057071,
     "input_tokens": 11916,
-    "output_tokens": 9031
+    "output_tokens": 9031,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-027",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -10235,15 +10934,18 @@
     "latency_ms": 18729.516,
     "cost_usd": 0.0037452,
     "input_tokens": 7472,
-    "output_tokens": 5996
+    "output_tokens": 5996,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-028",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -10276,15 +10978,18 @@
     "latency_ms": 15056.418,
     "cost_usd": 0.0029593,
     "input_tokens": 5923,
-    "output_tokens": 4734
+    "output_tokens": 4734,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-029",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -10317,15 +11022,18 @@
     "latency_ms": 9001.405,
     "cost_usd": 0.0016872,
     "input_tokens": 4322,
-    "output_tokens": 2510
+    "output_tokens": 2510,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-030",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -10358,15 +11066,18 @@
     "latency_ms": 20782.213,
     "cost_usd": 0.0036741,
     "input_tokens": 6796,
-    "output_tokens": 5989
+    "output_tokens": 5989,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-034",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -10399,15 +11110,18 @@
     "latency_ms": 13954.557,
     "cost_usd": 0.0028991,
     "input_tokens": 6841,
-    "output_tokens": 4430
+    "output_tokens": 4430,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-037",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-037",
     "tags": {
@@ -10442,15 +11156,18 @@
     "latency_ms": 35883.128,
     "cost_usd": 0.0072281,
     "input_tokens": 12966,
-    "output_tokens": 11863
+    "output_tokens": 11863,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-039",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-039",
     "tags": {
@@ -10483,15 +11200,18 @@
     "latency_ms": 8174.12,
     "cost_usd": 0.0017278,
     "input_tokens": 5173,
-    "output_tokens": 2421
+    "output_tokens": 2421,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-040",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-040",
     "tags": {
@@ -10526,15 +11246,18 @@
     "latency_ms": 24545.134,
     "cost_usd": 0.0050719,
     "input_tokens": 10194,
-    "output_tokens": 8105
+    "output_tokens": 8105,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-042",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-042",
     "tags": {
@@ -10567,15 +11290,18 @@
     "latency_ms": 7478.442,
     "cost_usd": 0.001583,
     "input_tokens": 5165,
-    "output_tokens": 2133
+    "output_tokens": 2133,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-043",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-043",
     "tags": {
@@ -10608,15 +11334,18 @@
     "latency_ms": 23902.702,
     "cost_usd": 0.0049995,
     "input_tokens": 10100,
-    "output_tokens": 7979
+    "output_tokens": 7979,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-044",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -10649,15 +11378,18 @@
     "latency_ms": 31697.484,
     "cost_usd": 0.0063699,
     "input_tokens": 9019,
-    "output_tokens": 10936
+    "output_tokens": 10936,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-045",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -10690,15 +11422,18 @@
     "latency_ms": 5589.407,
     "cost_usd": 0.0016618,
     "input_tokens": 11583,
-    "output_tokens": 1007
+    "output_tokens": 1007,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-047",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -10731,15 +11466,18 @@
     "latency_ms": 13656.95,
     "cost_usd": 0.0028846,
     "input_tokens": 6811,
-    "output_tokens": 4407
+    "output_tokens": 4407,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-048",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -10772,15 +11510,18 @@
     "latency_ms": 6855.538,
     "cost_usd": 0.0014003,
     "input_tokens": 4328,
-    "output_tokens": 1935
+    "output_tokens": 1935,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-049",
    "model": "claude-haiku-5-5",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-049",
     "tags": {
@@ -10813,15 +11554,18 @@
     "latency_ms": 33075.584,
     "cost_usd": 0.0069369,
     "input_tokens": 12839,
-    "output_tokens": 11306
+    "output_tokens": 11306,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-00",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -10854,15 +11598,18 @@
     "latency_ms": 5701.506,
     "cost_usd": 0.00519425,
     "input_tokens": 5921,
-    "output_tokens": 2476
+    "output_tokens": 2476,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 29821.096999999998
+   "parse_cpu_ms": 29821.096999999998,
+   "reused": false
   },
   {
    "doc_id": "large-01",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -10895,15 +11642,18 @@
     "latency_ms": 7042.853,
     "cost_usd": 0.0061845,
     "input_tokens": 5694,
-    "output_tokens": 3174
+    "output_tokens": 3174,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6199.044
+   "parse_cpu_ms": 6199.044,
+   "reused": false
   },
   {
    "doc_id": "large-02",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -10939,15 +11689,18 @@
     "latency_ms": 7598.89,
     "cost_usd": 0.006803,
     "input_tokens": 6548,
-    "output_tokens": 3444
+    "output_tokens": 3444,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34609.739
+   "parse_cpu_ms": 34609.739,
+   "reused": false
   },
   {
    "doc_id": "large-03",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -10980,15 +11733,18 @@
     "latency_ms": 8047.228,
     "cost_usd": 0.00752075,
     "input_tokens": 7097,
-    "output_tokens": 3831
+    "output_tokens": 3831,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 48053.28
+   "parse_cpu_ms": 48053.28,
+   "reused": false
   },
   {
    "doc_id": "large-04",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -11021,15 +11777,18 @@
     "latency_ms": 5004.582,
     "cost_usd": 0.00461875,
     "input_tokens": 6019,
-    "output_tokens": 2076
+    "output_tokens": 2076,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 29029.452
+   "parse_cpu_ms": 29029.452,
+   "reused": false
   },
   {
    "doc_id": "large-05",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -11062,15 +11821,18 @@
     "latency_ms": 7729.784,
     "cost_usd": 0.00725025,
     "input_tokens": 6471,
-    "output_tokens": 3755
+    "output_tokens": 3755,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 41659.61
+   "parse_cpu_ms": 41659.61,
+   "reused": false
   },
   {
    "doc_id": "large-06",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -11103,15 +11865,18 @@
     "latency_ms": 4118.951,
     "cost_usd": 0.00390625,
     "input_tokens": 6043,
-    "output_tokens": 1597
+    "output_tokens": 1597,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 51954.126
+   "parse_cpu_ms": 51954.126,
+   "reused": false
   },
   {
    "doc_id": "large-07",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -11144,15 +11909,18 @@
     "latency_ms": 8208.752,
     "cost_usd": 0.00762075,
     "input_tokens": 6267,
-    "output_tokens": 4036
+    "output_tokens": 4036,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 25063.245
+   "parse_cpu_ms": 25063.245,
+   "reused": false
   },
   {
    "doc_id": "large-08",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -11185,15 +11953,18 @@
     "latency_ms": 8390.628,
     "cost_usd": 0.0075505,
     "input_tokens": 6574,
-    "output_tokens": 3938
+    "output_tokens": 3938,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 35431.313
+   "parse_cpu_ms": 35431.313,
+   "reused": false
   },
   {
    "doc_id": "large-09",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -11226,15 +11997,18 @@
     "latency_ms": 4837.379,
     "cost_usd": 0.00416525,
     "input_tokens": 5465,
-    "output_tokens": 1866
+    "output_tokens": 1866,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 27301.951
+   "parse_cpu_ms": 27301.951,
+   "reused": false
   },
   {
    "doc_id": "pdf-001",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -11267,15 +12041,18 @@
     "latency_ms": 9769.454,
     "cost_usd": 0.0081135,
     "input_tokens": 4680,
-    "output_tokens": 4629
+    "output_tokens": 4629,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 18592.329
+   "parse_cpu_ms": 18592.329,
+   "reused": false
   },
   {
    "doc_id": "pdf-004",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-004",
     "tags": {
@@ -11308,15 +12085,18 @@
     "latency_ms": 9107.915,
     "cost_usd": 0.00697875,
     "input_tokens": 3363,
-    "output_tokens": 4092
+    "output_tokens": 4092,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 7775.362
+   "parse_cpu_ms": 7775.362,
+   "reused": false
   },
   {
    "doc_id": "pdf-005",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -11349,15 +12129,18 @@
     "latency_ms": 6411.237,
     "cost_usd": 0.0043565,
     "input_tokens": 2234,
-    "output_tokens": 2532
+    "output_tokens": 2532,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 16066.413
+   "parse_cpu_ms": 16066.413,
+   "reused": false
   },
   {
    "doc_id": "pdf-006",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -11390,15 +12173,18 @@
     "latency_ms": 13199.115,
     "cost_usd": 0.010896,
     "input_tokens": 5064,
-    "output_tokens": 6420
+    "output_tokens": 6420,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 62554.434
+   "parse_cpu_ms": 62554.434,
+   "reused": false
   },
   {
    "doc_id": "pdf-007",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -11431,15 +12217,18 @@
     "latency_ms": 13512.652,
     "cost_usd": 0.0108985,
     "input_tokens": 4924,
-    "output_tokens": 6445
+    "output_tokens": 6445,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6480.724
+   "parse_cpu_ms": 6480.724,
+   "reused": false
   },
   {
    "doc_id": "pdf-008",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -11472,15 +12261,18 @@
     "latency_ms": 7269.255,
     "cost_usd": 0.0054745,
     "input_tokens": 2344,
-    "output_tokens": 3259
+    "output_tokens": 3259,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 9302.268
+   "parse_cpu_ms": 9302.268,
+   "reused": false
   },
   {
    "doc_id": "pdf-010",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -11513,15 +12305,18 @@
     "latency_ms": 5903.018,
     "cost_usd": 0.0045955,
     "input_tokens": 2608,
-    "output_tokens": 2629
+    "output_tokens": 2629,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12069.167
+   "parse_cpu_ms": 12069.167,
+   "reused": false
   },
   {
    "doc_id": "pdf-011",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -11554,15 +12349,18 @@
     "latency_ms": 8723.082,
     "cost_usd": 0.00685,
     "input_tokens": 3334,
-    "output_tokens": 4011
+    "output_tokens": 4011,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34781.907
+   "parse_cpu_ms": 34781.907,
+   "reused": false
   },
   {
    "doc_id": "pdf-016",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-016",
     "tags": {
@@ -11595,15 +12393,18 @@
     "latency_ms": 12653.973,
     "cost_usd": 0.0106045,
     "input_tokens": 4516,
-    "output_tokens": 6317
+    "output_tokens": 6317,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 13.853
+   "parse_cpu_ms": 13.853,
+   "reused": false
   },
   {
    "doc_id": "pdf-018",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -11636,15 +12437,18 @@
     "latency_ms": 17987.1,
     "cost_usd": 0.01528175,
     "input_tokens": 5417,
-    "output_tokens": 9285
+    "output_tokens": 9285,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 50559.924
+   "parse_cpu_ms": 50559.924,
+   "reused": false
   },
   {
    "doc_id": "pdf-019",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -11677,15 +12481,18 @@
     "latency_ms": 7144.454,
     "cost_usd": 0.0059845,
     "input_tokens": 3022,
-    "output_tokens": 3486
+    "output_tokens": 3486,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 30642.143
+   "parse_cpu_ms": 30642.143,
+   "reused": false
   },
   {
    "doc_id": "pdf-020",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-020",
     "tags": {
@@ -11718,15 +12525,18 @@
     "latency_ms": 14519.368,
     "cost_usd": 0.01304075,
     "input_tokens": 5609,
-    "output_tokens": 7759
+    "output_tokens": 7759,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 25.088
+   "parse_cpu_ms": 25.088,
+   "reused": false
   },
   {
    "doc_id": "pdf-021",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-021",
     "tags": {
@@ -11759,15 +12569,18 @@
     "latency_ms": 4939.073,
     "cost_usd": 0.00357225,
     "input_tokens": 1839,
-    "output_tokens": 2075
+    "output_tokens": 2075,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 3.066
+   "parse_cpu_ms": 3.066,
+   "reused": false
   },
   {
    "doc_id": "pdf-023",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -11800,15 +12613,18 @@
     "latency_ms": 11283.332,
     "cost_usd": 0.00942775,
     "input_tokens": 4273,
-    "output_tokens": 5573
+    "output_tokens": 5573,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 4769.249
+   "parse_cpu_ms": 4769.249,
+   "reused": false
   },
   {
    "doc_id": "pdf-027",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -11841,15 +12657,18 @@
     "latency_ms": 8116.123,
     "cost_usd": 0.006789,
     "input_tokens": 3318,
-    "output_tokens": 3973
+    "output_tokens": 3973,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 34902.629
+   "parse_cpu_ms": 34902.629,
+   "reused": false
   },
   {
    "doc_id": "pdf-028",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -11882,15 +12701,18 @@
     "latency_ms": 6985.324,
     "cost_usd": 0.00536275,
     "input_tokens": 2761,
-    "output_tokens": 3115
+    "output_tokens": 3115,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 28467.420000000002
+   "parse_cpu_ms": 28467.420000000002,
+   "reused": false
   },
   {
    "doc_id": "pdf-029",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -11923,15 +12745,18 @@
     "latency_ms": 3890.627,
     "cost_usd": 0.00279,
     "input_tokens": 1590,
-    "output_tokens": 1595
+    "output_tokens": 1595,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 10098.024
+   "parse_cpu_ms": 10098.024,
+   "reused": false
   },
   {
    "doc_id": "pdf-030",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -11964,15 +12789,18 @@
     "latency_ms": 9271.464,
     "cost_usd": 0.00695675,
     "input_tokens": 2957,
-    "output_tokens": 4145
+    "output_tokens": 4145,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12779.554
+   "parse_cpu_ms": 12779.554,
+   "reused": false
   },
   {
    "doc_id": "pdf-034",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -12005,15 +12833,18 @@
     "latency_ms": 8023.84,
     "cost_usd": 0.00662425,
     "input_tokens": 2833,
-    "output_tokens": 3944
+    "output_tokens": 3944,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12069.262999999999
+   "parse_cpu_ms": 12069.262999999999,
+   "reused": false
   },
   {
    "doc_id": "pdf-037",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-037",
     "tags": {
@@ -12046,15 +12877,18 @@
     "latency_ms": 18049.895,
     "cost_usd": 0.01537575,
     "input_tokens": 5229,
-    "output_tokens": 9379
+    "output_tokens": 9379,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12.933
+   "parse_cpu_ms": 12.933,
+   "reused": false
   },
   {
    "doc_id": "pdf-039",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-039",
     "tags": {
@@ -12087,15 +12921,18 @@
     "latency_ms": 3123.585,
     "cost_usd": 0.0020675,
     "input_tokens": 1724,
-    "output_tokens": 1091
+    "output_tokens": 1091,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 8.165
+   "parse_cpu_ms": 8.165,
+   "reused": false
   },
   {
    "doc_id": "pdf-040",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-040",
     "tags": {
@@ -12128,15 +12965,18 @@
     "latency_ms": 7972.619,
     "cost_usd": 0.006729,
     "input_tokens": 3792,
-    "output_tokens": 3854
+    "output_tokens": 3854,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 10.544
+   "parse_cpu_ms": 10.544,
+   "reused": false
   },
   {
    "doc_id": "pdf-042",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-042",
     "tags": {
@@ -12169,15 +13009,18 @@
     "latency_ms": 2658.088,
     "cost_usd": 0.001717,
     "input_tokens": 1612,
-    "output_tokens": 876
+    "output_tokens": 876,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 6.481
+   "parse_cpu_ms": 6.481,
+   "reused": false
   },
   {
    "doc_id": "pdf-043",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-043",
     "tags": {
@@ -12210,15 +13053,18 @@
     "latency_ms": 10353.433,
     "cost_usd": 0.00847775,
     "input_tokens": 3767,
-    "output_tokens": 5024
+    "output_tokens": 5024,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 9.927
+   "parse_cpu_ms": 9.927,
+   "reused": false
   },
   {
    "doc_id": "pdf-044",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -12251,15 +13097,18 @@
     "latency_ms": 17087.777,
     "cost_usd": 0.01448875,
     "input_tokens": 5065,
-    "output_tokens": 8815
+    "output_tokens": 8815,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 50801.063
+   "parse_cpu_ms": 50801.063,
+   "reused": false
   },
   {
    "doc_id": "pdf-045",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -12292,15 +13141,18 @@
     "latency_ms": 15408.916,
     "cost_usd": 0.01251275,
     "input_tokens": 5297,
-    "output_tokens": 7459
+    "output_tokens": 7459,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 14838.865
+   "parse_cpu_ms": 14838.865,
+   "reused": false
   },
   {
    "doc_id": "pdf-047",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -12333,15 +13185,18 @@
     "latency_ms": 6380.895,
     "cost_usd": 0.00526025,
     "input_tokens": 2789,
-    "output_tokens": 3042
+    "output_tokens": 3042,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 12343.907000000001
+   "parse_cpu_ms": 12343.907000000001,
+   "reused": false
   },
   {
    "doc_id": "pdf-048",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -12374,15 +13229,18 @@
     "latency_ms": 2725.531,
     "cost_usd": 0.001897,
     "input_tokens": 1438,
-    "output_tokens": 1025
+    "output_tokens": 1025,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 8512.513
+   "parse_cpu_ms": 8512.513,
+   "reused": false
   },
   {
    "doc_id": "pdf-049",
    "model": "gemini-3.1-flash-lite",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-049",
     "tags": {
@@ -12415,15 +13273,18 @@
     "latency_ms": 17068.748,
     "cost_usd": 0.0143025,
     "input_tokens": 5190,
-    "output_tokens": 8670
+    "output_tokens": 8670,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 22.836
+   "parse_cpu_ms": 22.836,
+   "reused": false
   },
   {
    "doc_id": "large-00",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -12456,15 +13317,18 @@
     "latency_ms": 7955.672,
     "cost_usd": 0.00570275,
     "input_tokens": 6101,
-    "output_tokens": 2785
+    "output_tokens": 2785,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-01",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -12497,15 +13361,18 @@
     "latency_ms": 7852.43,
     "cost_usd": 0.00616225,
     "input_tokens": 5605,
-    "output_tokens": 3174
+    "output_tokens": 3174,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-02",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -12538,15 +13405,18 @@
     "latency_ms": 9275.285,
     "cost_usd": 0.00684875,
     "input_tokens": 6137,
-    "output_tokens": 3543
+    "output_tokens": 3543,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-03",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -12579,15 +13449,18 @@
     "latency_ms": 11398.857,
     "cost_usd": 0.00850175,
     "input_tokens": 6137,
-    "output_tokens": 4645
+    "output_tokens": 4645,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-04",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -12620,15 +13493,18 @@
     "latency_ms": 6719.698,
     "cost_usd": 0.00448825,
     "input_tokens": 5581,
-    "output_tokens": 2062
+    "output_tokens": 2062,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-05",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -12661,15 +13537,18 @@
     "latency_ms": 9928.092,
     "cost_usd": 0.00741425,
     "input_tokens": 6101,
-    "output_tokens": 3926
+    "output_tokens": 3926,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-06",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -12702,15 +13581,18 @@
     "latency_ms": 5549.096,
     "cost_usd": 0.00397475,
     "input_tokens": 6089,
-    "output_tokens": 1635
+    "output_tokens": 1635,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-07",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -12743,15 +13625,18 @@
     "latency_ms": 10251.684,
     "cost_usd": 0.00757675,
     "input_tokens": 5581,
-    "output_tokens": 4121
+    "output_tokens": 4121,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-08",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -12784,15 +13669,18 @@
     "latency_ms": 9154.201,
     "cost_usd": 0.00726275,
     "input_tokens": 6113,
-    "output_tokens": 3823
+    "output_tokens": 3823,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "large-09",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -12825,15 +13713,18 @@
     "latency_ms": 5742.359,
     "cost_usd": 0.00406125,
     "input_tokens": 5061,
-    "output_tokens": 1864
+    "output_tokens": 1864,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-001",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -12868,15 +13759,18 @@
     "latency_ms": 10115.235,
     "cost_usd": 0.00750325,
     "input_tokens": 2413,
-    "output_tokens": 4600
+    "output_tokens": 4600,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-004",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-004",
     "tags": {
@@ -12909,15 +13803,18 @@
     "latency_ms": 9693.557,
     "cost_usd": 0.00710725,
     "input_tokens": 2413,
-    "output_tokens": 4336
+    "output_tokens": 4336,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-005",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -12950,15 +13847,18 @@
     "latency_ms": 6904.607,
     "cost_usd": 0.00475575,
     "input_tokens": 1881,
-    "output_tokens": 2857
+    "output_tokens": 2857,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-006",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -12991,15 +13891,18 @@
     "latency_ms": 13870.201,
     "cost_usd": 0.01018025,
     "input_tokens": 2945,
-    "output_tokens": 6296
+    "output_tokens": 6296,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-007",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -13032,15 +13935,18 @@
     "latency_ms": 13466.226,
     "cost_usd": 0.01061075,
     "input_tokens": 2945,
-    "output_tokens": 6583
+    "output_tokens": 6583,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-008",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -13073,15 +13979,18 @@
     "latency_ms": 7227.439,
     "cost_usd": 0.00507525,
     "input_tokens": 1881,
-    "output_tokens": 3070
+    "output_tokens": 3070,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-010",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -13114,15 +14023,18 @@
     "latency_ms": 6908.168,
     "cost_usd": 0.00466425,
     "input_tokens": 1881,
-    "output_tokens": 2796
+    "output_tokens": 2796,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-011",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -13155,15 +14067,18 @@
     "latency_ms": 12439.072,
     "cost_usd": 0.00785425,
     "input_tokens": 2413,
-    "output_tokens": 4834
+    "output_tokens": 4834,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-016",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-016",
     "tags": {
@@ -13196,15 +14111,18 @@
     "latency_ms": 16429.251,
     "cost_usd": 0.01249325,
     "input_tokens": 2897,
-    "output_tokens": 7846
+    "output_tokens": 7846,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-018",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -13237,15 +14155,18 @@
     "latency_ms": 17187.51,
     "cost_usd": 0.01225325,
     "input_tokens": 2897,
-    "output_tokens": 7686
+    "output_tokens": 7686,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-019",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -13278,15 +14199,18 @@
     "latency_ms": 8945.682,
     "cost_usd": 0.00621675,
     "input_tokens": 1881,
-    "output_tokens": 3831
+    "output_tokens": 3831,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-020",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-020",
     "tags": {
@@ -13319,15 +14243,18 @@
     "latency_ms": 15973.967,
     "cost_usd": 0.01202975,
     "input_tokens": 2945,
-    "output_tokens": 7529
+    "output_tokens": 7529,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-021",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-021",
     "tags": {
@@ -13360,15 +14287,18 @@
     "latency_ms": 4838.674,
     "cost_usd": 0.00344975,
     "input_tokens": 1349,
-    "output_tokens": 2075
+    "output_tokens": 2075,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-023",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -13401,15 +14331,18 @@
     "latency_ms": 15088.841,
     "cost_usd": 0.01144625,
     "input_tokens": 2897,
-    "output_tokens": 7148
+    "output_tokens": 7148,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-027",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -13442,15 +14375,18 @@
     "latency_ms": 11164.523,
     "cost_usd": 0.00661375,
     "input_tokens": 2377,
-    "output_tokens": 4013
+    "output_tokens": 4013,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-028",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -13483,15 +14419,18 @@
     "latency_ms": 7682.883,
     "cost_usd": 0.00539175,
     "input_tokens": 1881,
-    "output_tokens": 3281
+    "output_tokens": 3281,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-029",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -13524,15 +14463,18 @@
     "latency_ms": 4573.074,
     "cost_usd": 0.00271625,
     "input_tokens": 1337,
-    "output_tokens": 1588
+    "output_tokens": 1588,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-030",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -13565,15 +14507,18 @@
     "latency_ms": 8330.792,
     "cost_usd": 0.00549375,
     "input_tokens": 1857,
-    "output_tokens": 3353
+    "output_tokens": 3353,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-034",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -13606,15 +14551,18 @@
     "latency_ms": 8948.658,
     "cost_usd": 0.00636225,
     "input_tokens": 1857,
-    "output_tokens": 3932
+    "output_tokens": 3932,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-037",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-037",
     "tags": {
@@ -13647,15 +14595,18 @@
     "latency_ms": 14986.899,
     "cost_usd": 0.01199975,
     "input_tokens": 2945,
-    "output_tokens": 7509
+    "output_tokens": 7509,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-039",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-039",
     "tags": {
@@ -13688,15 +14639,18 @@
     "latency_ms": 4466.889,
     "cost_usd": 0.00313325,
     "input_tokens": 1337,
-    "output_tokens": 1866
+    "output_tokens": 1866,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-040",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-040",
     "tags": {
@@ -13729,15 +14683,18 @@
     "latency_ms": 10677.245,
     "cost_usd": 0.00819925,
     "input_tokens": 2413,
-    "output_tokens": 5064
+    "output_tokens": 5064,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-042",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-042",
     "tags": {
@@ -13770,15 +14727,18 @@
     "latency_ms": 3556.067,
     "cost_usd": 0.00244775,
     "input_tokens": 1349,
-    "output_tokens": 1407
+    "output_tokens": 1407,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-043",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-043",
     "tags": {
@@ -13811,15 +14771,18 @@
     "latency_ms": 10393.541,
     "cost_usd": 0.00829375,
     "input_tokens": 2377,
-    "output_tokens": 5133
+    "output_tokens": 5133,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-044",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -13852,15 +14815,18 @@
     "latency_ms": 14501.559,
     "cost_usd": 0.01097825,
     "input_tokens": 2897,
-    "output_tokens": 6836
+    "output_tokens": 6836,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-045",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -13895,15 +14861,18 @@
     "latency_ms": 11834.125,
     "cost_usd": 0.00826625,
     "input_tokens": 2945,
-    "output_tokens": 5020
+    "output_tokens": 5020,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-047",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -13936,15 +14905,18 @@
     "latency_ms": 7847.869,
     "cost_usd": 0.00557925,
     "input_tokens": 1881,
-    "output_tokens": 3406
+    "output_tokens": 3406,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-048",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -13977,15 +14949,18 @@
     "latency_ms": 3798.144,
     "cost_usd": 0.00214775,
     "input_tokens": 1337,
-    "output_tokens": 1209
+    "output_tokens": 1209,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   },
   {
    "doc_id": "pdf-049",
    "model": "gemini-3.1-flash-lite",
    "route": "native",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-049",
     "tags": {
@@ -14018,9 +14993,11 @@
     "latency_ms": 14148.388,
     "cost_usd": 0.01159325,
     "input_tokens": 2945,
-    "output_tokens": 7238
+    "output_tokens": 7238,
+    "reasoning_tokens": null
    },
-   "parse_cpu_ms": 0.0
+   "parse_cpu_ms": 0.0,
+   "reused": false
   }
  ]
 }

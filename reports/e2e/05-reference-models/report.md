@@ -16,9 +16,9 @@
 | `claude-sonnet-5-5` | native | 12 | 100.0% | 75.0% | 78.9% | 100.0% | 12,302 | 2,907 | n/a | $0.05367 | $53.67 | 12.8 s | n/a |
 | `claude-sonnet-5-5` | hybrid | 12 | 100.0% | 75.0% | 85.1% | 100.0% | 9,908 | 3,182 | n/a | $0.05163 | $51.63 | 14.0 s | n/a |
 
-### Against the docfunnel route
+### Against the text route
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## scan=digital
@@ -30,7 +30,7 @@
 | `claude-sonnet-5-5` | native | 2 | 100.0% | 100.0% | 100.0% | 100.0% | 13,081 | 8,042 | n/a | $0.10659 | $106.59 | 38.4 s | n/a |
 | `claude-sonnet-5-5` | hybrid | 2 | 100.0% | 100.0% | 100.0% | 100.0% | 6,873 | 7,584 | n/a | $0.08959 | $89.59 | 34.6 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## scan=has_scanned_pages
@@ -42,7 +42,7 @@
 | `claude-sonnet-5-5` | native | 10 | 100.0% | 70.0% | 66.7% | 100.0% | 12,147 | 1,880 | n/a | $0.04309 | $43.09 | 11.2 s | n/a |
 | `claude-sonnet-5-5` | hybrid | 10 | 100.0% | 70.0% | 77.1% | 100.0% | 10,515 | 2,301 | n/a | $0.04404 | $44.04 | 12.0 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## size=large
@@ -54,7 +54,7 @@
 | `claude-sonnet-5-5` | native | 3 | 100.0% | 66.7% | 73.9% | 100.0% | 23,631 | 2,156 | n/a | $0.06883 | $68.83 | 11.9 s | n/a |
 | `claude-sonnet-5-5` | hybrid | 3 | 100.0% | 33.3% | 46.8% | 100.0% | 16,901 | 1,005 | n/a | $0.04385 | $43.85 | 2.6 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## size=small
@@ -66,5 +66,5 @@
 | `claude-sonnet-5-5` | native | 9 | 100.0% | 77.8% | 79.9% | 100.0% | 8,526 | 3,157 | n/a | $0.04862 | $48.62 | 13.8 s | n/a |
 | `claude-sonnet-5-5` | hybrid | 9 | 100.0% | 88.9% | 90.8% | 100.0% | 7,577 | 3,907 | n/a | $0.05423 | $54.23 | 14.3 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |

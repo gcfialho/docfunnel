@@ -53,3 +53,22 @@ def test_model_names() -> None:
     assert model_name("gpt-6-luna") == "GPT-6 Luna"
     assert model_name("claude-haiku-5-5+effort=medium") == "Claude Haiku 5.5 (effort=medium)"
     assert model_name("some-new-model") == "some-new-model"
+
+
+def test_paired_comparisons_and_intervals() -> None:
+    from docfunnel.evals.e2e.summary import paired_comparisons
+    from docfunnel.evals.stats import mcnemar_exact_p, wilson_interval
+
+    assert mcnemar_exact_p(6, 0) == 2 / 64  # 6 to 0: the smallest split below 0.05
+    assert mcnemar_exact_p(0, 0) == 1.0
+    low, high = wilson_interval(39, 39)
+    assert high == 1.0
+    assert 0.90 < low < 0.92  # 39 of 39 still allows ~91%
+
+    pairs = paired_comparisons(load_runs(RUNS))
+    keys = [(a.model, a.route, b.route) for a, b, *_ in pairs]
+    assert len(keys) == len(set(keys))
+    gpt = {(a.route, b.route): (only_a, only_b, p) for a, b, _, only_a, only_b, p in pairs}
+    assert gpt[("hybrid-ocr", "native")] == (6, 0, 2 / 64)
+    readme = (RUNS / "README.md").read_text()
+    assert "| GPT-6 Luna | hybrid-ocr | native | 39 | 6 | 0 | 0.031 |" in readme

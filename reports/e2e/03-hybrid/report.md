@@ -2,7 +2,7 @@
 
 - Dataset: `data/synthetic/e2e`: 29 invoices, 146 pages
 - Models: `gemini:gemini-3.5-flash-lite`, `anthropic:claude-haiku-5-5`, `gemini:gemini-3.1-flash-lite`; routes: hybrid
-- Spend: gemini $0.53 of $0.70, anthropic $0.10 of $0.70; skipped calls (budget reached): 0
+- Spend: gemini $0.53 of $0.70, anthropic $0.10 of $0.70; skipped calls (budget reached or provider stopped): 0
 - Package `0.1.0`, prompt `v2`, created 2026-11-17T20:25:52+00:00
 
 **docfunnel**: the parse stage reads the PDF on the CPU and the model gets text. **native**: the PDF goes to the model as a file. Same prompt, schema, repair turn and scoring. Cost per 1k docs is the measured cost per document times 1,000. LLM p50 is the model's wall-clock time; the parse CPU time is reported apart, per document, summed over its pages.
@@ -15,9 +15,9 @@
 | `claude-haiku-5-5` | hybrid | 29 | 100.0% | 75.9% | 91.6% | 100.0% | 11,425 | 4,908 | n/a | $0.00360 | $3.60 | 14.0 s | n/a |
 | `gemini-3.1-flash-lite` | hybrid | 29 | 100.0% | 96.6% | 100.0% | 100.0% | 5,112 | 3,809 | 0 | $0.00699 | $6.99 | 8.3 s | n/a |
 
-### Against the docfunnel route
+### Against the text route
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## scan=has_scanned_pages
@@ -28,7 +28,7 @@
 | `claude-haiku-5-5` | hybrid | 29 | 100.0% | 75.9% | 91.6% | 100.0% | 11,425 | 4,908 | n/a | $0.00360 | $3.60 | 14.0 s | n/a |
 | `gemini-3.1-flash-lite` | hybrid | 29 | 100.0% | 96.6% | 100.0% | 100.0% | 5,112 | 3,809 | 0 | $0.00699 | $6.99 | 8.3 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## size=large
@@ -39,7 +39,7 @@
 | `claude-haiku-5-5` | hybrid | 10 | 100.0% | 60.0% | 86.1% | 100.0% | 16,752 | 3,274 | n/a | $0.00331 | $3.31 | 10.8 s | n/a |
 | `gemini-3.1-flash-lite` | hybrid | 10 | 100.0% | 100.0% | 100.0% | 100.0% | 7,682 | 3,098 | 0 | $0.00657 | $6.57 | 8.3 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## size=small
@@ -50,5 +50,5 @@
 | `claude-haiku-5-5` | hybrid | 19 | 100.0% | 84.2% | 93.1% | 100.0% | 8,622 | 5,767 | n/a | $0.00375 | $3.75 | 14.9 s | n/a |
 | `gemini-3.1-flash-lite` | hybrid | 19 | 100.0% | 94.7% | 100.0% | 100.0% | 3,759 | 4,184 | 0 | $0.00722 | $7.22 | 8.3 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |

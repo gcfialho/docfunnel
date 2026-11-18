@@ -23,7 +23,8 @@
    "gemini": 0.534327,
    "anthropic": 0.104293
   },
-  "skipped_calls": 0
+  "skipped_calls": 0,
+  "unavailable": {}
  },
  "groups": [
   {
@@ -381,6 +382,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -424,6 +426,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -467,6 +470,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -510,6 +514,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -553,6 +558,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -596,6 +602,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -639,6 +646,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -682,6 +690,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -725,6 +734,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -768,6 +778,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -811,6 +822,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -854,6 +866,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -897,6 +910,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -940,6 +954,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -983,6 +998,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -1026,6 +1042,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -1069,6 +1086,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -1112,6 +1130,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -1155,6 +1174,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -1198,6 +1218,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -1241,6 +1262,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -1284,6 +1306,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -1327,6 +1350,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -1370,6 +1394,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -1413,6 +1438,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -1456,6 +1482,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -1499,6 +1526,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -1542,6 +1570,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -1585,6 +1614,7 @@
    "model": "gemini-3.5-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -1628,6 +1658,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -1674,6 +1705,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -1717,6 +1749,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -1760,6 +1793,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -1803,6 +1837,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -1846,6 +1881,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -1889,6 +1925,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -1932,6 +1969,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -1978,6 +2016,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -2024,6 +2063,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -2067,6 +2107,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -2112,6 +2153,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -2155,6 +2197,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -2198,6 +2241,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -2241,6 +2285,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -2284,6 +2329,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -2327,6 +2373,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -2370,6 +2417,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -2413,6 +2461,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -2458,6 +2507,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -2501,6 +2551,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -2544,6 +2595,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -2587,6 +2639,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -2630,6 +2683,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -2676,6 +2730,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -2721,6 +2776,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -2764,6 +2820,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -2807,6 +2864,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -2853,6 +2911,7 @@
    "model": "claude-haiku-5-5",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
@@ -2896,6 +2955,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-00",
     "tags": {
@@ -2939,6 +2999,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-01",
     "tags": {
@@ -2982,6 +3043,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-02",
     "tags": {
@@ -3025,6 +3087,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-03",
     "tags": {
@@ -3068,6 +3131,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-04",
     "tags": {
@@ -3111,6 +3175,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-05",
     "tags": {
@@ -3154,6 +3219,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-06",
     "tags": {
@@ -3197,6 +3263,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-07",
     "tags": {
@@ -3240,6 +3307,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-08",
     "tags": {
@@ -3283,6 +3351,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "large-09",
     "tags": {
@@ -3326,6 +3395,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-001",
     "tags": {
@@ -3369,6 +3439,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-005",
     "tags": {
@@ -3412,6 +3483,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-006",
     "tags": {
@@ -3455,6 +3527,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-007",
     "tags": {
@@ -3498,6 +3571,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-008",
     "tags": {
@@ -3541,6 +3615,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-010",
     "tags": {
@@ -3584,6 +3659,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-011",
     "tags": {
@@ -3627,6 +3703,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-018",
     "tags": {
@@ -3670,6 +3747,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-019",
     "tags": {
@@ -3713,6 +3791,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-023",
     "tags": {
@@ -3756,6 +3835,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-027",
     "tags": {
@@ -3799,6 +3879,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-028",
     "tags": {
@@ -3842,6 +3923,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-029",
     "tags": {
@@ -3885,6 +3967,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-030",
     "tags": {
@@ -3928,6 +4011,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-034",
     "tags": {
@@ -3971,6 +4055,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-044",
     "tags": {
@@ -4014,6 +4099,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-045",
     "tags": {
@@ -4057,6 +4143,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-047",
     "tags": {
@@ -4100,6 +4187,7 @@
    "model": "gemini-3.1-flash-lite",
    "route": "hybrid",
    "skipped": false,
+   "skip_reason": null,
    "score": {
     "id": "pdf-048",
     "tags": {
