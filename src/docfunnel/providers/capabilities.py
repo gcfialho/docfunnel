@@ -82,6 +82,12 @@ OPENAI_MODELS: dict[str, OpenAIModel] = {
     ),
 }
 
+# Local models behind Ollama's OpenAI-compatible endpoint. Ollama turns a JSON Schema
+# response_format into constrained decoding, and reasoning_effort "none" turns thinking
+# off on models that think by default (Gemma 4, Qwen 3).
+OLLAMA_DEFAULT = OpenAIModel(structured_outputs=True, reasoning_effort="none")
+OLLAMA_MODELS: dict[str, OpenAIModel] = {}
+
 ANTHROPIC_DEFAULT = AnthropicModel()
 ANTHROPIC_MODELS: dict[str, AnthropicModel] = {
     # Haiku 4.5: no effort parameter (it errors), thinking off unless requested.
@@ -157,6 +163,10 @@ def _with_options[P: (OpenAIModel, AnthropicModel, GeminiModel)](profile: P, nam
 
 def openai_model(name: str) -> OpenAIModel:
     return _with_options(OPENAI_MODELS.get(base_model(name), OPENAI_DEFAULT), name)
+
+
+def ollama_model(name: str) -> OpenAIModel:
+    return _with_options(OLLAMA_MODELS.get(base_model(name), OLLAMA_DEFAULT), name)
 
 
 def anthropic_model(name: str) -> AnthropicModel:

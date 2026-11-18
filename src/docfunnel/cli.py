@@ -47,7 +47,7 @@ ProviderOpt = Annotated[
     typer.Option(
         "--provider",
         "-p",
-        help="fake | openai | anthropic | gemini | replay [env: DOCFUNNEL_PROVIDER]",
+        help="fake | openai | anthropic | gemini | ollama | replay [env: DOCFUNNEL_PROVIDER]",
     ),
 ]
 ModelOpt = Annotated[
@@ -434,7 +434,8 @@ def eval_e2e(
         "reports/e2e-latest"
     ),
     route: Annotated[
-        list[str] | None, typer.Option("--route", help="docfunnel | native | hybrid (repeatable)")
+        list[str] | None,
+        typer.Option("--route", help="docfunnel | native | hybrid | hybrid-ocr (repeatable)"),
     ] = None,
     budget_usd: Annotated[
         float, typer.Option(help="Spending cap per provider; later calls are skipped")

@@ -14,13 +14,14 @@ from docfunnel.providers.base import (
 )
 from docfunnel.providers.fake import FakeProvider
 
-PROVIDER_NAMES = ("fake", "openai", "anthropic", "gemini", "replay")
+PROVIDER_NAMES = ("fake", "openai", "anthropic", "gemini", "ollama", "replay")
 
 DEFAULT_MODELS: dict[str, str] = {
     "fake": "fake-mini",
     "openai": "gpt-6-luna",
     "anthropic": "claude-haiku-5-5",
     "gemini": "gemini-3.5-flash-lite",
+    "ollama": "gemma4:12b-mlx",
 }
 """The low-cost tier of each provider's current model family (prices in ``pricing.json``)."""
 
@@ -42,6 +43,10 @@ def get_provider(name: str, *, cassette: Path | None = None) -> LLMProvider:
             from docfunnel.providers.gemini_provider import GeminiProvider
 
             return GeminiProvider()
+        case "ollama":
+            from docfunnel.providers.ollama_provider import OllamaProvider
+
+            return OllamaProvider()
         case "replay":
             from docfunnel.providers.replay import ReplayProvider
 

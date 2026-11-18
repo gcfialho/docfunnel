@@ -44,6 +44,11 @@
     "source": "https://platform.claude.com/docs/en/about-claude/pricing", "checked": "2026-11-03"
   },
 
+  "gemma4:": {
+    "input": 0.0, "output": 0.0,
+    "source": "https://ollama.com/library/gemma4", "checked": "2026-11-17",
+    "_note": "Ollama tags (gemma4:12b-mlx, ...): runs locally, no API charge; hardware and power are not counted."
+  },
   "gemini-3.8-flash": {
     "input": 0.75, "output": 3.75,
     "source": "https://aistudio.google.com/docs/pricing#gemini-3.8-flash", "checked": "2026-11-17",

@@ -1,7 +1,7 @@
 """Runtime configuration from environment variables.
 
 =====================================  ================================================
-``DOCFUNNEL_PROVIDER``                 fake | openai | anthropic | gemini | replay
+``DOCFUNNEL_PROVIDER``                 fake | openai | anthropic | gemini | ollama | replay
 ``DOCFUNNEL_MODEL``                    model name (defaults per provider)
 ``DOCFUNNEL_FALLBACK``                 comma-separated ``provider:model`` chain
 ``DOCFUNNEL_MAX_ATTEMPTS``             attempts per model (default 3)

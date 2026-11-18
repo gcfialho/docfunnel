@@ -76,12 +76,38 @@ def test_gemini_puts_files_before_the_text(monkeypatch: pytest.MonkeyPatch) -> N
     assert parts[1].text == "Extract it."
 
 
-def test_openai_refuses_attachments() -> None:
+def test_openai_sends_pdfs_as_files_and_images_as_data_urls() -> None:
     pytest.importorskip("openai")
     from docfunnel.providers.openai_provider import OpenAIProvider
 
-    with pytest.raises(ProviderError, match="does not send attachments") as info:
-        OpenAIProvider(api_key="test-key").complete(request(PDF))
+    params = OpenAIProvider.build_params(request(PDF, PNG))
+    system, user = params["messages"]
+    assert system == {"role": "system", "content": "SYSTEM"}
+    content = user["content"]
+    assert isinstance(content, list)
+    file, image, text = content
+    pdf_url = "data:application/pdf;base64," + base64.standard_b64encode(PDF.data).decode()
+    assert file == {"type": "file", "file": {"filename": "document-1.pdf", "file_data": pdf_url}}
+    assert image["type"] == "image_url"
+    assert image["image_url"]["url"].startswith("data:image/png;base64,")
+    assert text == {"type": "text", "text": "Extract it."}
+
+
+def test_openai_interleaves_images_and_rejects_unsupported_types() -> None:
+    pytest.importorskip("openai")
+    from docfunnel.providers.openai_provider import OpenAIProvider
+
+    req = CompletionRequest(
+        model="m",
+        messages=(Message("system", "S"), Message("user", "page 1\n[[attachment:1]]\npage 3")),
+        attachments=(PNG,),
+    )
+    _, user = OpenAIProvider.build_params(req)["messages"]
+    content = user["content"]
+    assert isinstance(content, list)
+    assert [part["type"] for part in content] == ["text", "image_url", "text"]
+    with pytest.raises(ProviderError, match="cannot take 'image/tiff'") as info:
+        OpenAIProvider.build_params(request(Attachment(b"II*\x00", "image/tiff")))
     assert not info.value.retryable
 
 
@@ -143,3 +169,19 @@ def test_anthropic_interleaves_images_between_pages() -> None:
     assert isinstance(content, list)
     assert [block["type"] for block in content] == ["text", "image", "text"]
     assert content[0] == {"type": "text", "text": "page 1\n"}
+
+
+def test_ollama_uses_the_local_endpoint_and_refuses_pdfs(monkeypatch: pytest.MonkeyPatch) -> None:
+    pytest.importorskip("openai")
+    from docfunnel.providers import get_provider
+    from docfunnel.providers.ollama_provider import OllamaProvider
+
+    monkeypatch.setenv("OLLAMA_HOST", "gpu-box:11434")
+    provider = get_provider("ollama")
+    assert isinstance(provider, OllamaProvider)
+    assert str(provider._client.base_url) == "http://gpu-box:11434/v1/"
+    params = OllamaProvider.build_params(request(PNG))
+    assert params["reasoning_effort"] == "none"  # thinking off by default
+    with pytest.raises(ProviderError, match="not PDF files") as info:
+        provider.complete(request(PDF))
+    assert not info.value.retryable
