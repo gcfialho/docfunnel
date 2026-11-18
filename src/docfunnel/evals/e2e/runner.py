@@ -42,7 +42,9 @@ from docfunnel.parse.model import ParsedDocument
 from docfunnel.parse.pipeline import PagePool, ParseOptions
 from docfunnel.providers.base import Attachment
 
-ROUTES = ("docfunnel", "native", "hybrid")
+ROUTES = ("docfunnel", "native", "hybrid", "hybrid-ocr")
+"""``hybrid-ocr`` is ``hybrid`` plus each scanned page's OCR text after its image."""
+HYBRID_ROUTES = frozenset({"hybrid", "hybrid-ocr"})
 DEFAULT_ROUTES = ("docfunnel", "native")
 
 
@@ -181,8 +183,13 @@ def _page_jpeg(path: Path, index: int, dpi: int) -> bytes:
         pdf.close()
 
 
-def hybrid_inputs(document: ParsedDocument, pdf: Path, dpi: int) -> tuple[str, list[Attachment]]:
-    """Text of the text-layer pages, and a JPEG of each page the parse stage sent to OCR."""
+def hybrid_inputs(
+    document: ParsedDocument, pdf: Path, dpi: int, *, with_ocr_text: bool = False
+) -> tuple[str, list[Attachment]]:
+    """Text of the text-layer pages, and a JPEG of each page the parse stage sent to OCR.
+
+    With ``with_ocr_text``, the OCR text of each scanned page follows its image.
+    """
     parts: list[str] = []
     images: list[Attachment] = []
     for page in document.pages:
@@ -190,6 +197,8 @@ def hybrid_inputs(document: ParsedDocument, pdf: Path, dpi: int) -> tuple[str, l
             images.append(Attachment(_page_jpeg(pdf, page.number - 1, dpi), "image/jpeg"))
             # The adapters put the image here, between the pages of text around it.
             parts.append(f"[Page {page.number}, scanned:]\n[[attachment:{len(images)}]]")
+            if with_ocr_text and page.text.strip():
+                parts.append(f"[OCR text of page {page.number}, may contain errors:]\n{page.text}")
         else:
             parts.append(page.text)
     return "\n\n".join(parts), images
@@ -212,17 +221,21 @@ def run_e2e(
     docs = docs[: config.limit]
     routes = sorted(config.routes, key=ROUTES.index)  # docfunnel before hybrid, for reuse
     parsed: dict[str, ParsedDocument] = {}
-    if {"docfunnel", "hybrid"} & set(routes):
+    if ({"docfunnel"} | HYBRID_ROUTES) & set(routes):
         parsed = _parse_all(docs, config.dataset, config.parse_options)
     text_scores: dict[tuple[str, str], DocumentScore] = {}
     # PDFium is not thread-safe: render the hybrid route's page images here, once per
     # document and in this thread, before the model calls run in the worker threads.
-    hybrid: dict[str, tuple[str, list[Attachment]]] = {}
-    if "hybrid" in routes:
-        hybrid = {
-            d.id: hybrid_inputs(parsed[d.id], config.dataset / d.file, config.hybrid_dpi)
-            for d in docs
-        }
+    hybrid: dict[tuple[str, str], tuple[str, list[Attachment]]] = {
+        (route, d.id): hybrid_inputs(
+            parsed[d.id],
+            config.dataset / d.file,
+            config.hybrid_dpi,
+            with_ocr_text=route == "hybrid-ocr",
+        )
+        for route in HYBRID_ROUTES & set(routes)
+        for d in docs
+    }
     budget = _Budget(config.budget_usd, config.default_budget_usd)
     factory = make_extractor or _default_extractor
     rows: list[E2ERow] = []
@@ -244,7 +257,7 @@ def run_e2e(
                 result = extractor.extract(attachments=[Attachment(data, "application/pdf")])
             else:
                 row.parse_cpu_ms = _cpu_ms(parsed[doc.id])
-                text, images = hybrid[doc.id]
+                text, images = hybrid[(route, doc.id)]
                 if not images and (model, doc.id) in text_scores:
                     row.score, row.reused = text_scores[(model, doc.id)], True
                 else:
