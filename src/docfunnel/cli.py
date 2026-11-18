@@ -444,7 +444,7 @@ def eval_e2e(
     ),
     route: Annotated[
         list[str] | None,
-        typer.Option("--route", help="docfunnel | native | hybrid | hybrid-ocr (repeatable)"),
+        typer.Option("--route", help="text | native | hybrid | hybrid-ocr (repeatable)"),
     ] = None,
     budget_usd: Annotated[
         float, typer.Option(help="Spending cap per provider; later calls are skipped")

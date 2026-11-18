@@ -30,7 +30,7 @@ Shared fixtures live in `tests/conftest.py`; shared helpers (`ScriptedProvider`,
 
 ## Conventions
 
-- **Tests never touch the network.** Real providers are tested against stubbed SDK clients and a mock HTTP transport; end-to-end runs use the `fake` provider. CI has no API keys.
+- **Tests never touch the network.** Real providers are tested against stubbed SDK clients and a mock HTTP transport; tests of the end-to-end eval use scripted providers. CI has no API keys; real-model runs are made by hand under a spending cap and committed to `reports/e2e/`.
 - **Types are strict.** `mypy --strict` covers `src/` and `tests/`. Optional dependencies without stubs are listed in `[tool.mypy.overrides]`.
 - **Optional dependencies are imported lazily**, inside the function or adapter that needs them, so `import docfunnel` works with no extras.
 - **Datasets are generated, not collected.** No real or personal data. Generators are seeded, and a test checks that the committed `data/synthetic/receipts.jsonl` matches the generator.

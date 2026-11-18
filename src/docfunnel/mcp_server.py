@@ -123,9 +123,10 @@ def extract_document(
 ) -> dict[str, Any]:
     """Extract a receipt or invoice from ``source`` or ``text`` as JSON-compatible data.
 
-    ``route`` sets what the model is sent for a PDF or image: ``text`` (parsed text,
-    cheapest), ``hybrid-ocr`` (adds an image of each scanned page; most accurate on scans)
-    or ``hybrid`` / ``native``. The server's ``DOCFUNNEL_ROUTE`` applies when it is left out.
+    ``route`` sets what the model is sent for a PDF or image: ``text`` (the parsed
+    text), ``hybrid-ocr`` (adds an image of each scanned page and its OCR text),
+    ``hybrid`` (the image without the OCR text) or ``native`` (the file). The server's
+    ``DOCFUNNEL_ROUTE`` applies when it is left out.
     """
     settings = get_settings()
     result = _extract(

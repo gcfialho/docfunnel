@@ -1,8 +1,8 @@
 # Architecture
 
-docfunnel is a pipeline of stages. Each stage has a typed output, its own evaluation and its own regression gate in CI.
+docfunnel is the pipeline built for a proof of concept ([report](evaluation/real-models.md)): a parse stage on the CPU, then an LLM step. Each stage has a typed output and a regression gate in CI. The parse stage is evaluated on synthetic PDFs. The LLM step's failure handling is evaluated with the offline `fake` provider, and the end-to-end eval runs real models.
 
-Solid arrows are the normal path; dotted arrows are the fallback chain. Transient errors (429, 5xx, timeouts) are retried with backoff on the same model before the chain moves on. Each stage is scored on its own: see [Evaluation: parse stage](evaluation/parse-stage.md) and [Evaluation: LLM step](evaluation/llm-step.md).
+Solid arrows are the normal path. Dotted arrows are the fallback chain and the `native` route, which sends the file itself. Transient errors (429, 5xx, timeouts) are retried with backoff on the same model before the chain moves on. Each stage is scored on its own: see [Evaluation: parse stage](evaluation/parse-stage.md) and [Evaluation: LLM step](evaluation/llm-step.md).
 
 ```mermaid
 ---
@@ -41,13 +41,14 @@ flowchart LR
     end
 
     subgraph S2["Stage 2 · LLM extraction"]
+        INPUT["Model input · route<br/>text · hybrid · hybrid-ocr<br/>· native"]
         PROMPT["Prompt<br/>JSON Schema<br/>and rules"]
-        LLM{{"Model target<br/>OpenAI · Anthropic · Gemini<br/>logs tokens · cost · latency"}}
+        LLM{{"Model target<br/>OpenAI · Anthropic · Gemini · Ollama<br/>logs tokens · cost · latency"}}
         SCHEMA{"Valid<br/>schema?"}
         REPAIR["Repair prompt<br/>with the errors"]
         NEXT["Next model in<br/>fallback chain"]
         RULES{"Business<br/>rules?"}
-        PROMPT --> LLM --> SCHEMA
+        INPUT --> PROMPT --> LLM --> SCHEMA
         SCHEMA -->|no| REPAIR
         REPAIR --> LLM
         LLM -.->|"attempts<br/>exhausted"| NEXT
@@ -56,7 +57,8 @@ flowchart LR
     end
 
     IN --> POOL
-    DOC --> PROMPT
+    DOC -->|"text; images of<br/>OCR pages"| INPUT
+    IN -.->|"native: the file"| INPUT
     RULES -->|pass| ACCEPT(["Auto-accept"])
     RULES -->|fail| REVIEW(["Human review<br/>with reasons"])
 
@@ -71,7 +73,7 @@ flowchart LR
     style S2 fill:#f8fafc,stroke:#c4b5fd,stroke-width:1.5px,color:#4c1d95
     class IN io
     class POOL,TEXT,OCR parse
-    class PROMPT,LLM,REPAIR,NEXT llm
+    class INPUT,PROMPT,LLM,REPAIR,NEXT llm
     class ROUTE,SCHEMA,RULES decision
     class DOC data
     class ACCEPT ok
@@ -101,13 +103,15 @@ src/docfunnel/
 │   ├── base.py            #   interface, ProviderError (retryable or not)
 │   ├── capabilities.py    #   per-model table: structured output, reasoning/thinking, token floors
 │   ├── openai_provider.py, anthropic_provider.py, gemini_provider.py
+│   ├── ollama_provider.py #   local models through Ollama's OpenAI-compatible endpoint
 │   ├── fake.py            #   deterministic offline provider with fault injection
 │   └── replay.py          #   record / replay cassettes
 ├── evals/
 │   ├── parse/             # parse-stage eval: models, scoring, bench, runner, report, compare
 │   ├── extract/           # LLM-step eval: dataset, metrics, runner, report, compare
+│   ├── e2e/               # end-to-end eval: routes against real models, spending cap, run index and chart
 │   ├── gate.py            # Check / Status / Comparison shared by both regression gates
-│   ├── stats.py           # safe_div, f1, percentile
+│   ├── stats.py           # safe_div, f1, percentile, Wilson interval, exact McNemar test
 │   ├── text.py            # CER, WER, quote lookup
 │   └── formatting.py      # number formatting for reports
 ├── datasets/              # seeded synthetic data with exact ground truth
@@ -123,7 +127,7 @@ src/docfunnel/
 ├── service.py             # process-wide extractor shared by the API and the MCP server
 ├── cli.py                 # `docfunnel` command line
 ├── api.py                 # FastAPI app
-└── mcp_server.py          # MCP server with the extract_document tool
+└── mcp_server.py          # MCP server with the parse_document and extract_document tools
 ```
 
 Dependencies point one way: `parse` knows nothing about LLMs; `extract` knows nothing about PDFs (`loaders.py` and `inputs.py` join them); `evals` and `datasets` depend on the stages, never the reverse. Heavy optional dependencies (pypdfium2, RapidOCR, Tesseract, ReportLab, the provider SDKs) are imported inside the functions that need them, so the core installs and imports without any extra.

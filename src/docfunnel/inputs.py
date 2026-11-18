@@ -8,10 +8,11 @@
 ==============  =====================================================================
 
 On fully digital PDFs the three parsed routes send the same text. They differ only on
-pages the parse stage sent to OCR. In the real-model runs in ``docs/evaluation``,
-``hybrid-ocr`` was the most accurate route: OCR text keeps identifiers right, the
-image keeps table rows right. Page images need a model that reads images; the
-``native`` route also needs one that reads PDFs (not Ollama).
+pages the parse stage sent to OCR. In the proof of concept (``docs/evaluation/
+real-models.md``: GPT-6 Luna, 39 synthetic invoices, in-sample), ``hybrid-ocr`` did
+best: the OCR text kept identifiers right and the image kept table rows right. Page
+images need a model that reads images; ``native`` also needs one that reads PDFs (not
+Ollama).
 """
 
 from __future__ import annotations

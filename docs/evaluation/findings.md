@@ -1,8 +1,21 @@
 # Findings from real-model runs
 
-A lab notebook: what each run with a real model showed, what it cost, and what changed in the code because of it. Newest entries first. Raw reports are in [`reports/e2e/`](../../reports/e2e/README.md); the conclusions are in the [real-model benchmark](real-models.md).
+A lab notebook: what each run with a real model showed, what it cost, and what changed in the code because of it. Newest entries first. Raw reports are in [`reports/e2e/`](../../reports/e2e/README.md).
 
-Spend so far (cap: US$ 5 per provider key): Gemini ~US$ 3.81 by our price table, after which the key's prepaid credit ran out; Anthropic ~US$ 2.03 (the key was later revoked); OpenAI ~US$ 0.65.
+> **Read with care.** Entries were written as the runs happened, from single runs on 39 or fewer synthetic invoices. Several first readings were later revised.
+>
+> - **Rule of thumb for noise:** differences under ~10 points on 29 invoices, or ~20 on 10, are within run-to-run noise.
+> - **The `hybrid-ocr` route was designed after reading the errors below,** on the same invoices it was then scored on.
+> - **Current verdicts,** with 95% intervals and paired tests: the [proof-of-concept report](real-models.md).
+> - **Route name:** the route called `docfunnel` when these runs were made is the `text` route. The reports and this notebook now use `text`.
+
+Spend so far (cap: US$ 5 per provider key), about US$ 6.50 in all:
+
+- **Gemini:** ~US$ 3.81 by our price table, after which the key's prepaid credit ran out.
+- **Anthropic:** ~US$ 2.03; the key was later revoked.
+- **OpenAI:** ~US$ 0.65.
+
+The pilot and a run that crashed are not in `reports/e2e/`, so its index totals a little less.
 
 ## Summary after the first day (2026-11-17)
 
@@ -12,49 +25,58 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 | --- | ---: | ---: |
 | **GPT-6 Luna, hybrid-ocr route** | **100% (39/39); repeat 97% (28/29 with scans)** | **$2.15** |
 | GPT-6 Luna, native PDF | 85% | $1.7 |
-| Gemini 3.1 Flash-Lite, hybrid route | ~97% | ~$7.3 |
+| Gemini 3.1 Flash-Lite, hybrid on the 29 with scans + text on the 10 digital (two runs combined) | ~97% | ~$7.3 |
 | Gemini 3.5 Flash-Lite, native PDF | 97% | $11.9 |
 | Claude Haiku 5.5, hybrid (effort low) | 82% | $3.6 |
 | Claude Haiku 5.5, hybrid (effort medium), 12-doc sample | 100% (12/12) | $4.4 |
 | Claude Sonnet 5.5, 12-doc sample | 75% (9/12) | $52 |
 | Gemma 4 12B on a laptop (Ollama), hybrid-ocr, 12-doc sample | 67% (8/12) | $0 API, ~6 min/doc |
 
-- **What helps:** routing per page. The parse stage on digital pages (exact text, fewer Claude tokens); on scanned pages, the image plus its OCR text (`hybrid-ocr`), which fixed both the table rows the OCR text loses and the identifiers a vision model misreads, on GPT-6 Luna and on a local Gemma 4. Also Haiku at effort `medium`, and the `line_items_missing` rule, which caught every empty item list.
+- **What helped:**
+  - **Routing per page.** On digital pages, the parsed text was exact and used fewer Claude tokens. On scanned pages, the image plus its OCR text (`hybrid-ocr`) fixed both the table rows the OCR text loses and the identifiers a vision model misreads.
+    - On GPT-6 Luna, significantly so (in-sample).
+    - On a local Gemma 4, by one invoice of 12.
+  - **The `line_items_missing` rule,** which caught every empty item list. Most other wrong answers were not flagged.
+  - **Haiku at effort `medium`** may help (12 invoices, inconclusive).
 - **What does not:** OCR text alone for scans; an image alone on a small model; sending text to save money on Gemini or OpenAI (both read PDFs cheaply); compact keys; a bigger model (Gemini 3.8 Flash no better, Sonnet 5.5 worse on long invoices); reasoning effort `low` on GPT-6 Luna.
-- **What costs money:** the answer. Output is 72 to 92% of the cost, and it is the line items' values.
-- **What is not settled:** run-to-run variance is ~10 pp on 29 documents; the documents are synthetic; `hybrid-ocr` is untested on Claude and Gemini (both keys stopped working); the Gemini bill may differ from our price table.
+- **What costs money:** the answer. Output is 52 to 92% of the cost across all runs, and it is the line items' values.
+- **What is not settled:**
+  - Run-to-run variance is ~10 pp on 29 documents.
+  - The documents are synthetic.
+  - `hybrid-ocr` was designed on these invoices and is untested on new ones, and on Claude and Gemini (both keys stopped working).
+  - The Gemini bill may differ from our price table.
 
 ## 2026-11-17: a local model (Gemma 4 12B on Ollama)
 
-**Setup.** New `ollama` provider (Ollama's OpenAI-compatible endpoint, JSON Schema constraint, thinking off). Gemma 4 12B (`gemma4:12b-mlx`, 4-bit MLX build, vision) on an Apple M4 Pro with 24 GB, two requests at a time, 32K context. The 12-invoice sample used for the reference models; docfunnel, hybrid and hybrid-ocr routes. Ollama does not take PDF files, so there is no native route. No API cost. Report: [`reports/e2e/09-local-gemma/`](../../reports/e2e/09-local-gemma/report.md).
+**Setup.** New `ollama` provider (Ollama's OpenAI-compatible endpoint, JSON Schema constraint, thinking off). Gemma 4 12B (`gemma4:12b-mlx`, 4-bit MLX build, vision) on an Apple M4 Pro with 24 GB, two requests at a time, 32K context. The 12-invoice sample used for the reference models; text, hybrid and hybrid-ocr routes. Ollama does not take PDF files, so there is no native route. No API cost. Report: [`reports/e2e/09-local-gemma/`](../../reports/e2e/09-local-gemma/report.md).
 
 | `gemma4:12b-mlx` (12 invoices) | Field accuracy | Exact match | Line items F1 | Sent to review | LLM p50 |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| docfunnel | 99.1% | 58.3% | 92.6% | 2 | 415 s |
+| text | 99.1% | 58.3% | 92.6% | 2 | 415 s |
 | hybrid | 86.1% | 33.3% | 90.9% | 6 | 312 s |
 | **hybrid-ocr** | **99.1%** | **66.7%** | **96.2%** | 2 | 390 s |
 
-1. **The same pattern as GPT-6 Luna: image plus OCR text beats either alone.** On a small local model, the image alone is the worst input (86% of header fields; on the 3 large invoices 63%, and none exactly right): it misses or misreads tax IDs, totals and dates. The OCR text alone gets the header right and loses table rows. Both together: best on every slice.
+1. **The same pattern as GPT-6 Luna: image plus OCR text beats either alone.** On a small local model, the image alone is the worst input (86% of header fields; on the 3 large invoices 63%, and none exactly right): it misses or misreads tax IDs, totals and dates. The OCR text alone gets the header right and loses table rows. Both together: the best or tied on every slice, but only one invoice ahead of the OCR text alone overall (8 against 7 of 12).
 2. **A 12B local model is far behind the API models** on this task: 67% exact match where GPT-6 Luna, Haiku 5.5 (effort `medium`) and Gemini Flash-Lite reach 97 to 100% on the same documents. It is usable for header fields (99%) with line items sent to review, not as a drop-in replacement.
 3. **It is slow on a laptop:** 5 to 7 minutes per invoice with two in flight, against ~16 s for an API model. The parse stage (CPU OCR) adds 1.5 minutes on documents with scans.
-4. **The parse stage matters most here.** A local deployment has no cheap PDF reader to fall back on: without the OCR text, the local model loses 25 pp of exact match.
+4. **The parse stage matters most here.** A local deployment has no cheap PDF reader to fall back on: without the OCR text (image only), the local model loses 33 pp of exact match.
 
 ## 2026-11-17: GPT-6 Luna, and the hybrid route with OCR text
 
-**Setup.** The OpenAI adapter now sends PDFs (`file` part) and page images (`image_url`, `detail: "high"`). GPT-6 Luna at reasoning effort `none` (default) and `low`, on all 39 invoices and the docfunnel, native and hybrid routes. Then a fourth route, `hybrid-ocr`: the hybrid input plus each scanned page's OCR text after its image. Then `hybrid-ocr` again on the 29 invoices with scans, to check it was not luck. Cost: OpenAI US$ 0.65 in total. Reports: [`reports/e2e/06-gpt-6-luna/`](../../reports/e2e/06-gpt-6-luna/report.md), [`reports/e2e/07-gpt-6-luna-hybrid-ocr/`](../../reports/e2e/07-gpt-6-luna-hybrid-ocr/report.md), [`reports/e2e/08-hybrid-ocr-repeat/`](../../reports/e2e/08-hybrid-ocr-repeat/report.md).
+**Setup.** The OpenAI adapter now sends PDFs (`file` part) and page images (`image_url`, `detail: "high"`). GPT-6 Luna at reasoning effort `none` (default) and `low`, on all 39 invoices and the text, native and hybrid routes. Then a fourth route, `hybrid-ocr`: the hybrid input plus each scanned page's OCR text after its image. Then `hybrid-ocr` again on the 29 invoices with scans, to check run-to-run stability. Those were the same invoices, so this does not test overfitting. Cost: OpenAI US$ 0.65 in total. Reports: [`reports/e2e/06-gpt-6-luna/`](../../reports/e2e/06-gpt-6-luna/report.md), [`reports/e2e/07-gpt-6-luna-hybrid-ocr/`](../../reports/e2e/07-gpt-6-luna-hybrid-ocr/report.md), [`reports/e2e/08-hybrid-ocr-repeat/`](../../reports/e2e/08-hybrid-ocr-repeat/report.md).
 
 | `gpt-6-luna` (all 39) | Field accuracy | Exact match | Line items F1 | Input tok/doc | Cost per 1k docs |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| docfunnel | 100.0% | 72 to 74% | 91 to 96% | 3,933 | $1.47 to $1.68 |
+| text | 100.0% | 72 to 74% | 91 to 96% | 3,933 | $1.47 to $1.68 |
 | native | 98.0% | 84.6% | 98.7% | 5,232 | $1.71 |
 | hybrid | 97.7% | 80 to 85% | 95 to 100% | 7,264 | $1.85 to $1.97 |
 | **hybrid-ocr** | **100.0%** | **100.0%** | **100.0%** | 8,349 | **$2.15** |
 | hybrid-ocr, repeat (29 with scans) | 100.0% | 96.6% | 97.2% | 9,999 | $2.10 |
 | native, effort `low` | 99.1% | 87.2% | 97.6% | 5,232 | $1.92 |
 
-1. **Text and image fail in different places, and together they do not.** On the docfunnel route GPT-6 Luna got every header field right and every miss (10 to 11 documents) was in the line items of a scanned page: RapidOCR text loses the table. On the native and hybrid routes the items were right, but it misread or skipped identifiers on scanned pages: 3 to 8 errors per run, mostly the vendor tax ID, then the document number and the date. With both the image and its OCR text, it got 39 of 39 documents right, and 28 of 29 on the repeat. This is the best result of the benchmark, on the cheapest model tested, for 26% more than native input ($2.15 against $1.71 per 1k).
-2. **The misread identifiers are a GPT-6 Luna trait.** Gemini 3.5 Flash-Lite, 3.1 Flash-Lite and Claude Haiku 5.5 did not misread them on the native or hybrid routes. Haiku's hybrid misses were line items, which the OCR text may also fix: not tested, as neither the Anthropic nor the Gemini key works any more.
-3. **OpenAI reads a PDF cheaply too.** Native input is 1.33x the docfunnel input and costs 2% more; like Gemini, unlike Claude. The hypothesis that GPT would behave like Claude was wrong.
+1. **Text and image fail in different places, and together they do not.** On the text route GPT-6 Luna got every header field right and every miss (10 to 11 documents) was in the line items of a scanned page: RapidOCR text loses the table. On the native and hybrid routes the items were right, but it misread or skipped identifiers on scanned pages: 3 to 8 errors per run, mostly the vendor tax ID, then the document number and the date. With both the image and its OCR text, it got 39 of 39 documents right, and 28 of 29 on the repeat. This is the best result of the benchmark, on the cheapest model tested, for 26% more than native input ($2.15 against $1.71 per 1k). It is in-sample: the route was designed after reading the errors on these invoices.
+2. **Misread identifiers were seen only on GPT-6 Luna in these runs.** Gemini 3.5 Flash-Lite, 3.1 Flash-Lite and Claude Haiku 5.5 did not misread them on the native or hybrid routes. Haiku's hybrid misses were line items, which the OCR text may also fix: not tested, as neither the Anthropic nor the Gemini key works any more.
+3. **OpenAI reads a PDF cheaply too.** Native input is 1.33x the text input and costs 2% more; like Gemini, unlike Claude. The hypothesis that GPT would behave like Claude was wrong.
 4. **Reasoning effort `low` did not pay off:** +3 pp of exact match on native input (within the noise), +12% cost.
 5. **GPT-6 Luna is the cheapest model per document** ($1.5 to $2.2 per 1k against $3.6 to $4.4 for Haiku 5.5 and $7 to $12 for Gemini Flash-Lite), because it writes fewer output tokens (2,100 to 2,600 per document against 5,000 to 6,500 for Haiku).
 
@@ -73,12 +95,12 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 | Gemini 3.5 Flash-Lite | native | 100.0% | 100.0% | 5,106 | $13.73 |
 | Gemini 3.1 Flash-Lite | hybrid | 100.0% | 100.0% | 4,401 | $7.80 |
 
-1. **Effort `medium` pays for itself on Haiku 5.5:** +17 pp exact match on native input, +8 pp on hybrid, for 7 to 8% more cost. Haiku 5.5 at medium on the hybrid route was the cheapest setup with every document right.
+1. **Effort `medium` looked better on Haiku 5.5:** +17 pp exact match on native input, +8 pp on hybrid, for 7 to 8% more cost. On 12 invoices that is 1 to 2 documents, inside the noise, so this is inconclusive. Haiku 5.5 at medium on the hybrid route was the cheapest setup with every document right.
 2. **Sonnet 5.5 skips long item lists.** On every invoice with 54 or more items (3 per route) it returned all header fields right and an empty `line_items`, in ~215 output tokens; costing 12x Haiku, it scored lower. The `line_items_missing` rule added earlier today sent all 6 to review; without it they would have been auto-accepted.
 
 ## 2026-11-17: compact line items; the Gemini key runs out of credit
 
-**Setup.** Hybrid route on all 39 invoices with `--compact-output` (one-letter line-item keys), Gemini 3.1 Flash-Lite and Claude Haiku 5.5, compared with the standard answer format on the same documents (hybrid on the 29 with scans, docfunnel on the 10 digital ones). Cost: Anthropic US$ 0.14. Report: [`reports/e2e/04-compact-output/`](../../reports/e2e/04-compact-output/report.md).
+**Setup.** Hybrid route on all 39 invoices with `--compact-output` (one-letter line-item keys), Gemini 3.1 Flash-Lite and Claude Haiku 5.5, compared with the standard answer format on the same documents (hybrid on the 29 with scans, text on the 10 digital ones). Cost: Anthropic US$ 0.14. Report: [`reports/e2e/04-compact-output/`](../../reports/e2e/04-compact-output/report.md).
 
 | `claude-haiku-5-5` | Exact match | Line items F1 | Output tok/doc | Cost per 1k docs |
 | --- | ---: | ---: | ---: | ---: |
@@ -95,26 +117,26 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 | Model | Route | Exact match | Line items F1 | Cost per 1k docs |
 | --- | --- | ---: | ---: | ---: |
-| `gemini-3.1-flash-lite` | docfunnel | 82.8% | 98.7% | $7.08 |
+| `gemini-3.1-flash-lite` | text | 82.8% | 98.7% | $7.08 |
 | `gemini-3.1-flash-lite` | native | 79.3% | 97.7% | $6.76 |
 | `gemini-3.1-flash-lite` | **hybrid** | **96.6%** | **100.0%** | **$6.99** |
-| `gemini-3.5-flash-lite` | docfunnel | 58.6% | 96.1% | $11.68 |
+| `gemini-3.5-flash-lite` | text | 58.6% | 96.1% | $11.68 |
 | `gemini-3.5-flash-lite` | native | **100.0%** | 100.0% | $10.93 |
 | `gemini-3.5-flash-lite` | hybrid | 93.1% | 100.0% | $11.43 |
-| `claude-haiku-5-5` | docfunnel | 58.6% | 89.1% | $3.08 |
+| `claude-haiku-5-5` | text | 58.6% | 89.1% | $3.08 |
 | `claude-haiku-5-5` | native | **86.2%** | 92.4% | $4.12 |
 | `claude-haiku-5-5` | hybrid | 75.9% | 91.6% | $3.60 |
 
 1. **Placement was the whole problem.** Gemini 3.5 Flash-Lite went from 75.9% (images first) to 93.1% exact match, 3.1 Flash-Lite from 55.2% to 96.6%.
-2. **The hybrid route makes the cheapest Gemini model match the best one.** Over all 39 invoices (hybrid on the 29 with scans, the identical docfunnel request on the 10 digital ones), Gemini 3.1 Flash-Lite reaches ~97.4% exact match at ~US$ 7.32 per 1k documents; Gemini 3.5 Flash-Lite on native PDFs reaches 97.4% at US$ 11.86. Same accuracy, 62% of the cost.
-3. **It is not a rule.** On Gemini 3.5 Flash-Lite and Haiku 5.5 native input is still the most accurate route; the hybrid route sits between docfunnel and native in both accuracy and cost.
+2. **On Gemini 3.1 Flash-Lite the hybrid route matched the best setup, on paper.** Combining two runs over all 39 invoices (hybrid on the 29 with scans, the identical text request on the 10 digital ones), Gemini 3.1 Flash-Lite reaches ~97.4% exact match at ~US$ 7.32 per 1k documents. Gemini 3.5 Flash-Lite on native PDFs reaches 97.4% at US$ 11.86: the same accuracy, at 62% of the cost, from runs not made together.
+3. **It is not a rule.** On Gemini 3.5 Flash-Lite and Haiku 5.5 native input is still the most accurate route; the hybrid route sits between text and native in both accuracy and cost.
 4. **Run-to-run variance is large at this size.** Haiku's hybrid exact match was 79.3% in the first run and 75.9% in this one, with the same requests for most documents; on the 10 large documents it moved from 80% to 60%. Differences under ~10 pp on 29 documents, or ~20 pp on 10, are within noise.
 
 ## 2026-11-17: hybrid route, first attempt (images before the text)
 
 **Setup.** `--route hybrid --where scan=has_scanned_pages`: the 29 invoices with scanned pages; Gemini 3.5 / 3.1 Flash-Lite and Claude Haiku 5.5. Every page the parse stage routed to OCR was sent as a 150 dpi JPEG, all images before the text, with a note in the text where each scanned page was ("read it from attached image 2"). Cost: Gemini US$ 0.44, Anthropic US$ 0.10. Report: [`reports/e2e/02-hybrid-images-first/`](../../reports/e2e/02-hybrid-images-first/report.md).
 
-| Model | docfunnel exact match | native | hybrid v1 | hybrid v1 cost / native cost |
+| Model | text exact match | native | hybrid v1 | hybrid v1 cost / native cost |
 | --- | ---: | ---: | ---: | ---: |
 | `gemini-3.5-flash-lite` | 58.6% | 100.0% | 75.9% | 0.84x |
 | `claude-haiku-5-5` | 58.6% | 86.2% | 79.3% | 0.87x |
@@ -133,29 +155,29 @@ On 39 synthetic invoices (174 pages, 29 with scanned pages), single runs unless 
 
 | Model | Route | Field accuracy | Exact match | Line items F1 | Cost per 1k docs | LLM p50 |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
-| `gemini-3.5-flash-lite` | docfunnel | 99.4% | 69.2% | 97.3% | $12.46 | 7.3 s |
+| `gemini-3.5-flash-lite` | text | 99.4% | 69.2% | 97.3% | $12.46 | 7.3 s |
 | `gemini-3.5-flash-lite` | native | 99.7% | **97.4%** | 100.0% | $11.86 | 8.5 s |
-| `gemini-3.8-flash` | docfunnel | 99.4% | 64.1% | 95.7% | $15.20 | 17.1 s |
+| `gemini-3.8-flash` | text | 99.4% | 64.1% | 95.7% | $15.20 | 17.1 s |
 | `gemini-3.8-flash` | native | 100.0% | **97.4%** | 100.0% | $14.40 | 19.8 s |
-| `claude-haiku-5-5` | docfunnel | 98.0% | 69.2% | 92.7% | **$3.21** | 16.0 s |
+| `claude-haiku-5-5` | text | 98.0% | 69.2% | 92.7% | **$3.21** | 16.0 s |
 | `claude-haiku-5-5` | native | 100.0% | 82.1% | 86.5% | $4.29 | 17.6 s |
-| `gemini-3.1-flash-lite` | docfunnel | 99.1% | 87.2% | 99.1% | $7.39 | 8.0 s |
+| `gemini-3.1-flash-lite` | text | 99.1% | 87.2% | 99.1% | $7.39 | 8.0 s |
 | `gemini-3.1-flash-lite` | native | 99.7% | 84.6% | 98.4% | $7.10 | 9.3 s |
 
-The docfunnel route also spends parse CPU: 0.8 s per digital document, 26 s per document with scans (RapidOCR, summed over pages; wall-clock is lower across the page pool).
+The text route also spends parse CPU: 0.8 s per digital document, 26 s per document with scans (RapidOCR, summed over pages; wall-clock is lower across the page pool).
 
 ### What it shows
 
-1. **The parse stage is right on digital pages and wrong on scans.** Every docfunnel miss, on every model, is on a document with scanned pages; on the 10 digital documents the docfunnel route is as good or better than native (exact match +10 pp on Gemini, +30 pp on Haiku, whose native line-item F1 drops to 74%). On documents with scans, native wins by 28 to 48 pp of exact match on Gemini 3.5 / 3.8: the model reading the scan beats RapidOCR text. Header fields stay at 97 to 100% either way; the misses are line items.
+1. **The parse stage is right on digital pages and wrong on scans.** Every text-route miss, on every model, is on a document with scanned pages; on the 10 digital documents the text route is as good or better than native (exact match +10 pp on Gemini and +30 pp on Haiku: 1 and 3 of 10 documents; Haiku's native line-item F1 drops to 74%). On documents with scans, native wins by 28 to 48 pp of exact match on Gemini 3.5 / 3.8: the model reading the scan beats RapidOCR text. Header fields stay at 97 to 100% either way; the misses are line items.
 2. **On Gemini, the parse stage does not save money.** Gemini reads a PDF page in ~600 tokens, fewer than its extracted text plus our prompt (native input 0.63x on digital, 0.94x on large documents). Native is 2 to 6% cheaper on all three Gemini models.
-3. **On Claude it does, and more as documents grow.** Native input is 1.6x the docfunnel input on small documents and 2.2x on large ones; cost 1.25x and 1.63x.
-4. **Output is 72 to 92% of the cost**, on every model and both routes: line items plus thinking. The parse stage only touches input, so the biggest cost lever left is output (compact line-item format, thinking level), not parsing.
+3. **On Claude it does, and more as documents grow.** Native input is 1.6x the text input on small documents and 2.2x on large ones; cost 1.25x and 1.63x.
+4. **Output is 72 to 92% of the cost** in this run (52 to 92% across all later runs), on every model and both routes: line items plus thinking. The parse stage only touches input, so the biggest cost lever left is output (compact line-item format, thinking level), not parsing.
 5. **A bigger model did not help.** Gemini 3.8 Flash matches 3.5 Flash-Lite's accuracy (97.4% exact match native), costs 21% more and is 2.3x slower.
-6. **Cost-benefit ranking** (exact match / cost per 1k docs): Haiku 5.5 docfunnel 69% / $3.21; Haiku 5.5 native 82% / $4.29; Gemini 3.1 Flash-Lite native 85% / $7.10 (docfunnel 87% / $7.39); Gemini 3.5 Flash-Lite native 97% / $11.86.
+6. **Cost-benefit ranking** (exact match / cost per 1k docs): Haiku 5.5 text 69% / $3.21; Haiku 5.5 native 82% / $4.29; Gemini 3.1 Flash-Lite native 85% / $7.10 (text 87% / $7.39); Gemini 3.5 Flash-Lite native 97% / $11.86.
 
 ### What to change or test next
 
-- **Hybrid route** (built, `--route hybrid`): text for text-layer pages, an image only for pages routed to OCR. If finding 1 holds, it should keep the docfunnel result on digital pages and the native result on scans, at native-like cost on Claude.
+- **Hybrid route** (built, `--route hybrid`): text for text-layer pages, an image only for pages routed to OCR. If finding 1 holds, it should keep the text result on digital pages and the native result on scans, at native-like cost on Claude.
 - **Output tokens:** measure how much is thinking, then try a compact line-item format.
 - **More models** as quality references: Gemini 3.6 Flash, Claude Sonnet 5.5, on a subset.
 
@@ -178,16 +200,16 @@ The offline tests (stubbed SDKs, a mock HTTP transport) had checked the request 
 
 | Model | Route | Field accuracy | Line items F1 | Input tok/doc | Output tok/doc | Cost/doc | LLM p50 |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `gemini-3.5-flash-lite` | docfunnel | 96.3% | 89.1% | 3,426 | 4,931 | $0.0134 | 10.4 s |
+| `gemini-3.5-flash-lite` | text | 96.3% | 89.1% | 3,426 | 4,931 | $0.0134 | 10.4 s |
 | `gemini-3.5-flash-lite` | native | 96.3% | 100.0% | 2,236 | 4,782 | $0.0126 | 8.3 s |
-| `claude-haiku-5-5` | docfunnel | 100.0% | 64.2% | 5,156 | 3,874 | $0.0025 | 13.7 s |
+| `claude-haiku-5-5` | text | 100.0% | 64.2% | 5,156 | 3,874 | $0.0025 | 13.7 s |
 | `claude-haiku-5-5` | native | 66.7% | 66.2% | 13,812 | 9,068 | $0.0059 | 22.0 s |
 
-The docfunnel route also spent 5.8 s of CPU per document parsing (OCR on scanned pages).
+The text route also spent 5.8 s of CPU per document parsing (OCR on scanned pages).
 
 1. **Output, not input, drives the cost of invoice extraction.** Line items plus thinking are 4k to 8k output tokens per invoice, against 2k to 7k input tokens. The parse stage reduces input; output is the same on both routes. The lever is smaller than expected for line-item-heavy documents.
 2. **The parse stage pays off on Claude, not on Gemini.** Gemini reads a digital PDF in fewer tokens than its extracted text plus our prompt (0.65x); cost is even (0.95x). Claude turns each PDF page into an image plus text: 2.7x the input tokens, 2.4x the cost, and the long invoice ran out of output tokens.
-3. **The cheapest combination was Haiku 5.5 on the docfunnel route**, about 5x cheaper per document than Gemini 3.5 Flash-Lite: input prices are close, but Gemini's output costs US$ 2.50 per 1M tokens against Haiku's US$ 0.50, and output dominates.
+3. **The cheapest combination was Haiku 5.5 on the text route**, about 5x cheaper per document than Gemini 3.5 Flash-Lite: input prices are close, but Gemini's output costs US$ 2.50 per 1M tokens against Haiku's US$ 0.50, and output dominates.
 4. **CPU OCR loses to the model reading the scan.** On Gemini, line-item F1 was 100% native against 89% via RapidOCR text; the misses are on scanned pages.
 
 ### Open questions for the next runs
