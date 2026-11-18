@@ -25,7 +25,9 @@ Reading the text layer of a digital PDF takes milliseconds per page, and it is e
 
 ## Results at a glance
 
-End to end with real models, on 39 synthetic invoices of 1 to 10 pages (29 with scanned pages). Exact match means every header field and every line item right. [Lab notebook with every run, its cost and what changed because of it →](docs/evaluation/findings.md)
+End to end with real models, on 39 synthetic invoices of 1 to 10 pages (29 with scanned pages). Exact match means every header field and every line item right. [Full benchmark: setup, results, which route to use, how to reproduce →](docs/evaluation/real-models.md)
+
+<p align="center"><img src="docs/img/e2e-accuracy-vs-cost.svg" alt="Exact match against cost per 1,000 invoices. GPT-6 Luna rises from 72% on parsed text to 100% on page images with their OCR text, for $2.15 per 1,000; Gemini models reach 97% reading the PDF at $12 to $14." width="760"></p>
 
 | Model | What the model sees | Exact match | Cost per 1k invoices |
 | --- | --- | ---: | ---: |
@@ -38,7 +40,16 @@ End to end with real models, on 39 synthetic invoices of 1 to 10 pages (29 with 
 | Claude Sonnet 5.5, 12-invoice sample | the PDF file | 75% | $52 |
 | Gemma 4 12B on a laptop (Ollama), 12-invoice sample | `hybrid-ocr` | 67% | $0 API, ~6 min each |
 
-What the runs showed: output tokens are 72 to 92% of the cost, so sending less text saves little on Gemini and OpenAI, which read PDFs cheaply (it does save 25 to 63% on Claude). The gain is in accuracy on scans: OCR text keeps identifiers right, the image keeps table rows right, and together they fixed both. A bigger model did not help. These are single runs on synthetic documents (run-to-run variance ~10 pp), and `hybrid-ocr` has not been run on Claude or Gemini yet.
+What the runs showed: output tokens are 72 to 92% of the cost, so sending less text saves little on Gemini and OpenAI, which read PDFs cheaply (on Claude Haiku it cuts the cost by 25%). The gain is in accuracy on scans: OCR text keeps identifiers right, the image keeps table rows right, and together they fixed both. A bigger model did not help. These are single runs on synthetic documents (run-to-run variance ~10 pp), and `hybrid-ocr` has not been run on Claude or Gemini yet. Every run, its cost and what changed in the code because of it: the [lab notebook](docs/evaluation/findings.md) and [`reports/e2e/`](reports/e2e/README.md).
+
+### Which route to use
+
+| Your documents | `route` | Why |
+| --- | --- | --- |
+| Digital PDFs, text | `text` (default) | The text layer is exact; on Claude it costs 25% less than the PDF |
+| Scans or mixed PDFs, API model that reads images | `hybrid-ocr` | Most accurate in every run; about 25% more than sending the PDF on GPT-6 Luna |
+| Documents that must stay on your machines | `hybrid-ocr` on [Ollama](docs/providers.md) | Header fields 99% right on a 12B local model; keep review on for line items |
+| Simplest integration, cost secondary | `native` | Gemini Flash-Lite read the PDFs well, at five to seven times the cost |
 
 Parse stage on 50 synthetic PDFs (134 pages), Apple M4 Pro, 12 worker processes. [Full results and discussion →](docs/evaluation/parse-stage.md)
 
@@ -81,6 +92,19 @@ uv run docfunnel extract examples/invoice_br.txt --provider openai --fallback an
 ```
 
 Also available as an HTTP API (`docfunnel serve`) and a Docker image. See the [usage guide](docs/usage.md).
+
+### A worked example: an invoice inbox
+
+[`examples/invoice_inbox.py`](examples/invoice_inbox.py) reads a folder of invoices and receipts, writes the accepted ones to `accepted.csv` and queues the rest in `review.jsonl` with the reasons a person should look at them. It prints what the run cost.
+
+```bash
+uv run python examples/invoice_inbox.py examples/          # offline, fake provider
+#   accept  invoice_br.txt: Papelaria Estrela, 20053.20 BRL
+#   review  invoice_multipage.pdf: line_items_missing:line_items,subtotal
+#   review  receipt_misprinted.txt: total_mismatch:subtotal,tax,total
+#   5 documents: 3 accepted, 2 sent to review; model cost $0.0000 ...
+uv run python examples/invoice_inbox.py ./inbox --provider openai --route hybrid-ocr
+```
 
 ### From Python
 
@@ -192,8 +216,9 @@ src/docfunnel/
 tests/            # mirrors src/: parse, extract, providers, evals, datasets, interfaces
 docs/             # architecture, usage, providers, evaluation reports, roadmap
 reports/baseline/ # committed baselines the CI gates compare against
+reports/e2e/      # every real-model run, one folder each, with a generated index
 data/synthetic/   # bundled receipt dataset; generated PDFs go to data/synthetic/pdf (git-ignored)
-examples/         # sample documents for the quickstart
+examples/         # sample documents, and invoice_inbox.py: a folder to CSV plus a review queue
 ```
 
 ## Documentation
@@ -206,7 +231,8 @@ examples/         # sample documents for the quickstart
 | [Providers](docs/providers.md) | Default models, what each adapter sends, pricing, adding a provider |
 | [Evaluation: parse stage](docs/evaluation/parse-stage.md) | Dataset, metrics, results across engines and platforms, the gate |
 | [Evaluation: LLM step](docs/evaluation/llm-step.md) | Dataset, metrics, fake-provider results, reproducing with a real model |
-| [Evaluation: real models](docs/evaluation/findings.md) | End-to-end runs on GPT, Claude, Gemini and a local model: routes, accuracy, cost |
+| [Evaluation: real models](docs/evaluation/real-models.md) | GPT, Claude, Gemini and a local model on every route: results, which route to use, how to reproduce |
+| [Lab notebook](docs/evaluation/findings.md) | Every real-model run in order: what it showed, what it cost, what changed in the code |
 | [Roadmap](docs/roadmap.md) | Known limitations and the next phases |
 | [Contributing](CONTRIBUTING.md) | Setup, where code goes, baselines, CI |
 | [Changelog](CHANGELOG.md) | What changed between versions |
