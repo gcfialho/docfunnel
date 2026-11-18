@@ -81,9 +81,9 @@ def test_both_routes_budget_and_report(e2e_dir: Path, tmp_path: Path) -> None:
     requests = providers[0].requests
     text_requests = [r for r in requests if not r.attachments]
     file_requests = [r for r in requests if r.attachments]
-    assert len(text_requests) == 3  # docfunnel route: parsed text, no file
+    assert len(text_requests) == 3  # text route: parsed text, no file
     assert "<document>" in text_requests[0].messages[1].content
-    # Budget: $3 spent after the docfunnel route, so one native call runs, two are skipped.
+    # Budget: $3 spent after the text route, so one native call runs, two are skipped.
     assert len(file_requests) == 1
     assert file_requests[0].attachments[0].media_type == "application/pdf"
     assert file_requests[0].messages[1].content == ATTACHED_DOCUMENT_PROMPT
@@ -91,15 +91,15 @@ def test_both_routes_budget_and_report(e2e_dir: Path, tmp_path: Path) -> None:
     assert report.meta.spent_usd == {"scripted": 4.0}
 
     by_route = {g.route: g.metrics for g in report.groups if g.slice == "all"}
-    assert by_route["docfunnel"].documents == 3
+    assert by_route["text"].documents == 3
     assert by_route["native"].documents == 1
-    assert by_route["docfunnel"].field_accuracy > 0
+    assert by_route["text"].field_accuracy > 0
 
     json_path, md_path = write_e2e_report(report, tmp_path)
     assert load_e2e_report(json_path).meta == report.meta
     markdown = md_path.read_text()
-    assert "| `cheap-model` | docfunnel | 3 |" in markdown
-    assert "### Against the docfunnel route" in markdown
+    assert "| `cheap-model` | text | 3 |" in markdown
+    assert "### Against the text route" in markdown
     assert "skipped calls (budget reached or provider stopped): 2" in markdown
 
 
@@ -118,7 +118,7 @@ def test_hybrid_sends_images_of_scanned_pages_and_reuses_digital_results(
     config = E2EConfig(
         dataset=e2e_dir,
         targets=[("scripted", "m")],
-        routes=("hybrid", "docfunnel"),  # run in docfunnel-first order regardless
+        routes=("hybrid", "text"),  # run in text-first order regardless
         workers=4,  # page images are rendered before the threads start (PDFium)
     )
     report = run_e2e(config, make_extractor=make)
@@ -135,7 +135,7 @@ def test_hybrid_sends_images_of_scanned_pages_and_reuses_digital_results(
         assert all(a.media_type == "image/jpeg" for a in request.attachments)
         assert all(a.data.startswith(b"\xff\xd8") for a in request.attachments)
         assert "[[attachment:1]]" in request.messages[1].content
-    assert report.meta.routes == ["docfunnel", "hybrid"]
+    assert report.meta.routes == ["text", "hybrid"]
 
 
 def test_a_provider_that_fails_without_tokens_is_stopped(e2e_dir: Path) -> None:

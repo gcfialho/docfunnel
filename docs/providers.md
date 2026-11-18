@@ -2,7 +2,7 @@
 
 OpenAI, Anthropic and Gemini are selected with environment variables or CLI flags (`--provider`, `--model`, `--fallback provider:model`). Three more providers need no API key:
 
-- **`ollama`**: a model on a local [Ollama](https://ollama.com) server (`OLLAMA_HOST`, default `http://localhost:11434`), through its OpenAI-compatible endpoint. The extraction schema is sent as a JSON Schema constraint and thinking is turned off (`reasoning_effort: "none"`). Ollama takes page images but not PDF files, so use the `docfunnel` or `hybrid` route. Local models have no API charge; the price table lists them at $0, without hardware or power.
+- **`ollama`**: a model on a local [Ollama](https://ollama.com) server (`OLLAMA_HOST`, default `http://localhost:11434`), through its OpenAI-compatible endpoint. The extraction schema is sent as a JSON Schema constraint and thinking is turned off (`reasoning_effort: "none"`). Ollama takes page images but not PDF files, so use the `text`, `hybrid` or `hybrid-ocr` route (on Gemma 4 12B, `hybrid-ocr` and `text` were close: 8 and 7 of 12 invoices; the image alone was worse). Local models have no API charge; the price table lists them at $0, without hardware or power.
 
 - **`fake`**: a deterministic regex parser written for the synthetic templates, with fault injection (malformed JSON, schema violations, hard failures and confident hallucinations at fixed rates). It exists to test the harness and the failure handling, not to measure a model.
 - **`replay`**: plays back a cassette recorded with `docfunnel eval --record`, so a real-model run can be re-scored offline after changing a metric.

@@ -44,16 +44,16 @@ _HEADER = [
 
 
 def _comparison(report: E2EReport, slice_: str) -> list[str]:
-    """Every other route against the docfunnel route, per model (per-document averages)."""
+    """Every other route against the text route, per model (per-document averages)."""
     lines = [
-        "| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) "
-        "| Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |",
+        "| Model | Route | Input tokens (route / text) | Cost (route / text) "
+        "| Field accuracy (route - text) | Exact match (route - text) |",
         "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
     by_key = {(g.model, g.route): g.metrics for g in report.groups if g.slice == slice_}
     for model, route in by_key:
-        other, ours = by_key[(model, route)], by_key.get((model, "docfunnel"))
-        if route == "docfunnel" or ours is None or not ours.input_tokens:
+        other, ours = by_key[(model, route)], by_key.get((model, "text"))
+        if route == "text" or ours is None or not ours.input_tokens:
             continue
         tokens = (other.input_tokens / other.documents) / (ours.input_tokens / ours.documents)
         cost = (
@@ -102,7 +102,7 @@ def render_e2e_markdown(report: E2EReport) -> str:
         *_HEADER,
         *[_group_row(report, g) for g in report.groups if g.slice == "all"],
         "",
-        "### Against the docfunnel route",
+        "### Against the text route",
         "",
         *_comparison(report, "all"),
     ]

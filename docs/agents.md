@@ -1,6 +1,6 @@
 # Using docfunnel from an agent
 
-An agent that reads a PDF itself spends tokens on every page and loses track of where each fact came from. docfunnel does the cheap part on the CPU: it reads the text layer, OCRs only the pages that need it, and returns Markdown with one `## Page N` section per page, so the agent can quote and cite pages. For receipts and invoices it can also return validated JSON with a review decision.
+docfunnel gives an agent a document as page-numbered text: it reads the text layer on the CPU, OCRs only the pages that need it, and returns Markdown with one `## Page N` section per page, so the agent can quote and cite pages. Whether that is cheaper than letting the model read the PDF depends on the model. In [the proof of concept](evaluation/real-models.md) it saved about 25% on Claude Haiku and nothing on Gemini or OpenAI. For receipts and invoices it can also return validated JSON with a review decision.
 
 The bridge is an [MCP](https://modelcontextprotocol.io) server over stdio, so one setup works in Claude Code, the Claude Agent SDK, the OpenAI Agents SDK, Gemini CLI, LiteLLM and any other MCP client. In Python code without an agent framework, call the [library API](usage.md#python-api) directly.
 

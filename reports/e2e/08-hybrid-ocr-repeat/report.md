@@ -13,9 +13,9 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `gpt-6-luna` | hybrid-ocr | 29 | 100.0% | 96.6% | 97.2% | 100.0% | 9,999 | 2,203 | 0 | $0.00210 | $2.10 | 15.0 s | n/a |
 
-### Against the docfunnel route
+### Against the text route
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## scan=has_scanned_pages
@@ -24,7 +24,7 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `gpt-6-luna` | hybrid-ocr | 29 | 100.0% | 96.6% | 97.2% | 100.0% | 9,999 | 2,203 | 0 | $0.00210 | $2.10 | 15.0 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## size=large
@@ -33,7 +33,7 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `gpt-6-luna` | hybrid-ocr | 10 | 100.0% | 100.0% | 100.0% | 100.0% | 14,296 | 1,544 | 0 | $0.00220 | $2.20 | 12.4 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## size=small
@@ -42,5 +42,5 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `gpt-6-luna` | hybrid-ocr | 19 | 100.0% | 94.7% | 96.3% | 100.0% | 7,738 | 2,550 | 0 | $0.00205 | $2.05 | 15.7 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |

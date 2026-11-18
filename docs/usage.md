@@ -29,8 +29,11 @@ uv sync --extra cpu         # parse stage only: pypdfium2 + RapidOCR
 | | `compare-parse BASE CAND` | Parse regression gate; exit 1 on a quality regression |
 | | `eval` | LLM-step eval on the labelled receipts -> `reports/latest/` |
 | | `compare BASE CAND` | LLM regression gate; exit 1 when quality drops or cost rises beyond thresholds |
+| | `eval-e2e -t provider:model` | Every route against real models on the end-to-end set, under a spending cap -> `reports/e2e-latest/` ([how](evaluation/real-models.md#reproduce)) |
+| | `e2e-summary` | Regenerate `reports/e2e/README.md` and the accuracy-vs-cost chart from the committed runs |
 | Datasets | `generate-dataset` | Rewrite `data/synthetic/receipts.jsonl` (seed 7) |
 | | `generate-pdfs` | 50 PDFs + `manifest.jsonl` in `data/synthetic/pdf` (seed 11) |
+| | `generate-e2e` | The end-to-end set: those invoices plus 10 with contracts annexed, in `data/synthetic/e2e` (seed 5) |
 | Serve | `serve` | FastAPI on `127.0.0.1:8000` |
 | | `mcp` | MCP server over stdio |
 
@@ -65,9 +68,9 @@ PDFs and images go through the parse stage first. See [Providers, models and pri
 | Route | The model gets | Use it when |
 | --- | --- | --- |
 | `text` (default) | the parsed text: text layer, OCR text on scanned pages | documents are digital, or the model cannot read images |
-| `hybrid-ocr` | the text of digital pages; for each scanned page, its image in place, then its OCR text | documents have scans: the most accurate route in [our runs](evaluation/findings.md) |
-| `hybrid` | the same, without the OCR text | comparison only; small models misread images alone |
-| `native` | the PDF or image file itself | the provider reads files well and cheaply (Gemini, OpenAI); not Ollama |
+| `hybrid-ocr` | the text of digital pages; for each scanned page, its image in place, then its OCR text | documents have scans and the model reads images. Best on GPT-6 Luna in [the proof of concept](evaluation/real-models.md), in-sample and untested on other API models |
+| `hybrid` | the same, without the OCR text | comparing routes. Mixed results: good on Gemini 3.1 Flash-Lite, worse than `hybrid-ocr` on GPT-6 Luna and Gemma 4 |
+| `native` | the PDF or image file itself | you would rather not parse; Gemini and OpenAI read PDFs at about the cost of their text. Not Ollama |
 
 On a fully digital PDF the three parsed routes send the same text. Page images need a model that takes images (every provider here except `fake` reads them; `replay` matches them by hash).
 
