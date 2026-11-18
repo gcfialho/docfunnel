@@ -17,7 +17,8 @@ from docfunnel import __version__
 from docfunnel.config import Settings
 from docfunnel.extract.extractor import MAX_DOCUMENT_CHARS, Extractor
 from docfunnel.extract.schema import ExtractionResult
-from docfunnel.loaders import UnsupportedDocumentError, load_document
+from docfunnel.inputs import ModelInput, Route, build_input
+from docfunnel.loaders import UnsupportedDocumentError
 from docfunnel.service import get_extractor, get_settings
 
 app = FastAPI(
@@ -39,6 +40,11 @@ class ExtractRequest(BaseModel):
     )
     path: str | None = Field(
         default=None, description="File (txt/pdf/image) relative to DOCFUNNEL_INPUT_DIR."
+    )
+    route: Route | None = Field(
+        default=None,
+        description="What the model is sent for a file: text, hybrid, hybrid-ocr or native. "
+        "Defaults to DOCFUNNEL_ROUTE (text).",
     )
 
     @model_validator(mode="after")
@@ -83,13 +89,14 @@ def extract(
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> ExtractionResult:
     if request.path is not None:
+        path = _resolve_input(request.path, settings)
         try:
-            text = load_document(_resolve_input(request.path, settings))
+            model_input = build_input(path, request.route or settings.route)
         except UnsupportedDocumentError as exc:
             raise HTTPException(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, str(exc)) from exc
     else:
-        text = request.text or ""
+        model_input = ModelInput(request.text or "")
     try:
-        return extractor.extract(text)
+        return extractor.extract(model_input.text, attachments=model_input.attachments)
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc

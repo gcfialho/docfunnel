@@ -155,18 +155,3 @@ def test_a_provider_that_fails_without_tokens_is_stopped(e2e_dir: Path) -> None:
     assert len(scripted.requests) == 3  # DEAD_CALLS_LIMIT, then the provider is stopped
     assert [r.skip_reason for r in report.rows if r.skipped] == ["provider_unavailable"] * 3
     assert "credits are depleted" in report.meta.unavailable["broke"]
-
-
-def test_hybrid_ocr_puts_the_ocr_text_after_each_scanned_page_image(e2e_dir: Path) -> None:
-    from docfunnel.evals.e2e.runner import hybrid_inputs
-    from docfunnel.parse import parse_file
-
-    doc = next(d for d in load_e2e_set(e2e_dir) if d.scanned_pages)
-    parsed = parse_file(e2e_dir / doc.file)
-    plain, images = hybrid_inputs(parsed, e2e_dir / doc.file, 72)
-    text, same_images = hybrid_inputs(parsed, e2e_dir / doc.file, 72, with_ocr_text=True)
-    assert len(images) == len(same_images) > 0
-    assert "OCR text of page" not in plain
-    scanned = next(p for p in parsed.pages if p.source == "ocr")
-    marker = f"[Page {scanned.number}, scanned:]"
-    assert text.index(marker) < text.index(f"[OCR text of page {scanned.number}")

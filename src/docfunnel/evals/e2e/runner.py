@@ -38,6 +38,7 @@ from docfunnel.evals.extract.runner import DocumentScore, Metrics, aggregate, sc
 from docfunnel.extract.extractor import Extractor
 from docfunnel.extract.prompts import PROMPT_VERSION
 from docfunnel.extract.schema import ExtractionResult
+from docfunnel.inputs import ModelInput, page_image_input
 from docfunnel.parse.model import ParsedDocument
 from docfunnel.parse.pipeline import PagePool, ParseOptions
 from docfunnel.providers.base import Attachment
@@ -168,42 +169,6 @@ def _cpu_ms(document: ParsedDocument) -> float:
     return sum(page.timings_ms.get("total", 0.0) for page in document.pages)
 
 
-def _page_jpeg(path: Path, index: int, dpi: int) -> bytes:
-    import io
-
-    import pypdfium2 as pdfium
-
-    pdf = pdfium.PdfDocument(str(path))
-    try:
-        image = pdf[index].render(scale=dpi / 72, grayscale=True).to_pil()
-        buffer = io.BytesIO()
-        image.save(buffer, format="JPEG", quality=85)
-        return buffer.getvalue()
-    finally:
-        pdf.close()
-
-
-def hybrid_inputs(
-    document: ParsedDocument, pdf: Path, dpi: int, *, with_ocr_text: bool = False
-) -> tuple[str, list[Attachment]]:
-    """Text of the text-layer pages, and a JPEG of each page the parse stage sent to OCR.
-
-    With ``with_ocr_text``, the OCR text of each scanned page follows its image.
-    """
-    parts: list[str] = []
-    images: list[Attachment] = []
-    for page in document.pages:
-        if page.source == "ocr":
-            images.append(Attachment(_page_jpeg(pdf, page.number - 1, dpi), "image/jpeg"))
-            # The adapters put the image here, between the pages of text around it.
-            parts.append(f"[Page {page.number}, scanned:]\n[[attachment:{len(images)}]]")
-            if with_ocr_text and page.text.strip():
-                parts.append(f"[OCR text of page {page.number}, may contain errors:]\n{page.text}")
-        else:
-            parts.append(page.text)
-    return "\n\n".join(parts), images
-
-
 def run_e2e(
     config: E2EConfig,
     *,
@@ -226,11 +191,11 @@ def run_e2e(
     text_scores: dict[tuple[str, str], DocumentScore] = {}
     # PDFium is not thread-safe: render the hybrid route's page images here, once per
     # document and in this thread, before the model calls run in the worker threads.
-    hybrid: dict[tuple[str, str], tuple[str, list[Attachment]]] = {
-        (route, d.id): hybrid_inputs(
+    hybrid: dict[tuple[str, str], ModelInput] = {
+        (route, d.id): page_image_input(
             parsed[d.id],
             config.dataset / d.file,
-            config.hybrid_dpi,
+            dpi=config.hybrid_dpi,
             with_ocr_text=route == "hybrid-ocr",
         )
         for route in HYBRID_ROUTES & set(routes)
@@ -257,11 +222,13 @@ def run_e2e(
                 result = extractor.extract(attachments=[Attachment(data, "application/pdf")])
             else:
                 row.parse_cpu_ms = _cpu_ms(parsed[doc.id])
-                text, images = hybrid[(route, doc.id)]
-                if not images and (model, doc.id) in text_scores:
+                model_input = hybrid[(route, doc.id)]
+                if not model_input.attachments and (model, doc.id) in text_scores:
                     row.score, row.reused = text_scores[(model, doc.id)], True
                 else:
-                    result = extractor.extract(text, attachments=images)
+                    result = extractor.extract(
+                        model_input.text, attachments=model_input.attachments
+                    )
             if result is not None:
                 budget.add(provider, result.usage.cost_usd)
                 budget.record_outcome(provider, result)

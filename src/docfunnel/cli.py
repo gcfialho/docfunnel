@@ -171,6 +171,13 @@ def extract(
     model: ModelOpt = None,
     fallback: FallbackOpt = None,
     cassette: CassetteOpt = None,
+    route: Annotated[
+        str | None,
+        typer.Option(
+            help="What the model is sent: text | hybrid | hybrid-ocr | native "
+            "[env: DOCFUNNEL_ROUTE; default: text]"
+        ),
+    ] = None,
     include_calls: Annotated[bool, typer.Option(help="Include per-call accounting")] = True,
     fail_on_review: Annotated[
         bool, typer.Option(help="Exit with code 3 when the result needs human review")
@@ -184,7 +191,9 @@ def extract(
             result = extract_document(text=sys.stdin.read(), extractor=extractor)
         else:
             fetch = settings.fetch_policy(confine_to_input_dir=False)
-            result = extract_document(source, extractor=extractor, fetch=fetch)
+            result = extract_document(
+                source, extractor=extractor, fetch=fetch, route=route or settings.route
+            )
     except (OSError, UnsupportedDocumentError, ProviderNotConfiguredError, ValueError) as exc:
         raise _fail(str(exc)) from exc
     exclude = None if include_calls else {"calls"}
