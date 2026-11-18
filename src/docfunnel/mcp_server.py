@@ -116,10 +116,25 @@ def parse_document(
     }
 
 
-def extract_document(source: str | None = None, text: str | None = None) -> dict[str, Any]:
-    """Extract a receipt or invoice from ``source`` or ``text`` as JSON-compatible data."""
+def extract_document(
+    source: str | None = None,
+    text: str | None = None,
+    route: Literal["text", "hybrid", "hybrid-ocr", "native"] | None = None,
+) -> dict[str, Any]:
+    """Extract a receipt or invoice from ``source`` or ``text`` as JSON-compatible data.
+
+    ``route`` sets what the model is sent for a PDF or image: ``text`` (parsed text,
+    cheapest), ``hybrid-ocr`` (adds an image of each scanned page; most accurate on scans)
+    or ``hybrid`` / ``native``. The server's ``DOCFUNNEL_ROUTE`` applies when it is left out.
+    """
     settings = get_settings()
-    result = _extract(source, text=text, extractor=get_extractor(), fetch=settings.fetch_policy())
+    result = _extract(
+        source,
+        text=text,
+        extractor=get_extractor(),
+        fetch=settings.fetch_policy(),
+        route=route or settings.route,
+    )
     return result.model_dump(mode="json", exclude={"calls"})
 
 

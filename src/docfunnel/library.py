@@ -15,12 +15,11 @@ and :func:`docfunnel.config.build_extractor`.
 from __future__ import annotations
 
 import asyncio
-from pathlib import Path
 
 from docfunnel.config import Settings, build_extractor
 from docfunnel.extract.extractor import Extractor
 from docfunnel.extract.schema import ExtractionResult
-from docfunnel.loaders import load_document, load_parsed
+from docfunnel.inputs import ModelInput, Route, build_input, parse_route
 from docfunnel.parse.model import ParsedDocument
 from docfunnel.parse.pipeline import ParseOptions, parse_file
 from docfunnel.sources import FetchPolicy, SourceLike, open_source
@@ -53,6 +52,7 @@ def extract_document(
     settings: Settings | None = None,
     parse_options: ParseOptions | None = None,
     fetch: FetchPolicy | None = None,
+    route: Route | str | None = None,
 ) -> ExtractionResult:
     """Extract a receipt or invoice into validated JSON, with a review decision.
 
@@ -61,16 +61,25 @@ def extract_document(
     from the ``DOCFUNNEL_*`` environment variables (the offline ``fake`` provider when
     nothing is set). Bad model output never raises: it ends up in the result with
     ``needs_review=True``.
+
+    ``route`` sets what the model is sent for a PDF or image (see
+    :mod:`docfunnel.inputs`): ``"text"`` (the default), ``"hybrid"``, ``"hybrid-ocr"``
+    (most accurate on scans in our runs) or ``"native"``. It defaults to
+    ``settings.route`` (``DOCFUNNEL_ROUTE``).
     """
     if (source is None) == (text is None):
         raise ValueError("pass exactly one of source or text")
-    if text is None:
+    if text is not None:
+        model_input = ModelInput(text)
+    else:
         assert source is not None
+        if route is None:
+            route = (settings or Settings.from_env()).route
         with open_source(source, fetch) as resolved:
-            text = _document_text(resolved.path, parse_options)
+            model_input = build_input(resolved.path, parse_route(route), parse_options)
     if extractor is None:
         extractor = build_extractor(settings or Settings.from_env())
-    return extractor.extract(text)
+    return extractor.extract(model_input.text, attachments=model_input.attachments)
 
 
 async def aparse_document(
@@ -94,6 +103,7 @@ async def aextract_document(
     settings: Settings | None = None,
     parse_options: ParseOptions | None = None,
     fetch: FetchPolicy | None = None,
+    route: Route | str | None = None,
 ) -> ExtractionResult:
     """:func:`extract_document` in a worker thread."""
     return await asyncio.to_thread(
@@ -104,9 +114,5 @@ async def aextract_document(
         settings=settings,
         parse_options=parse_options,
         fetch=fetch,
+        route=route,
     )
-
-
-def _document_text(path: Path, options: ParseOptions | None) -> str:
-    # Default options keep custom loaders registered with docfunnel.loaders.register_loader.
-    return load_document(path) if options is None else load_parsed(path, options)

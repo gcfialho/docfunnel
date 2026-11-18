@@ -12,6 +12,7 @@ README lists the sources. None of them has been exercised against the live APIs 
 
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass
 from typing import Literal
 
@@ -81,6 +82,12 @@ OPENAI_MODELS: dict[str, OpenAIModel] = {
     ),
 }
 
+# Local models behind Ollama's OpenAI-compatible endpoint. Ollama turns a JSON Schema
+# response_format into constrained decoding, and reasoning_effort "none" turns thinking
+# off on models that think by default (Gemma 4, Qwen 3).
+OLLAMA_DEFAULT = OpenAIModel(structured_outputs=True, reasoning_effort="none")
+OLLAMA_MODELS: dict[str, OpenAIModel] = {}
+
 ANTHROPIC_DEFAULT = AnthropicModel()
 ANTHROPIC_MODELS: dict[str, AnthropicModel] = {
     # Haiku 4.5: no effort parameter (it errors), thinking off unless requested.
@@ -107,16 +114,64 @@ GEMINI_MODELS: dict[str, GeminiModel] = {
     "gemini-3.5-flash-lite": GeminiModel(
         structured_outputs=True, thinking_level="minimal", min_output_tokens=8192
     ),
+    # Gemini 3.1 Flash-Lite: JSON Schema output; thinking left at the model default.
+    "gemini-3.1-flash-lite": GeminiModel(structured_outputs=True, min_output_tokens=8192),
+    # Gemini 3.8 Flash: thinking on by default at "medium"; "minimal" is rejected, so the
+    # lowest level is "low".
+    "gemini-3.8-flash": GeminiModel(
+        structured_outputs=True, thinking_level="low", min_output_tokens=8192
+    ),
 }
 
 
+# ---- variants: one model with some parameters changed, for ablations ------------------
+#
+# ``gemini-3.8-flash+thinking_level=medium`` is gemini-3.8-flash with its table entry's
+# thinking level replaced. The API receives the base name, prices are looked up by it
+# (prefix match), and reports keep the full name, so two variants of one model can be
+# compared in one run. Values: true/false, integers, a literal, or none.
+
+VARIANT_SEPARATOR = "+"
+
+
+def base_model(name: str) -> str:
+    """The model name to send to the API: ``name`` without its variant options."""
+    return name.split(VARIANT_SEPARATOR, 1)[0]
+
+
+def _with_options[P: (OpenAIModel, AnthropicModel, GeminiModel)](profile: P, name: str) -> P:
+    options = name.split(VARIANT_SEPARATOR)[1:]
+    if not options:
+        return profile
+    fields = {f.name: f for f in dataclasses.fields(profile)}
+    changes: dict[str, object] = {}
+    for option in options:
+        key, sep, raw = option.partition("=")
+        if not sep or key not in fields:
+            raise ValueError(
+                f"model option {option!r} must be key=value with key in {sorted(fields)}"
+            )
+        kind = str(fields[key].type)
+        if kind == "bool":
+            changes[key] = raw.lower() in {"1", "true", "yes", "on"}
+        elif kind == "int":
+            changes[key] = int(raw)
+        else:
+            changes[key] = None if raw.lower() in {"none", "null", ""} else raw
+    return dataclasses.replace(profile, **changes)  # type: ignore[arg-type]
+
+
 def openai_model(name: str) -> OpenAIModel:
-    return OPENAI_MODELS.get(name, OPENAI_DEFAULT)
+    return _with_options(OPENAI_MODELS.get(base_model(name), OPENAI_DEFAULT), name)
+
+
+def ollama_model(name: str) -> OpenAIModel:
+    return _with_options(OLLAMA_MODELS.get(base_model(name), OLLAMA_DEFAULT), name)
 
 
 def anthropic_model(name: str) -> AnthropicModel:
-    return ANTHROPIC_MODELS.get(name, ANTHROPIC_DEFAULT)
+    return _with_options(ANTHROPIC_MODELS.get(base_model(name), ANTHROPIC_DEFAULT), name)
 
 
 def gemini_model(name: str) -> GeminiModel:
-    return GEMINI_MODELS.get(name, GEMINI_DEFAULT)
+    return _with_options(GEMINI_MODELS.get(base_model(name), GEMINI_DEFAULT), name)

@@ -29,6 +29,10 @@ def request_key(request: CompletionRequest) -> str:
         "messages": [[m.role, m.content] for m in request.messages],
         "json_mode": request.json_mode,
     }
+    if request.attachments:  # keep keys of text-only requests unchanged
+        payload["attachments"] = [
+            [a.media_type, hashlib.sha256(a.data).hexdigest()] for a in request.attachments
+        ]
     return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
 

@@ -9,7 +9,8 @@ Phase 1 (this version) is the parse stage and its evaluation, feeding the LLM st
 - **No `garbled` test pages.** The rule for broken text layers (fonts without a Unicode map) exists and is unit-tested, but the generator does not produce such PDFs yet.
 - **Lines, not layout.** Blocks are text lines. Paragraphs, tables and multi-column reading order need a layout model (Docling as an optional extra, planned).
 - **Tesseract runs with the `eng` model only**, which costs it accuracy on German and Portuguese text; `ParseOptions(tesseract_lang="eng+deu+por")` is available when those models are installed.
-- **The LLM step is still evaluated only with the fake provider.** No real-model numbers are published, and no request has been sent to the OpenAI, Anthropic or Gemini APIs yet. The adapters follow the providers' current documentation and the installed SDKs (see [Providers, models and pricing](providers.md)), but the first real call per provider is still the real test.
+- **Real-model results are single runs on synthetic invoices.** The [end-to-end runs](evaluation/findings.md) cover GPT-6 Luna, Claude Haiku and Sonnet 5.5, three Gemini Flash models and a local Gemma 4, with ~10 pp of run-to-run variance. `hybrid-ocr`, the most accurate route, has been run on GPT-6 Luna and Gemma 4 only. Real scans (CORD v2) are the next test.
+- **The `text` route stays the default.** It works with every provider, including those that cannot read images; `hybrid-ocr` is opt-in until it is confirmed on more providers and on real scans.
 - **The bundled receipt dataset is read from the working directory.** `docfunnel eval` defaults to `data/synthetic/receipts.jsonl`, so run it from the repository root (or pass `--dataset`).
 
 ## Next phases

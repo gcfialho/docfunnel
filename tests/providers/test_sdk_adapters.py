@@ -79,7 +79,11 @@ class TestOpenAI:
             return SimpleNamespace(
                 model="some-model-2025",
                 choices=[SimpleNamespace(message=message)],
-                usage=SimpleNamespace(prompt_tokens=11, completion_tokens=7),
+                usage=SimpleNamespace(
+                    prompt_tokens=11,
+                    completion_tokens=7,
+                    completion_tokens_details=SimpleNamespace(reasoning_tokens=3),
+                ),
             )
 
         monkeypatch.setattr(
@@ -106,6 +110,7 @@ class TestOpenAI:
             11,
             7,
         )
+        assert response.reasoning_tokens == 3
 
     def test_unknown_model_gets_the_safe_default(self) -> None:
         from docfunnel.providers.openai_provider import OpenAIProvider

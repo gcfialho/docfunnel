@@ -93,6 +93,17 @@ def check_business_rules(
                     "line_items",
                 )
 
+    if not doc.line_items and doc.subtotal is not None:
+        # A printed subtotal sums printed items: an empty list means the model skipped
+        # them (seen with long invoices), which no other rule would notice.
+        add(
+            "line_items_missing",
+            "a subtotal is present but no line items were extracted",
+            Severity.ERROR,
+            "line_items",
+            "subtotal",
+        )
+
     if doc.line_items and doc.subtotal is not None:
         items_sum = sum((item.total for item in doc.line_items), Decimal("0"))
         if not _close(items_sum, doc.subtotal, policy):

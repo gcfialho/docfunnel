@@ -1,6 +1,8 @@
 # Providers, models and pricing
 
-OpenAI, Anthropic and Gemini are selected with environment variables or CLI flags (`--provider`, `--model`, `--fallback provider:model`). Two more providers need no key and no network:
+OpenAI, Anthropic and Gemini are selected with environment variables or CLI flags (`--provider`, `--model`, `--fallback provider:model`). Three more providers need no API key:
+
+- **`ollama`**: a model on a local [Ollama](https://ollama.com) server (`OLLAMA_HOST`, default `http://localhost:11434`), through its OpenAI-compatible endpoint. The extraction schema is sent as a JSON Schema constraint and thinking is turned off (`reasoning_effort: "none"`). Ollama takes page images but not PDF files, so use the `docfunnel` or `hybrid` route. Local models have no API charge; the price table lists them at $0, without hardware or power.
 
 - **`fake`**: a deterministic regex parser written for the synthetic templates, with fault injection (malformed JSON, schema violations, hard failures and confident hallucinations at fixed rates). It exists to test the harness and the failure handling, not to measure a model.
 - **`replay`**: plays back a cassette recorded with `docfunnel eval --record`, so a real-model run can be re-scored offline after changing a metric.
@@ -38,7 +40,15 @@ The Anthropic adapter never sends `temperature`: the `anthropic` 2.x SDK sends A
 
 A refusal (OpenAI `refusal`, Anthropic `stop_reason: "refusal"`) is a non-retryable error, so the fallback chain takes over. SDK-level retries are disabled: the extractor owns the retry policy, so every attempt is accounted for.
 
-> **Not yet exercised against the live APIs.** The tests check the request each SDK would send, offline: once against stubbed clients, and once with the real SDK clients on a mock HTTP transport, comparing the JSON body sent for each default model. Run one real extraction per provider before relying on these settings.
+The tests check the request each SDK would send, offline: once against stubbed clients, and once with the real SDK clients on a mock HTTP transport, comparing the JSON body sent for each default model. Since 2026-11-17 every default model has also been run against the live API; what that found is in [the findings log](evaluation/findings.md).
+
+### Files and page images
+
+A request can carry attachments (`CompletionRequest.attachments`): a PDF, or a PNG, JPEG, GIF or WebP image. Gemini gets them as inline parts, Anthropic as `document` and `image` blocks, OpenAI as a `file` part (PDF) or an `image_url` data URL at `detail: "high"`. A `[[attachment:N]]` marker in the user prompt puts file N at that point, between the text around it; files without a marker go first.
+
+### Model variants
+
+`provider:model+key=value` changes one field of the model's row in the table above for a run, without a code change: `anthropic:claude-haiku-5-5+effort=medium`, `openai:gpt-6-luna+reasoning_effort=low`, `gemini:gemini-3.8-flash+thinking_level=medium`. The API gets the name before the first `+`, and the price table matches it the same way.
 
 Sources, checked on 2026-11-03: OpenAI [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna), [GPT-6.1 Terra](https://developers.openai.com/api/docs/models/gpt-6.1-terra), [Using GPT-6](https://developers.openai.com/api/docs/guides/latest-model), [Reasoning](https://developers.openai.com/api/docs/guides/reasoning) and [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs); Anthropic [Structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs), [Steering thinking](https://platform.claude.com/docs/en/build-with-claude/thinking-steering-and-cost) and the [Claude Haiku 5.5 migration guide](https://platform.claude.com/docs/en/models/haiku-5-5/migration-guide); Google [Gemini 3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite), [What's new in Gemini 3.6 Flash and 3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/generate-content/whats-new-gemini-3.6), [Thinking](https://ai.google.dev/gemini-api/docs/thinking) and [Structured output](https://ai.google.dev/gemini-api/docs/structured-output); plus the installed SDKs (`openai` 3.42, `anthropic` 2.4, `google-genai` 2.34).
 
