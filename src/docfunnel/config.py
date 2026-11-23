@@ -9,7 +9,11 @@
 ``DOCFUNNEL_REVIEW_MIN_CONFIDENCE``    review threshold for field confidence (0.7)
 ``DOCFUNNEL_PRICING_FILE``             JSON price table overriding the bundled one
 ``DOCFUNNEL_CASSETTE``                 cassette path for the replay provider
-``DOCFUNNEL_INPUT_DIR``                directory the API may read files from (off if unset)
+``DOCFUNNEL_INPUT_DIR``                directory the API may read files from (off if unset);
+                                       for the MCP server, the directory paths must stay in
+``DOCFUNNEL_ALLOW_URLS``               let the MCP server download http(s) URLs (default 1)
+``DOCFUNNEL_ALLOW_PRIVATE_URLS``       allow URLs on private / loopback hosts (default 0)
+``DOCFUNNEL_MAX_DOWNLOAD_MB``          download size limit in MB (default 50)
 =====================================  ================================================
 """
 
@@ -24,6 +28,13 @@ from docfunnel.extract.extractor import Extractor, ModelTarget, RetryPolicy
 from docfunnel.extract.pricing import PriceTable
 from docfunnel.extract.validation import ReviewPolicy
 from docfunnel.providers import DEFAULT_MODELS, get_provider
+from docfunnel.sources import FetchPolicy
+
+
+def _flag(value: str | None, *, default: bool) -> bool:
+    if value is None or not value.strip():
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
 def parse_target(spec: str) -> tuple[str, str]:
@@ -47,6 +58,9 @@ class Settings:
     pricing_file: Path | None = None
     cassette: Path | None = None
     input_dir: Path | None = None
+    allow_urls: bool = True
+    allow_private_urls: bool = False
+    max_download_mb: float = 50.0
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] | None = None) -> Settings:
@@ -67,6 +81,20 @@ class Settings:
             pricing_file=path("DOCFUNNEL_PRICING_FILE"),
             cassette=path("DOCFUNNEL_CASSETTE"),
             input_dir=path("DOCFUNNEL_INPUT_DIR"),
+            allow_urls=_flag(env.get("DOCFUNNEL_ALLOW_URLS"), default=True),
+            allow_private_urls=_flag(env.get("DOCFUNNEL_ALLOW_PRIVATE_URLS"), default=False),
+            max_download_mb=float(env.get("DOCFUNNEL_MAX_DOWNLOAD_MB", "50")),
+        )
+
+    def fetch_policy(self, *, confine_to_input_dir: bool = True) -> FetchPolicy:
+        """What a source may point at: http(s) URLs on public hosts unless disabled, and
+        local files, confined to ``input_dir`` when it is set and ``confine_to_input_dir``
+        (tool callers such as the MCP server; the CLI passes ``False``)."""
+        return FetchPolicy(
+            base_dir=self.input_dir if confine_to_input_dir else None,
+            allow_urls=self.allow_urls,
+            allow_private_hosts=self.allow_private_urls,
+            max_bytes=int(self.max_download_mb * 1024 * 1024),
         )
 
     def with_overrides(

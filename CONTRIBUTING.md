@@ -23,6 +23,7 @@ The package is split by pipeline stage; see [docs/architecture.md](docs/architec
 | An LLM provider or a model's request parameters | `src/docfunnel/providers/` | `tests/providers/` |
 | A metric, a report or a regression gate | `src/docfunnel/evals/` | `tests/evals/` |
 | The synthetic generators | `src/docfunnel/datasets/` | `tests/datasets/` |
+| Public entry points, sources and downloads | `library.py`, `sources.py` | `tests/library/` |
 | CLI, HTTP API, MCP server | `cli.py`, `api.py`, `mcp_server.py` | `tests/interfaces/` |
 
 Shared fixtures live in `tests/conftest.py`; shared helpers (`ScriptedProvider`, paths) in `tests/helpers.py`.
