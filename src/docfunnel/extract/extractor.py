@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import random
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from typing import TypedDict
 
@@ -29,7 +29,9 @@ from pydantic import ValidationError
 
 from docfunnel.extract.pricing import PriceTable
 from docfunnel.extract.prompts import (
+    ATTACHED_DOCUMENT_PROMPT,
     OutputParseError,
+    expand_compact_items,
     format_validation_errors,
     output_schema,
     parse_json_object,
@@ -47,6 +49,7 @@ from docfunnel.extract.schema import (
 )
 from docfunnel.extract.validation import ReviewPolicy, check_business_rules, review_decision
 from docfunnel.providers.base import (
+    Attachment,
     CompletionRequest,
     LLMProvider,
     Message,
@@ -87,6 +90,7 @@ class _ResponseUsage(TypedDict):
 
     input_tokens: int
     output_tokens: int
+    reasoning_tokens: int | None
     model: str
 
 
@@ -99,6 +103,11 @@ class _Attempt:
     calls: list[CallRecord] = field(default_factory=list)
 
 
+def _sum_known(values: Iterable[int | None]) -> int | None:
+    known = [v for v in values if v is not None]
+    return sum(known) if known else None
+
+
 class Extractor:
     def __init__(
         self,
@@ -108,6 +117,7 @@ class Extractor:
         review: ReviewPolicy | None = None,
         prices: PriceTable | None = None,
         max_output_tokens: int = 2048,
+        compact_output: bool = False,
         sleep: Callable[[float], None] = time.sleep,
         clock: Callable[[], float] = time.perf_counter,
         rng: random.Random | None = None,
@@ -119,22 +129,32 @@ class Extractor:
         self.review = review or ReviewPolicy()
         self.prices = prices or PriceTable.load()
         self.max_output_tokens = max_output_tokens
+        self.compact_output = compact_output
         self._sleep = sleep
         self._clock = clock
         self._rng = rng or random.Random()
 
-    def extract(self, text: str) -> ExtractionResult:
-        if not text or not text.strip():
+    def extract(
+        self, text: str = "", *, attachments: Sequence[Attachment] = ()
+    ) -> ExtractionResult:
+        """Extract from ``text``, or from ``attachments`` sent to the model as files.
+
+        Attachments are native document input (a PDF or an image read by the model
+        itself, without the parse stage); only the Gemini and Anthropic adapters send them.
+        """
+        files = tuple(attachments)
+        if not files and not text.strip():
             raise ValueError("document text is empty")
         if len(text) > MAX_DOCUMENT_CHARS:
             raise ValueError(f"document exceeds {MAX_DOCUMENT_CHARS} characters")
 
         calls: list[CallRecord] = []
         started = self._clock()
-        base = [Message("system", system_prompt()), Message("user", user_prompt(text))]
+        prompt = user_prompt(text) if text.strip() else ATTACHED_DOCUMENT_PROMPT
+        base = [Message("system", system_prompt(self.compact_output)), Message("user", prompt)]
 
         for index, target in enumerate(self.targets):
-            document = self._run_target(target, list(base), calls)
+            document = self._run_target(target, list(base), calls, files)
             if document is not None:
                 return self._finish(document, target, calls, started, used_fallback=index > 0)
             logger.warning(
@@ -146,9 +166,13 @@ class Extractor:
         return self._finish(None, None, calls, started, used_fallback=len(self.targets) > 1)
 
     def _run_target(
-        self, target: ModelTarget, messages: list[Message], calls: list[CallRecord]
+        self,
+        target: ModelTarget,
+        messages: list[Message],
+        calls: list[CallRecord],
+        attachments: tuple[Attachment, ...] = (),
     ) -> ReceiptExtraction | None:
-        schema = output_schema()
+        schema = output_schema(compact=self.compact_output)
         for attempt in range(1, self.retry.max_attempts + 1):
             if attempt > 1:
                 self._sleep(self.retry.delay(attempt - 1, self._rng))
@@ -158,6 +182,7 @@ class Extractor:
                 messages=tuple(messages),
                 max_output_tokens=self.max_output_tokens,
                 response_schema=schema,
+                attachments=attachments,
             )
             t0 = self._clock()
             try:
@@ -173,10 +198,13 @@ class Extractor:
             record: _ResponseUsage = {
                 "input_tokens": response.input_tokens,
                 "output_tokens": response.output_tokens,
+                "reasoning_tokens": response.reasoning_tokens,
                 "model": response.model,
             }
             try:
                 data = parse_json_object(response.text)
+                if self.compact_output:
+                    data = expand_compact_items(data)
                 document = ReceiptExtraction.model_validate(data)
             except OutputParseError as exc:
                 calls.append(
@@ -219,6 +247,7 @@ class Extractor:
         *,
         input_tokens: int = 0,
         output_tokens: int = 0,
+        reasoning_tokens: int | None = None,
         model: str | None = None,
         error: str | None = None,
     ) -> CallRecord:
@@ -231,6 +260,7 @@ class Extractor:
             status=status,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
+            reasoning_tokens=reasoning_tokens,
             cost_usd=self.prices.cost(target.model, input_tokens, output_tokens),
             latency_ms=round(latency_ms, 3),
             error=error,
@@ -254,6 +284,7 @@ class Extractor:
             calls=len(calls),
             input_tokens=sum(c.input_tokens for c in calls),
             output_tokens=sum(c.output_tokens for c in calls),
+            reasoning_tokens=_sum_known(c.reasoning_tokens for c in calls),
             # One unpriced call makes the total unknown rather than silently too low.
             cost_usd=round(sum(known_costs), 8) if len(known_costs) == len(calls) else None,
             latency_ms=round((self._clock() - started) * 1000, 3),

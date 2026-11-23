@@ -47,7 +47,7 @@ ProviderOpt = Annotated[
     typer.Option(
         "--provider",
         "-p",
-        help="fake | openai | anthropic | gemini | replay [env: DOCFUNNEL_PROVIDER]",
+        help="fake | openai | anthropic | gemini | ollama | replay [env: DOCFUNNEL_PROVIDER]",
     ),
 ]
 ModelOpt = Annotated[
@@ -171,6 +171,13 @@ def extract(
     model: ModelOpt = None,
     fallback: FallbackOpt = None,
     cassette: CassetteOpt = None,
+    route: Annotated[
+        str | None,
+        typer.Option(
+            help="What the model is sent: text | hybrid | hybrid-ocr | native "
+            "[env: DOCFUNNEL_ROUTE; default: text]"
+        ),
+    ] = None,
     include_calls: Annotated[bool, typer.Option(help="Include per-call accounting")] = True,
     fail_on_review: Annotated[
         bool, typer.Option(help="Exit with code 3 when the result needs human review")
@@ -184,7 +191,9 @@ def extract(
             result = extract_document(text=sys.stdin.read(), extractor=extractor)
         else:
             fetch = settings.fetch_policy(confine_to_input_dir=False)
-            result = extract_document(source, extractor=extractor, fetch=fetch)
+            result = extract_document(
+                source, extractor=extractor, fetch=fetch, route=route or settings.route
+            )
     except (OSError, UnsupportedDocumentError, ProviderNotConfiguredError, ValueError) as exc:
         raise _fail(str(exc)) from exc
     exclude = None if include_calls else {"calls"}
@@ -397,6 +406,105 @@ def generate_pdfs(
     pages = sum(len(t.pages) for t in truths)
     scanned = sum(p.scanned for t in truths for p in t.pages)
     typer.echo(f"Wrote {len(truths)} documents ({pages} pages, {scanned} scanned) to {out}")
+
+
+@app.command("generate-e2e", rich_help_panel=DATASETS)
+def generate_e2e(
+    data: Annotated[Path, typer.Option(help="Directory from generate-pdfs")] = DEFAULT_PDF_DIR,
+    out: Annotated[Path, typer.Option(help="Output directory (PDFs + e2e.jsonl)")] = Path(
+        "data/synthetic/e2e"
+    ),
+    large: Annotated[int, typer.Option(help="Invoices with contracts annexed (8+ pages)")] = 10,
+    seed: Annotated[int, typer.Option(help="Random seed")] = 5,
+) -> None:
+    """Build the end-to-end PDF set: the generated invoices plus large ones with annexes."""
+    from docfunnel.evals.e2e import build_e2e_set
+
+    if not (data / MANIFEST_NAME).is_file():
+        raise _fail(f"{data}/{MANIFEST_NAME} not found; run 'docfunnel generate-pdfs' first")
+    docs = build_e2e_set(data, out, n_large=large, seed=seed)
+    pages = sum(d.pages for d in docs)
+    sizes = {s: sum(d.size == s for d in docs) for s in ("small", "large")}
+    typer.echo(
+        f"Wrote {len(docs)} invoices ({sizes['small']} small, {sizes['large']} large; "
+        f"{pages} pages) to {out}"
+    )
+
+
+@app.command("eval-e2e", rich_help_panel=EVALUATE)
+def eval_e2e(
+    target: Annotated[
+        list[str], typer.Option("--target", "-t", help="provider:model to test (repeatable)")
+    ],
+    data: Annotated[Path, typer.Option(help="Directory from generate-e2e")] = Path(
+        "data/synthetic/e2e"
+    ),
+    out: Annotated[Path, typer.Option(help="Output directory for report.json/report.md")] = Path(
+        "reports/e2e-latest"
+    ),
+    route: Annotated[
+        list[str] | None,
+        typer.Option("--route", help="docfunnel | native | hybrid | hybrid-ocr (repeatable)"),
+    ] = None,
+    budget_usd: Annotated[
+        float, typer.Option(help="Spending cap per provider; later calls are skipped")
+    ] = 4.0,
+    limit: Annotated[int | None, typer.Option(help="Only the first N documents")] = None,
+    sample: Annotated[
+        int | None, typer.Option(help="A seeded random sample of N documents (seed 0)")
+    ] = None,
+    where: Annotated[
+        list[str] | None,
+        typer.Option(help="Only documents with this tag, e.g. scan=has_scanned_pages, size=large"),
+    ] = None,
+    workers: Annotated[int, typer.Option(help="Concurrent documents per model")] = 4,
+    compact_output: Annotated[
+        bool, typer.Option(help="One-letter line-item keys in the model's answer")
+    ] = False,
+    run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
+) -> None:
+    """Compare the docfunnel route (CPU parse, then text) with native PDF input, per model.
+
+    Targets accept variant options for ablations, e.g.
+    ``gemini:gemini-3.8-flash+thinking_level=medium`` or
+    ``anthropic:claude-haiku-5-5+effort=medium``.
+    """
+    from docfunnel.evals.e2e import DEFAULT_ROUTES, ROUTES, E2EConfig, run_e2e, write_e2e_report
+
+    routes = tuple(route or DEFAULT_ROUTES)
+    if unknown := set(routes) - set(ROUTES):
+        raise _fail(f"unknown route(s) {sorted(unknown)}; use docfunnel, native or hybrid")
+    config = E2EConfig(
+        dataset=data,
+        targets=[parse_target(t) for t in target],
+        routes=routes,
+        default_budget_usd=budget_usd,
+        limit=limit,
+        where=dict(w.split("=", 1) for w in where or []),
+        compact_output=compact_output,
+        sample=sample,
+        workers=workers,
+        run_name=run_name,
+    )
+    interactive = sys.stderr.isatty()
+    done = 0
+
+    def progress(*_: object) -> None:
+        nonlocal done
+        done += 1
+        if interactive:
+            typer.echo(f"\r  {done} calls", nl=False, err=True)
+
+    try:
+        report = run_e2e(config, on_row=progress)
+    except (OSError, ValueError, ProviderNotConfiguredError) as exc:
+        raise _fail(str(exc)) from exc
+    if interactive:
+        typer.echo("", err=True)
+    json_path, md_path = write_e2e_report(report, out)
+    spent = ", ".join(f"{p} ${v:.4f}" for p, v in report.meta.spent_usd.items())
+    typer.echo(f"Spent: {spent or '$0'}; skipped calls: {report.meta.skipped_calls}")
+    typer.echo(f"Wrote {json_path} and {md_path}")
 
 
 @app.command(rich_help_panel=SERVE)

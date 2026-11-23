@@ -117,6 +117,7 @@ src/docfunnel/
 │   └── scan.py            #   deterministic scan simulation (rotation, blur, noise, JPEG)
 ├── config.py              # env-driven Settings, extractor factory
 ├── library.py             # parse_document / extract_document: the public entry points
+├── inputs.py              # routes: what the model is sent (text, the file, page images)
 ├── sources.py             # path, URL or bytes -> local file; download limits, host checks
 ├── loaders.py             # file -> text for the extractor, through the parse stage
 ├── service.py             # process-wide extractor shared by the API and the MCP server
@@ -125,7 +126,7 @@ src/docfunnel/
 └── mcp_server.py          # MCP server with the extract_document tool
 ```
 
-Dependencies point one way: `parse` knows nothing about LLMs; `extract` knows nothing about PDFs (`loaders.py` joins them); `evals` and `datasets` depend on the stages, never the reverse. Heavy optional dependencies (pypdfium2, RapidOCR, Tesseract, ReportLab, the provider SDKs) are imported inside the functions that need them, so the core installs and imports without any extra.
+Dependencies point one way: `parse` knows nothing about LLMs; `extract` knows nothing about PDFs (`loaders.py` and `inputs.py` join them); `evals` and `datasets` depend on the stages, never the reverse. Heavy optional dependencies (pypdfium2, RapidOCR, Tesseract, ReportLab, the provider SDKs) are imported inside the functions that need them, so the core installs and imports without any extra.
 
 ## Design choices
 

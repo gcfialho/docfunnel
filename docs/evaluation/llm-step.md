@@ -39,7 +39,7 @@ Reports also break these down by layout, locale and noise, and include retry and
 
 ## Results: fake provider only (not a real model)
 
-> **Read this first.** The numbers below were produced by running the harness with the **deterministic `fake` provider**. That provider is a regex parser written for these templates, with **fault injection**: malformed JSON, schema violations, hard failures and confident hallucinations, each at a fixed rate. The numbers show that the harness and the failure handling work end to end. **They say nothing about how any LLM performs.** No real-model results are published here; to get them, follow [Reproduce with a real model](#reproduce-with-a-real-model).
+> **Read this first.** The numbers below were produced by running the harness with the **deterministic `fake` provider**. That provider is a regex parser written for these templates, with **fault injection**: malformed JSON, schema violations, hard failures and confident hallucinations, each at a fixed rate. The numbers show that the harness and the failure handling work end to end. **They say nothing about how any LLM performs.** Real-model results, end to end on PDFs, are in [Findings from real-model runs](findings.md); to reproduce this eval with a real model, follow [Reproduce with a real model](#reproduce-with-a-real-model).
 
 Command: `uv run docfunnel eval --provider fake --model fake-mini [--fallback fake:fake-pro]`.
 

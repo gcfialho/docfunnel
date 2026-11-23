@@ -10,8 +10,9 @@ from docfunnel.providers.base import (
     CompletionResponse,
     ProviderError,
     ProviderNotConfiguredError,
+    interleave,
 )
-from docfunnel.providers.capabilities import gemini_model
+from docfunnel.providers.capabilities import base_model, gemini_model
 
 if TYPE_CHECKING:
     from google.genai import types as genai_types
@@ -70,9 +71,22 @@ class GeminiProvider:
             )
             for m in request.conversation
         ]
+        if request.attachments and contents:
+            first = request.conversation[0].content
+            contents[0].parts = [
+                types.Part(text=part)
+                if isinstance(part, str)
+                else types.Part.from_bytes(
+                    data=request.attachments[part].data,
+                    mime_type=request.attachments[part].media_type,
+                )
+                for part in interleave(first, len(request.attachments))
+            ]
         try:
             response = self._client.models.generate_content(
-                model=request.model, contents=contents, config=self.build_config(request)
+                model=base_model(request.model),
+                contents=contents,
+                config=self.build_config(request),
             )
         except self._errors.APIError as exc:
             code = getattr(exc, "code", None) or 0
@@ -88,4 +102,5 @@ class GeminiProvider:
             model=request.model,
             input_tokens=(usage.prompt_token_count or 0) if usage else 0,
             output_tokens=candidates + thoughts,
+            reasoning_tokens=thoughts,
         )

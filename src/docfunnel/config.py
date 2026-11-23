@@ -1,10 +1,15 @@
 """Runtime configuration from environment variables.
 
 =====================================  ================================================
-``DOCFUNNEL_PROVIDER``                 fake | openai | anthropic | gemini | replay
+``DOCFUNNEL_PROVIDER``                 fake | openai | anthropic | gemini | ollama | replay
 ``DOCFUNNEL_MODEL``                    model name (defaults per provider)
 ``DOCFUNNEL_FALLBACK``                 comma-separated ``provider:model`` chain
+``DOCFUNNEL_ROUTE``                   what the model is sent: text | hybrid | hybrid-ocr |
+                                       native (default text; see docfunnel.inputs)
 ``DOCFUNNEL_MAX_ATTEMPTS``             attempts per model (default 3)
+``DOCFUNNEL_COMPACT_OUTPUT``           one-letter line-item keys in the model's answer (0)
+``DOCFUNNEL_MAX_OUTPUT_TOKENS``        output token limit per call (default 2048; raised to
+                                       each model's floor; long invoices need ~16000)
 ``DOCFUNNEL_BACKOFF_BASE_S``           base backoff in seconds (default 0.5)
 ``DOCFUNNEL_REVIEW_MIN_CONFIDENCE``    review threshold for field confidence (0.7)
 ``DOCFUNNEL_PRICING_FILE``             JSON price table overriding the bundled one
@@ -27,6 +32,7 @@ from pathlib import Path
 from docfunnel.extract.extractor import Extractor, ModelTarget, RetryPolicy
 from docfunnel.extract.pricing import PriceTable
 from docfunnel.extract.validation import ReviewPolicy
+from docfunnel.inputs import DEFAULT_ROUTE, Route, parse_route
 from docfunnel.providers import DEFAULT_MODELS, get_provider
 from docfunnel.sources import FetchPolicy
 
@@ -52,7 +58,10 @@ class Settings:
     provider: str = "fake"
     model: str | None = None
     fallbacks: tuple[tuple[str, str], ...] = field(default_factory=tuple)
+    route: Route = DEFAULT_ROUTE
     max_attempts: int = 3
+    max_output_tokens: int = 2048
+    compact_output: bool = False
     backoff_base_s: float = 0.5
     review_min_confidence: float = 0.7
     pricing_file: Path | None = None
@@ -75,7 +84,10 @@ class Settings:
             provider=env.get("DOCFUNNEL_PROVIDER", "fake"),
             model=env.get("DOCFUNNEL_MODEL") or None,
             fallbacks=tuple(parse_target(s) for s in fallback_spec.split(",") if s.strip()),
+            route=parse_route(env.get("DOCFUNNEL_ROUTE") or DEFAULT_ROUTE),
             max_attempts=int(env.get("DOCFUNNEL_MAX_ATTEMPTS", "3")),
+            max_output_tokens=int(env.get("DOCFUNNEL_MAX_OUTPUT_TOKENS", "2048")),
+            compact_output=_flag(env.get("DOCFUNNEL_COMPACT_OUTPUT"), default=False),
             backoff_base_s=float(env.get("DOCFUNNEL_BACKOFF_BASE_S", "0.5")),
             review_min_confidence=float(env.get("DOCFUNNEL_REVIEW_MIN_CONFIDENCE", "0.7")),
             pricing_file=path("DOCFUNNEL_PRICING_FILE"),
@@ -103,6 +115,7 @@ class Settings:
         provider: str | None = None,
         model: str | None = None,
         fallbacks: tuple[tuple[str, str], ...] | None = None,
+        route: Route | None = None,
         max_attempts: int | None = None,
         backoff_base_s: float | None = None,
         review_min_confidence: float | None = None,
@@ -116,6 +129,7 @@ class Settings:
             provider=self.provider if provider is None else provider,
             model=self.model if model is None else model,
             fallbacks=self.fallbacks if fallbacks is None else fallbacks,
+            route=self.route if route is None else route,
             max_attempts=self.max_attempts if max_attempts is None else max_attempts,
             backoff_base_s=self.backoff_base_s if backoff_base_s is None else backoff_base_s,
             review_min_confidence=(
@@ -149,4 +163,6 @@ def build_extractor(settings: Settings) -> Extractor:
         ),
         review=ReviewPolicy(min_confidence=settings.review_min_confidence),
         prices=PriceTable.load(settings.pricing_file),
+        max_output_tokens=settings.max_output_tokens,
+        compact_output=settings.compact_output,
     )

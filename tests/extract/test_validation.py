@@ -45,6 +45,15 @@ def test_line_items_must_sum_to_subtotal() -> None:
     assert "line_items_sum_mismatch" in codes(make(subtotal=11.00, total=11.80))
 
 
+def test_subtotal_without_line_items_goes_to_review() -> None:
+    # Seen with a real model on a 170-line invoice: an empty list, everything else right.
+    doc = make(line_items=[])
+    issues = check_business_rules(doc, today=TODAY)
+    assert {i.code for i in issues} == {"line_items_missing"}
+    assert review_decision(doc, issues) == (True, ["line_items_missing:line_items,subtotal"])
+    assert codes(make(line_items=[], subtotal=None, tax=None)) == set()  # e.g. a bare ticket
+
+
 def test_line_items_checked_against_total_when_no_subtotal() -> None:
     doc = make(subtotal=None, tax=None, total=9.00)
     assert "line_items_total_mismatch" in codes(doc)

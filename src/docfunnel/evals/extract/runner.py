@@ -38,6 +38,7 @@ class DocumentScore(BaseModel):
     cost_usd: float | None
     input_tokens: int
     output_tokens: int
+    reasoning_tokens: int | None = None
 
 
 class FieldStats(BaseModel):
@@ -69,6 +70,7 @@ class Metrics(BaseModel):
     cost_per_doc_usd: float | None
     input_tokens: int
     output_tokens: int
+    reasoning_tokens: int | None = None
     latency_p50_ms: float | None
     latency_p95_ms: float | None
 
@@ -123,6 +125,7 @@ def score_document(doc: LabeledDocument, result: ExtractionResult) -> DocumentSc
         cost_usd=result.usage.cost_usd,
         input_tokens=result.usage.input_tokens,
         output_tokens=result.usage.output_tokens,
+        reasoning_tokens=result.usage.reasoning_tokens,
     )
 
 
@@ -181,6 +184,11 @@ def aggregate(scores: Sequence[DocumentScore]) -> Metrics:
         cost_per_doc_usd=None if total_cost is None else total_cost / n,
         input_tokens=sum(s.input_tokens for s in scores),
         output_tokens=sum(s.output_tokens for s in scores),
+        reasoning_tokens=(
+            sum(known)
+            if (known := [s.reasoning_tokens for s in scores if s.reasoning_tokens is not None])
+            else None
+        ),
         latency_p50_ms=percentile(latencies, 50),
         latency_p95_ms=percentile(latencies, 95),
     )
