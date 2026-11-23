@@ -11,7 +11,7 @@
    "ollama:gemma4:12b-mlx"
   ],
   "routes": [
-   "docfunnel",
+   "text",
    "hybrid",
    "hybrid-ocr"
   ],
@@ -27,7 +27,7 @@
  "groups": [
   {
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "all",
    "metrics": {
     "documents": 12,
@@ -56,7 +56,7 @@
   },
   {
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=large",
    "metrics": {
     "documents": 3,
@@ -85,7 +85,7 @@
   },
   {
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=has_scanned_pages",
    "metrics": {
     "documents": 10,
@@ -114,7 +114,7 @@
   },
   {
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=small",
    "metrics": {
     "documents": 9,
@@ -143,7 +143,7 @@
   },
   {
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=digital",
    "metrics": {
     "documents": 2,
@@ -465,7 +465,7 @@
   {
    "doc_id": "large-01",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -509,7 +509,7 @@
   {
    "doc_id": "large-02",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -555,7 +555,7 @@
   {
    "doc_id": "large-03",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -599,7 +599,7 @@
   {
    "doc_id": "pdf-005",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -645,7 +645,7 @@
   {
    "doc_id": "pdf-020",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -689,7 +689,7 @@
   {
    "doc_id": "pdf-028",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -733,7 +733,7 @@
   {
    "doc_id": "pdf-029",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -777,7 +777,7 @@
   {
    "doc_id": "pdf-034",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -821,7 +821,7 @@
   {
    "doc_id": "pdf-037",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -865,7 +865,7 @@
   {
    "doc_id": "pdf-044",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -909,7 +909,7 @@
   {
    "doc_id": "pdf-045",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -953,7 +953,7 @@
   {
    "doc_id": "pdf-047",
    "model": "gemma4:12b-mlx",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {

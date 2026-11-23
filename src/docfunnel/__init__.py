@@ -1,4 +1,4 @@
-"""docfunnel: a CPU-first document pipeline with stage-level evals.
+"""docfunnel: a proof of concept of parsing documents on the CPU before an LLM reads them.
 
 Quick use::
 
@@ -12,7 +12,7 @@ Subpackages:
 * :mod:`docfunnel.parse`: PDFs and scans to pages and blocks, OCR only where needed.
 * :mod:`docfunnel.extract`: schema-validated LLM extraction with repair, fallback and
   review routing.
-* :mod:`docfunnel.providers`: OpenAI, Anthropic, Gemini, an offline fake and replay.
+* :mod:`docfunnel.providers`: OpenAI, Anthropic, Gemini, Ollama, an offline fake and replay.
 * :mod:`docfunnel.evals`: evaluations and regression gates for both stages.
 * :mod:`docfunnel.datasets`: seeded synthetic datasets with exact ground truth.
 """

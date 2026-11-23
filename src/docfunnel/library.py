@@ -64,7 +64,7 @@ def extract_document(
 
     ``route`` sets what the model is sent for a PDF or image (see
     :mod:`docfunnel.inputs`): ``"text"`` (the default), ``"hybrid"``, ``"hybrid-ocr"``
-    (most accurate on scans in our runs) or ``"native"``. It defaults to
+    (adds each scanned page's image and OCR text) or ``"native"``. It defaults to
     ``settings.route`` (``DOCFUNNEL_ROUTE``).
     """
     if (source is None) == (text is None):

@@ -1,16 +1,17 @@
-"""Run the end-to-end comparison: the docfunnel route against native PDF input.
+"""Run the end-to-end comparison: every route, per model, on the same documents.
 
 For every model and every document:
 
-* **docfunnel**: the parse stage reads the PDF on the CPU (text layer, OCR only on the
+* **text**: the parse stage reads the PDF on the CPU (text layer, OCR only on the
   pages that need it), and the model gets the text. The parse runs once per document
   and its CPU time is reported next to the model's latency.
 * **native**: the PDF itself goes to the model as a file, the way an application
   without a parse stage would send it.
 * **hybrid**: the text of the pages the parse stage read from the text layer, plus an
   image of each page it routed to OCR, so the model reads the scans itself. On a
-  document with no scanned page it is the docfunnel route; that result is reused
+  document with no scanned page it is the text route; that result is reused
   rather than paid for twice.
+* **hybrid-ocr**: ``hybrid``, plus each scanned page's OCR text after its image.
 
 All routes use the same prompt, output schema, repair turn and scoring
 (:func:`docfunnel.evals.extract.runner.score_document`). Spending is capped per
@@ -28,7 +29,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from docfunnel import __version__
 from docfunnel.config import Settings, build_extractor
@@ -43,10 +44,21 @@ from docfunnel.parse.model import ParsedDocument
 from docfunnel.parse.pipeline import PagePool, ParseOptions
 from docfunnel.providers.base import Attachment
 
-ROUTES = ("docfunnel", "native", "hybrid", "hybrid-ocr")
+ROUTES = ("text", "native", "hybrid", "hybrid-ocr")
 """``hybrid-ocr`` is ``hybrid`` plus each scanned page's OCR text after its image."""
 HYBRID_ROUTES = frozenset({"hybrid", "hybrid-ocr"})
-DEFAULT_ROUTES = ("docfunnel", "native")
+_OLD_ROUTE_NAMES = {"docfunnel": "text"}  # reports written before the route was renamed
+
+
+def _current_route(value: object) -> object:
+    if isinstance(value, str):
+        return _OLD_ROUTE_NAMES.get(value, value)
+    if isinstance(value, list):
+        return [_current_route(v) for v in value]
+    return value
+
+
+DEFAULT_ROUTES = ("text", "native")
 
 
 class E2ERow(BaseModel):
@@ -58,7 +70,12 @@ class E2ERow(BaseModel):
     score: DocumentScore | None = None
     parse_cpu_ms: float = 0.0
     reused: bool = False
-    """Hybrid route on a document without scanned pages: the docfunnel result, not a call."""
+    """Hybrid route on a document without scanned pages: the text route's result, not a call."""
+
+    @field_validator("route", mode="before")
+    @classmethod
+    def _renamed_route(cls, value: object) -> object:
+        return _current_route(value)
 
 
 class E2EGroup(BaseModel):
@@ -66,6 +83,11 @@ class E2EGroup(BaseModel):
     route: str
     slice: str  # "all", "size=small", "scan=digital", ...
     metrics: Metrics
+
+    @field_validator("route", mode="before")
+    @classmethod
+    def _renamed_route(cls, value: object) -> object:
+        return _current_route(value)
 
 
 class E2EMeta(BaseModel):
@@ -84,6 +106,11 @@ class E2EMeta(BaseModel):
     unavailable: dict[str, str] = Field(default_factory=dict)
     """Providers stopped after repeated calls that failed without using a token
     (out of credit, bad key, model withdrawn), with the last error."""
+
+    @field_validator("routes", mode="before")
+    @classmethod
+    def _renamed_routes(cls, value: object) -> object:
+        return _current_route(value)
 
 
 class E2EReport(BaseModel):
@@ -184,9 +211,9 @@ def run_e2e(
         picked = set(random.Random(config.sample_seed).sample([d.id for d in docs], config.sample))
         docs = [d for d in docs if d.id in picked]
     docs = docs[: config.limit]
-    routes = sorted(config.routes, key=ROUTES.index)  # docfunnel before hybrid, for reuse
+    routes = sorted(config.routes, key=ROUTES.index)  # text before hybrid, for reuse
     parsed: dict[str, ParsedDocument] = {}
-    if ({"docfunnel"} | HYBRID_ROUTES) & set(routes):
+    if ({"text"} | HYBRID_ROUTES) & set(routes):
         parsed = _parse_all(docs, config.dataset, config.parse_options)
     text_scores: dict[tuple[str, str], DocumentScore] = {}
     # PDFium is not thread-safe: render the hybrid route's page images here, once per
@@ -214,7 +241,7 @@ def run_e2e(
             labeled = LabeledDocument(id=doc.id, text="", label=doc.label, tags=doc.tags)
             pdf = config.dataset / doc.file
             result = None
-            if route == "docfunnel":
+            if route == "text":
                 row.parse_cpu_ms = _cpu_ms(parsed[doc.id])
                 result = extractor.extract(parsed[doc.id].text)
             elif route == "native":
@@ -233,7 +260,7 @@ def run_e2e(
                 budget.add(provider, result.usage.cost_usd)
                 budget.record_outcome(provider, result)
                 row.score = score_document(labeled, result)
-                if route == "docfunnel":
+                if route == "text":
                     with lock:
                         text_scores[(model, doc.id)] = row.score
         with lock:
@@ -303,8 +330,8 @@ def _groups(rows: Sequence[E2ERow], docs: Sequence[E2EDoc]) -> list[E2EGroup]:
 
 
 def parse_cpu_ms(report: E2EReport, model: str, route: str, slice_: str = "all") -> float | None:
-    """Mean parse CPU time per document for a group (docfunnel route only)."""
-    if route != "docfunnel":
+    """Mean parse CPU time per document for a group (text route only)."""
+    if route != "text":
         return None
     docs = _slice_docs(report, slice_)
     values = [

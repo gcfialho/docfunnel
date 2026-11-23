@@ -11,7 +11,7 @@
    "openai:gpt-6-luna"
   ],
   "routes": [
-   "docfunnel",
+   "text",
    "hybrid",
    "hybrid-ocr"
   ],
@@ -27,7 +27,7 @@
  "groups": [
   {
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "all",
    "metrics": {
     "documents": 39,
@@ -56,7 +56,7 @@
   },
   {
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=large",
    "metrics": {
     "documents": 10,
@@ -85,7 +85,7 @@
   },
   {
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=has_scanned_pages",
    "metrics": {
     "documents": 29,
@@ -114,7 +114,7 @@
   },
   {
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "size=small",
    "metrics": {
     "documents": 29,
@@ -143,7 +143,7 @@
   },
   {
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "slice": "scan=digital",
    "metrics": {
     "documents": 10,
@@ -465,7 +465,7 @@
   {
    "doc_id": "large-00",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -511,7 +511,7 @@
   {
    "doc_id": "large-01",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -555,7 +555,7 @@
   {
    "doc_id": "large-02",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -599,7 +599,7 @@
   {
    "doc_id": "large-03",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -643,7 +643,7 @@
   {
    "doc_id": "large-04",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -687,7 +687,7 @@
   {
    "doc_id": "large-05",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -731,7 +731,7 @@
   {
    "doc_id": "large-06",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -775,7 +775,7 @@
   {
    "doc_id": "large-07",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -821,7 +821,7 @@
   {
    "doc_id": "large-08",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -865,7 +865,7 @@
   {
    "doc_id": "large-09",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -909,7 +909,7 @@
   {
    "doc_id": "pdf-001",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -953,7 +953,7 @@
   {
    "doc_id": "pdf-004",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -997,7 +997,7 @@
   {
    "doc_id": "pdf-005",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1043,7 +1043,7 @@
   {
    "doc_id": "pdf-006",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1089,7 +1089,7 @@
   {
    "doc_id": "pdf-007",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1133,7 +1133,7 @@
   {
    "doc_id": "pdf-008",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1177,7 +1177,7 @@
   {
    "doc_id": "pdf-010",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1221,7 +1221,7 @@
   {
    "doc_id": "pdf-011",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1265,7 +1265,7 @@
   {
    "doc_id": "pdf-016",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1309,7 +1309,7 @@
   {
    "doc_id": "pdf-018",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1353,7 +1353,7 @@
   {
    "doc_id": "pdf-019",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1397,7 +1397,7 @@
   {
    "doc_id": "pdf-020",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1441,7 +1441,7 @@
   {
    "doc_id": "pdf-021",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1485,7 +1485,7 @@
   {
    "doc_id": "pdf-023",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1531,7 +1531,7 @@
   {
    "doc_id": "pdf-027",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1575,7 +1575,7 @@
   {
    "doc_id": "pdf-028",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1619,7 +1619,7 @@
   {
    "doc_id": "pdf-029",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1663,7 +1663,7 @@
   {
    "doc_id": "pdf-030",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1707,7 +1707,7 @@
   {
    "doc_id": "pdf-034",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1751,7 +1751,7 @@
   {
    "doc_id": "pdf-037",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1795,7 +1795,7 @@
   {
    "doc_id": "pdf-039",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1839,7 +1839,7 @@
   {
    "doc_id": "pdf-040",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1883,7 +1883,7 @@
   {
    "doc_id": "pdf-042",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1927,7 +1927,7 @@
   {
    "doc_id": "pdf-043",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -1971,7 +1971,7 @@
   {
    "doc_id": "pdf-044",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -2015,7 +2015,7 @@
   {
    "doc_id": "pdf-045",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -2061,7 +2061,7 @@
   {
    "doc_id": "pdf-047",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -2105,7 +2105,7 @@
   {
    "doc_id": "pdf-048",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {
@@ -2149,7 +2149,7 @@
   {
    "doc_id": "pdf-049",
    "model": "gpt-6-luna",
-   "route": "docfunnel",
+   "route": "text",
    "skipped": false,
    "skip_reason": null,
    "score": {

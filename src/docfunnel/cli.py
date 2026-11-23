@@ -444,7 +444,7 @@ def eval_e2e(
     ),
     route: Annotated[
         list[str] | None,
-        typer.Option("--route", help="docfunnel | native | hybrid | hybrid-ocr (repeatable)"),
+        typer.Option("--route", help="text | native | hybrid | hybrid-ocr (repeatable)"),
     ] = None,
     budget_usd: Annotated[
         float, typer.Option(help="Spending cap per provider; later calls are skipped")
@@ -463,7 +463,7 @@ def eval_e2e(
     ] = False,
     run_name: Annotated[str | None, typer.Option(help="Name shown in reports")] = None,
 ) -> None:
-    """Compare the docfunnel route (CPU parse, then text) with native PDF input, per model.
+    """Run each route (parsed text, the PDF, page images) against real models, under a cap.
 
     Targets accept variant options for ablations, e.g.
     ``gemini:gemini-3.8-flash+thinking_level=medium`` or
@@ -473,7 +473,7 @@ def eval_e2e(
 
     routes = tuple(route or DEFAULT_ROUTES)
     if unknown := set(routes) - set(ROUTES):
-        raise _fail(f"unknown route(s) {sorted(unknown)}; use docfunnel, native or hybrid")
+        raise _fail(f"unknown route(s) {sorted(unknown)}; use {', '.join(ROUTES)}")
     config = E2EConfig(
         dataset=data,
         targets=[parse_target(t) for t in target],
@@ -505,6 +505,25 @@ def eval_e2e(
     spent = ", ".join(f"{p} ${v:.4f}" for p, v in report.meta.spent_usd.items())
     typer.echo(f"Spent: {spent or '$0'}; skipped calls: {report.meta.skipped_calls}")
     typer.echo(f"Wrote {json_path} and {md_path}")
+
+
+@app.command("e2e-summary", rich_help_panel=EVALUATE)
+def e2e_summary(
+    runs: Annotated[
+        Path, typer.Argument(help="Directory of runs, one report.json per folder")
+    ] = Path("reports/e2e"),
+    chart: Annotated[Path, typer.Option(help="Where to write the accuracy-vs-cost SVG")] = Path(
+        "docs/img/e2e-accuracy-vs-cost.svg"
+    ),
+) -> None:
+    """Index committed end-to-end runs (README.md) and chart exact match against cost."""
+    from docfunnel.evals.e2e.summary import write_summary
+
+    try:
+        index, svg = write_summary(runs, chart)
+    except (OSError, ValueError) as exc:
+        raise _fail(str(exc)) from exc
+    typer.echo(f"Wrote {index} and {svg}")
 
 
 @app.command(rich_help_panel=SERVE)

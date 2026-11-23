@@ -14,9 +14,9 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `claude-haiku-5-5` | hybrid | 39 | 99.7% | 89.7% | 98.1% | 100.0% | 9,923 | 5,274 | n/a | $0.00363 | $3.63 | 14.7 s | n/a |
 
-### Against the docfunnel route
+### Against the text route
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## scan=digital
@@ -25,7 +25,7 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `claude-haiku-5-5` | hybrid | 10 | 98.9% | 90.0% | 100.0% | 100.0% | 5,611 | 5,960 | n/a | $0.00354 | $3.54 | 19.9 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## scan=has_scanned_pages
@@ -34,7 +34,7 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `claude-haiku-5-5` | hybrid | 29 | 100.0% | 89.7% | 97.2% | 100.0% | 11,410 | 5,037 | n/a | $0.00366 | $3.66 | 14.4 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## size=large
@@ -43,7 +43,7 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `claude-haiku-5-5` | hybrid | 10 | 100.0% | 90.0% | 95.9% | 100.0% | 16,737 | 3,876 | n/a | $0.00361 | $3.61 | 13.6 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
 
 ## size=small
@@ -52,5 +52,5 @@
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `claude-haiku-5-5` | hybrid | 29 | 99.6% | 89.7% | 98.5% | 100.0% | 7,574 | 5,756 | n/a | $0.00364 | $3.64 | 17.5 s | n/a |
 
-| Model | Route | Input tokens (route / docfunnel) | Cost (route / docfunnel) | Field accuracy (route - docfunnel) | Exact match (route - docfunnel) |
+| Model | Route | Input tokens (route / text) | Cost (route / text) | Field accuracy (route - text) | Exact match (route - text) |
 | --- | --- | ---: | ---: | ---: | ---: |
