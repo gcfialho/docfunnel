@@ -59,7 +59,9 @@ class RapidOcrEngine:
         try:
             from rapidocr import RapidOCR
         except ImportError as exc:
-            raise OcrUnavailableError("RapidOCR requires the 'ocr' extra") from exc
+            raise OcrUnavailableError(
+                "RapidOCR requires the 'ocr' extra: uv sync --extra ocr"
+            ) from exc
         params: dict[str, Any] = {"Global.log_level": "error"}
         if threads:
             params["EngineConfig.onnxruntime.intra_op_num_threads"] = threads
@@ -105,11 +107,16 @@ class TesseractEngine:
         try:
             import pytesseract
         except ImportError as exc:
-            raise OcrUnavailableError("Tesseract requires the 'tesseract' extra") from exc
+            raise OcrUnavailableError(
+                "Tesseract requires the 'tesseract' extra: uv sync --extra tesseract"
+            ) from exc
         try:
             self.version = str(pytesseract.get_tesseract_version())
         except pytesseract.TesseractNotFoundError as exc:
-            raise OcrUnavailableError("the tesseract binary is not installed") from exc
+            raise OcrUnavailableError(
+                "the tesseract binary is not installed: "
+                "brew install tesseract, or apt-get install tesseract-ocr"
+            ) from exc
         self._pytesseract = pytesseract
         self.lang = lang
 

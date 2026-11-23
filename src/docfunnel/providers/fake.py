@@ -25,8 +25,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
-from docfunnel.normalize import parse_amount, parse_date
-from docfunnel.prompts import DOCUMENT_CLOSE, DOCUMENT_OPEN, REPAIR_MARKER
+from docfunnel.extract.normalize import parse_amount, parse_date
+from docfunnel.extract.prompts import DOCUMENT_CLOSE, DOCUMENT_OPEN, REPAIR_MARKER
 from docfunnel.providers.base import (
     CompletionRequest,
     CompletionResponse,

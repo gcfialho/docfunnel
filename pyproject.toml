@@ -10,10 +10,17 @@ requires-python = ">=3.12"
 keywords = ["llm", "document-ai", "ocr", "pdf", "evals", "pydantic", "structured-output", "invoices"]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Framework :: FastAPI",
+    "Framework :: Pydantic :: 2",
     "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Text Processing",
     "Typing :: Typed",
 ]
 dependencies = [
@@ -42,7 +49,11 @@ cpu = ["docfunnel[pdf,ocr]"]
 docfunnel = "docfunnel.cli:app"
 
 [project.urls]
+Homepage = "https://github.com/gcfialho/docfunnel"
+Documentation = "https://github.com/gcfialho/docfunnel/tree/main/docs"
 Repository = "https://github.com/gcfialho/docfunnel"
+Issues = "https://github.com/gcfialho/docfunnel/issues"
+Changelog = "https://github.com/gcfialho/docfunnel/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
@@ -79,6 +90,7 @@ known-local-folder = ["helpers"]
 python_version = "3.12"
 strict = true
 files = ["src", "tests"]
+mypy_path = "tests"  # tests/helpers.py, imported from the test subfolders
 
 [[tool.mypy.overrides]]
 # Optional extras that ship neither inline types nor a py.typed marker, and have no stubs.
@@ -87,5 +99,6 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["tests"]  # tests/helpers.py, imported from the test subfolders
 addopts = "-ra --strict-markers"
 markers = ["integration: end-to-end tests through the fake provider"]

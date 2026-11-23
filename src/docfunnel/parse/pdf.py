@@ -28,7 +28,9 @@ def require_pdfium() -> Any:
     try:
         import pypdfium2 as pdfium
     except ImportError as exc:  # pragma: no cover - exercised only without the extra
-        raise MissingDependencyError("PDF input requires the 'pdf' extra (pypdfium2)") from exc
+        raise MissingDependencyError(
+            "PDF input requires the 'pdf' extra: uv sync --extra pdf"
+        ) from exc
     return pdfium
 
 

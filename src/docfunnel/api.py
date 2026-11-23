@@ -15,15 +15,19 @@ from pydantic import BaseModel, Field, model_validator
 
 from docfunnel import __version__
 from docfunnel.config import Settings
-from docfunnel.extractor import MAX_DOCUMENT_CHARS, Extractor
+from docfunnel.extract.extractor import MAX_DOCUMENT_CHARS, Extractor
+from docfunnel.extract.schema import ExtractionResult
 from docfunnel.loaders import UnsupportedDocumentError, load_document
-from docfunnel.schema import ExtractionResult
 from docfunnel.service import get_extractor, get_settings
 
 app = FastAPI(
-    title="LLM document extraction",
+    title="docfunnel",
     version=__version__,
-    description="Schema-constrained extraction of receipts and invoices with review routing.",
+    description=(
+        "Schema-validated LLM extraction of receipts and invoices, with business-rule "
+        "checks and human-review routing. Text, PDF and image input go through the "
+        "CPU parse stage first."
+    ),
 )
 
 
@@ -60,7 +64,7 @@ def _resolve_input(path: str, settings: Settings) -> Path:
     root = settings.input_dir.resolve()
     candidate = (root / path).resolve()
     if not candidate.is_relative_to(root):
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "path escapes the input directory")
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "path must stay inside DOCFUNNEL_INPUT_DIR")
     if not candidate.is_file():
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"file not found: {path}")
     return candidate

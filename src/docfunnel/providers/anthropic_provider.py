@@ -40,7 +40,9 @@ class AnthropicProvider:
             ) from exc
         api_key = api_key or os.environ.get("ANTHROPIC_API_KEY")
         if not api_key:
-            raise ProviderNotConfiguredError("ANTHROPIC_API_KEY is not set")
+            raise ProviderNotConfiguredError(
+                "ANTHROPIC_API_KEY is not set; set it, or choose another provider with --provider"
+            )
         self._anthropic = anthropic
         self._client = anthropic.Anthropic(api_key=api_key, timeout=timeout_s, max_retries=0)
 
